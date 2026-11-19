@@ -7,21 +7,22 @@
   <title>학과 Q&amp;A 챗봇 · 院系问答机器人</title>
   <style>
 :root {
-  --bg: #F3F6FB;
+  --bg: #F7F7F8;
   --ink: #111827;
-  --muted: #64708A;
+  --muted: #667085;
   --line: rgba(17, 24, 39, 0.08);
   --card: #ffffff;
   --brand: #2563EB;
-  --brand-2: #7C5CFF;
-  --brand-soft: rgba(37, 99, 235, 0.14);
-  --user: #EEF3FF;
+  --brand-soft: rgba(37, 99, 235, 0.12);
+  --user: #F3F6FF;
   --ok: #0F8A5F;
   --warn: #C45C16;
-  --shadow: 0 1px 2px rgba(17,24,39,0.04), 0 12px 32px rgba(17,24,39,0.06);
+  --shadow: 0 1px 2px rgba(17,24,39,0.04), 0 10px 28px rgba(17,24,39,0.06);
+  --spring: cubic-bezier(0.22, 1.2, 0.36, 1);
   --ease: cubic-bezier(.23, 1, .32, 1);
-  --mx: 50vw;
-  --my: 20vh;
+  --sx: 50%;
+  --sy: 50%;
+  --spot: 0;
 }
 * { box-sizing: border-box; }
 html, body {
@@ -33,72 +34,46 @@ html, body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-body { padding: 28px 18px 168px; overflow-x: hidden; }
+body { padding: 28px 18px 176px; overflow-x: hidden; }
 .fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.orb {
+#aurora {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.5;
-  will-change: transform;
+  inset: -8% 0;
+  width: 100%;
+  height: 116%;
+  display: block;
+  opacity: 0.85;
 }
-.orb-a { width: 460px; height: 460px; background: #93C5FD; top: -120px; left: 8%; animation: floatA 16s var(--ease) infinite; }
-.orb-b { width: 380px; height: 380px; background: #C4B5FD; top: 28%; right: -80px; animation: floatB 20s var(--ease) infinite; }
-.orb-c { width: 320px; height: 320px; background: #BFDBFE; bottom: 8%; left: 22%; animation: floatC 18s var(--ease) infinite; }
-@keyframes floatA {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(80px, 50px) scale(1.12); }
-}
-@keyframes floatB {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(-70px, 40px) scale(1.08); }
-}
-@keyframes floatC {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(40px, -60px) scale(1.1); }
-}
-#spotlight {
+.fx::after {
+  content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(520px circle at var(--mx) var(--my), rgba(37,99,235,0.20), transparent 42%);
-  transition: background 40ms linear;
-}
-.meteors { position: absolute; inset: 0; }
-.meteor {
-  position: absolute;
-  top: -10%;
-  width: 2px;
-  height: 90px;
-  background: linear-gradient(180deg, transparent, rgba(37,99,235,0.0), rgba(37,99,235,0.7));
-  border-radius: 2px;
-  animation: meteor linear infinite;
-  opacity: 0.7;
-}
-@keyframes meteor {
-  0% { transform: translate3d(0,-10vh,0) rotate(18deg); opacity: 0; }
-  10% { opacity: 0.8; }
-  100% { transform: translate3d(28vw, 120vh, 0) rotate(18deg); opacity: 0; }
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
 }
 .wrap, .dock { position: relative; z-index: 1; }
 .wrap { max-width: 720px; margin: 0 auto; }
-header.top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-h1 {
+header.top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+h1.blur-title {
   flex: 1;
   margin: 0;
   font-size: 1.5rem;
   font-weight: 760;
   letter-spacing: -0.045em;
-  line-height: 1.3;
-  background: linear-gradient(100deg, #111827 0%, #2563EB 35%, #7C5CFF 50%, #111827 65%, #111827 100%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shine 7s ease-in-out infinite;
+  line-height: 1.35;
+  color: var(--ink);
 }
-@keyframes shine {
-  0% { background-position: 120% 50%; }
-  40%,100% { background-position: -40% 50%; }
+.blur-word {
+  display: inline-block;
+  will-change: filter, transform, opacity;
+}
+.play .blur-word {
+  animation: unblur 0.8s var(--spring) both;
+}
+@keyframes unblur {
+  from { filter: blur(10px); opacity: 0; transform: translateY(10px); }
+  to { filter: blur(0); opacity: 1; transform: none; }
 }
 .hint { color: var(--muted); font-size: 0.92rem; line-height: 1.6; margin: 0 0 22px; max-width: 38em; }
 .lang {
@@ -108,7 +83,6 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 3px;
-  box-shadow: 0 1px 2px rgba(17,24,39,0.04);
   flex-shrink: 0;
 }
 .lang button, .clear-btn {
@@ -116,59 +90,48 @@ h1 {
   font: inherit; font-weight: 650; font-size: 0.86rem;
   cursor: pointer; min-height: 34px;
 }
-.lang button { padding: 0 13px; border-radius: 999px; transition: background .28s var(--ease), color .28s var(--ease), transform .2s var(--ease); }
+.lang button { padding: 0 13px; border-radius: 999px; transition: background .28s var(--ease), color .28s var(--ease); }
 .lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 .clear-btn {
   padding: 0 13px; border-radius: 999px; border: 1px solid var(--line);
   background: rgba(255,255,255,0.78); backdrop-filter: blur(12px);
-  box-shadow: 0 1px 2px rgba(17,24,39,0.04); white-space: nowrap;
-  transition: transform .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+  white-space: nowrap;
+  transition: transform .35s var(--spring), border-color .2s var(--ease), background .2s var(--ease);
 }
-.clear-btn:hover { border-color: rgba(37,99,235,0.35); background: #F7F9FF; }
-.clear-btn:active { transform: scale(.98); }
+.clear-btn:hover { border-color: rgba(17,24,39,0.16); background: #fff; }
 .card {
-  --sx: 50%; --sy: 50%;
+  --sx: 50%; --sy: 40%; --spot: 0;
   position: relative;
-  background: rgba(255,255,255,0.86);
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(16px);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 16px 20px;
   margin: 0 0 12px;
   box-shadow: var(--shadow);
-  transform-style: preserve-3d;
-  transition: transform .18s var(--ease), box-shadow .18s var(--ease);
-  animation: rise .55s var(--ease) both;
   overflow: hidden;
+  animation: springIn 0.7s var(--spring) both;
+}
+.card::before, .card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--spot);
+  transition: opacity .25s var(--ease);
 }
 .card::before {
-  content: "";
-  position: absolute; inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: radial-gradient(420px circle at var(--sx) var(--sy), rgba(37,99,235,0.55), transparent 42%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity .25s var(--ease);
-  pointer-events: none;
+  background: radial-gradient(240px circle at var(--sx) var(--sy), rgba(16,24,27,0.10), transparent 58%);
 }
 .card::after {
-  content: "";
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(280px circle at var(--sx) var(--sy), rgba(255,255,255,0.65), transparent 46%);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s var(--ease);
+  background: radial-gradient(220px circle at var(--sx) var(--sy), rgba(255,255,255,0.72), transparent 46%);
+  mix-blend-mode: soft-light;
 }
-.card:hover { box-shadow: 0 14px 40px rgba(17,24,39,0.10); }
-.card:hover::before, .card:hover::after { opacity: 1; }
-.card.user { background: linear-gradient(180deg, #F4F7FF 0%, #EEF3FF 100%); border-color: rgba(37,99,235,0.16); box-shadow: none; }
+.card.user { background: linear-gradient(180deg, #F7F8FF 0%, #F3F6FF 100%); border-color: rgba(37,99,235,0.14); box-shadow: none; }
 .card p { margin: 0; line-height: 1.7; white-space: pre-wrap; position: relative; z-index: 1; }
 .lead { font-weight: 650; margin-bottom: 8px; letter-spacing: -0.02em; }
-.badge, .meta, .fallback, .related-label, .examples, .chips { position: relative; z-index: 1; }
+.badge, .meta, .fallback, .related-label, .examples, .chips, .gen { position: relative; z-index: 1; }
 .badge { display: inline-block; font-size: 0.76rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin: 0 0 10px; }
 .badge.warn { background: #FDE8D5; color: var(--warn); }
 .badge.ok { background: #D9F3E8; color: var(--ok); }
@@ -179,91 +142,104 @@ h1 {
 .examples button, .chips button, .guess-item {
   font: inherit; font-weight: 600; text-align: left; line-height: 1.4;
   min-height: 44px; padding: 9px 15px; border-radius: 14px;
-  border: 1px solid var(--line); background: rgba(255,255,255,0.9);
+  border: 1px solid var(--line); background: rgba(255,255,255,0.92);
   box-shadow: 0 1px 2px rgba(17,24,39,0.04); cursor: pointer; color: var(--ink);
-  position: relative; overflow: hidden;
-  transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease), background .22s var(--ease);
-}
-.examples button::after, .chips button::after, .guess-item::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.8) 48%, transparent 66%);
-  transform: translateX(-120%);
+  will-change: transform;
+  transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
 }
 .examples button:hover, .chips button:hover, .guess-item:hover {
-  transform: translateY(-2px);
-  border-color: rgba(37,99,235,0.4);
-  background: #F7F9FF;
-  box-shadow: 0 10px 20px rgba(37,99,235,0.10);
+  border-color: rgba(17,24,39,0.16);
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(17,24,39,0.06);
 }
-.examples button:hover::after, .chips button:hover::after, .guess-item:hover::after {
-  animation: sweep .7s var(--ease);
-}
-.examples button:active, .chips button:active, .guess-item:active { transform: translateY(0) scale(.98); }
-@keyframes sweep { to { transform: translateX(120%); } }
 .related-label, .examples-label, .guess-label { color: var(--muted); font-size: 0.82rem; margin-top: 14px; }
-.dock { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px 18px; background: linear-gradient(to top, var(--bg) 68%, rgba(243,246,251,0)); }
+.gen span { display: inline; animation: wordIn .5s var(--ease) both; }
+@keyframes wordIn { from { opacity: 0; filter: blur(4px); } to { opacity: 1; filter: none; } }
+.dock { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px 20px; background: linear-gradient(to top, var(--bg) 68%, rgba(247,247,248,0)); }
 .guess { max-width: 720px; margin: 0 auto 8px; }
 .guess[hidden] { display: none !important; }
 .guess-label { margin: 0 0 8px; padding-left: 4px; font-weight: 650; }
 .guess-list { display: flex; flex-wrap: wrap; gap: 8px; }
-.guess-item { animation: rise .35s var(--ease) both; background: rgba(255,255,255,0.82); backdrop-filter: blur(10px); }
-.guess-item mark { background: rgba(37,99,235,0.16); color: inherit; border-radius: 3px; padding: 0 1px; }
-.composer-shell {
-  max-width: 720px; margin: 0 auto; position: relative; border-radius: 20px; padding: 1.5px;
-  background: rgba(17,24,39,0.06);
-}
-.composer-shell::before {
-  content: ""; position: absolute; inset: -1px; border-radius: inherit; z-index: 0;
-  background: conic-gradient(from var(--spin, 0deg), transparent 0 55%, #2563EB, #7C5CFF, #60A5FA, transparent 80%);
-  animation: spin 3.6s linear infinite;
-}
-.composer-inner {
-  position: relative; z-index: 1;
+.guess-item { animation: springIn .55s var(--spring) both; background: rgba(255,255,255,0.86); backdrop-filter: blur(10px); }
+.guess-item mark { background: rgba(37,99,235,0.14); color: inherit; border-radius: 3px; padding: 0 1px; }
+.prompt-bar {
+  max-width: 720px; margin: 0 auto;
+  position: relative;
   display: flex; gap: 8px; align-items: flex-end;
   background: rgba(255,255,255,0.94);
-  backdrop-filter: blur(14px);
-  border-radius: 18.5px;
-  padding: 8px 8px 8px 16px;
-  box-shadow: 0 10px 32px rgba(17,24,39,0.10);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  padding: 10px 10px 10px 20px;
+  box-shadow: 0 10px 32px rgba(17,24,39,0.08);
+  transition: transform .45s var(--spring), box-shadow .3s var(--ease), border-color .2s var(--ease);
 }
-.composer-inner:focus-within { box-shadow: 0 0 0 4px var(--brand-soft), 0 10px 32px rgba(17,24,39,0.10); }
-@property --spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-@keyframes spin { to { --spin: 360deg; } }
+.prompt-bar:focus-within {
+  transform: scale(1.012);
+  border-color: rgba(17,24,39,0.14);
+  box-shadow: 0 0 0 4px var(--brand-soft), 0 14px 36px rgba(17,24,39,0.10);
+}
+.prompt-bar.sending { transform: scale(0.985); }
+.ph {
+  position: absolute;
+  left: 20px; right: 90px; top: 50%;
+  transform: translateY(-50%);
+  color: #98A2B3;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity .35s var(--ease), transform .35s var(--spring);
+}
+.ph.out { opacity: 0; transform: translateY(-12px); }
+.ph.in { opacity: 1; transform: translateY(-50%); }
+.ph.hide { opacity: 0; visibility: hidden; }
 .composer textarea {
   flex: 1; border: 0; resize: none; font: inherit; line-height: 1.55;
   max-height: 120px; outline: none; background: transparent; color: var(--ink);
+  position: relative; z-index: 1;
 }
 .composer button.send {
   border: 0; background: var(--ink); color: #fff; font: inherit; font-weight: 700; font-size: 0.9rem;
-  border-radius: 14px; padding: 10px 16px; cursor: pointer; min-height: 42px;
-  transition: transform .2s var(--ease), background .2s var(--ease), opacity .2s var(--ease);
+  border-radius: 18px; padding: 10px 16px; cursor: pointer; min-height: 42px; z-index: 1;
+  transition: transform .3s var(--spring), background .2s var(--ease), opacity .2s var(--ease);
 }
-.composer button.send:hover { background: #1D4ED8; transform: translateY(-1px); }
-.composer button.send:active { transform: scale(.97); }
+.composer button.send:hover { background: #1D4ED8; }
+.composer button.send:active { transform: scale(.96); }
 .composer button.send:disabled { opacity: 0.4; cursor: default; transform: none; }
-@keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
-@media (max-width: 640px) { h1 { font-size: 1.22rem; } body { padding-top: 16px; } }
+.vanish-layer {
+  position: absolute; inset: 0 90px 0 20px;
+  pointer-events: none; overflow: hidden; z-index: 2;
+}
+.vanish-char {
+  position: absolute;
+  white-space: pre;
+  color: var(--ink);
+  will-change: transform, opacity;
+}
+@keyframes springIn {
+  0% { opacity: 0; transform: translateY(16px) scale(.97); }
+  58% { opacity: 1; transform: translateY(-3px) scale(1.01); }
+  100% { opacity: 1; transform: none; }
+}
+@media (max-width: 640px) { h1.blur-title { font-size: 1.22rem; } body { padding-top: 16px; } }
 @media (prefers-reduced-motion: reduce) {
-  .orb, .meteor, h1, .card, .guess-item, .composer-shell::before,
-  .examples button, .chips button, .clear-btn, .lang button, .composer button.send {
-    animation: none !important; transition: none !important;
+  .blur-word, .card, .guess-item, .gen span, .ph, .prompt-bar, .composer button.send, .clear-btn {
+    animation: none !important; transition: none !important; filter: none !important;
   }
-  .orb { opacity: 0.28; }
-  .meteors, #spotlight { display: none; }
+  .play .blur-word { opacity: 1; transform: none; }
+  #aurora { opacity: 0.55; }
 }
 </style>
 </head>
 <body>
   <div class="fx" aria-hidden="true">
-    <div class="orb orb-a"></div>
-    <div class="orb orb-b"></div>
-    <div class="orb orb-c"></div>
-    <div id="spotlight"></div>
-    <div class="meteors" id="meteors"></div>
+    <canvas id="aurora"></canvas>
   </div>
   <div class="wrap">
     <header class="top">
-      <h1 id="title"></h1>
+      <h1 class="blur-title" id="title"></h1>
       <div class="lang" role="group" aria-label="language">
         <button type="button" id="btn-ko" data-lang="ko">한국어</button>
         <button type="button" id="btn-zh" data-lang="zh">中文</button>
@@ -279,11 +255,11 @@ h1 {
       <div class="guess-list" id="guess-list"></div>
     </div>
     <form class="composer" id="form">
-      <div class="composer-shell">
-        <div class="composer-inner">
-          <textarea id="input" rows="1" required></textarea>
-          <button type="submit" class="send" id="btn-send"></button>
-        </div>
+      <div class="prompt-bar" id="prompt-bar">
+        <div class="ph hide" id="ph" aria-hidden="true"></div>
+        <div class="vanish-layer" id="vanish" hidden></div>
+        <textarea id="input" rows="1" required></textarea>
+        <button type="submit" class="send" id="btn-send"></button>
       </div>
     </form>
   </div>
@@ -523,6 +499,21 @@ function questionOf(faq, uiLang) {
     }
     return out;
   }
+  function attachMagnet(el, strength) {
+    if (reduceMotion || window.matchMedia("(pointer: coarse)").matches) return;
+    const k = strength == null ? 0.22 : strength;
+    el.addEventListener("pointermove", (e) => {
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
+      el.style.transition = "transform 0.16s linear";
+      el.style.transform = "translate(" + (dx * k).toFixed(2) + "px," + (dy * k).toFixed(2) + "px)";
+    });
+    el.addEventListener("pointerleave", () => {
+      el.style.transition = "transform 0.55s cubic-bezier(0.22, 1.2, 0.36, 1)";
+      el.style.transform = "";
+    });
+  }
   function renderGuess() {
     const items = liveGuess($("input").value);
     const box = $("guess");
@@ -537,47 +528,136 @@ function questionOf(faq, uiLang) {
       b.type = "button";
       b.className = "guess-item";
       b.innerHTML = highlight(q, item.text);
-      b.style.animationDelay = (i * 45) + "ms";
-      b.addEventListener("click", () => ask(item.text));
+      b.style.animationDelay = (i * 50) + "ms";
+      b.addEventListener("click", () => submitAsk(item.text));
+      attachMagnet(b, 0.2);
       list.appendChild(b);
     });
-  }
-  function attachTilt(el) {
-    if (reduceMotion || window.matchMedia("(pointer: coarse)").matches) return;
-    el.addEventListener("mousemove", (e) => {
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width;
-      const y = (e.clientY - r.top) / r.height;
-      el.style.setProperty("--sx", (x * 100) + "%");
-      el.style.setProperty("--sy", (y * 100) + "%");
-      el.style.transform = "perspective(900px) rotateY(" + ((x - 0.5) * 8).toFixed(2) + "deg) rotateX(" + ((0.5 - y) * 8).toFixed(2) + "deg)";
-    });
-    el.addEventListener("mouseleave", () => { el.style.transform = ""; });
   }
   function makeChip(label, onClick) {
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = label;
     b.addEventListener("click", onClick);
+    attachMagnet(b, 0.22);
     return b;
   }
   function unusedQuestion(faq) {
     const q = questionOf(faq, uiLang);
     return !wasSearched(q, faq);
   }
+  function splitTitle(text) {
+    if (uiLang === "zh" && text === "院系教务与生活问答机器人") return ["院系教务", "与生活", "问答机器人"];
+    return text.split(/\s+/).filter(Boolean);
+  }
+  function paintTitle() {
+    const el = $("title");
+    el.classList.remove("play");
+    el.textContent = "";
+    const parts = splitTitle(t("title"));
+    parts.forEach((part, i) => {
+      const s = document.createElement("span");
+      s.className = "blur-word";
+      s.textContent = part;
+      s.style.animationDelay = (i * 90) + "ms";
+      if (i) el.appendChild(document.createTextNode(" "));
+      el.appendChild(s);
+    });
+    void el.offsetWidth;
+    el.classList.add("play");
+  }
   function setLang(lang) {
     uiLang = lang === "ko" ? "ko" : "zh";
     localStorage.setItem("faq_ui_lang", uiLang);
     document.documentElement.lang = uiLang === "ko" ? "ko" : "zh-CN";
-    $("title").textContent = t("title");
+    paintTitle();
     $("hint").textContent = t("hint");
     $("btn-clear").textContent = t("clear");
-    $("input").placeholder = t("input");
+    $("input").setAttribute("aria-label", t("input"));
+    $("input").placeholder = "";
     $("btn-send").textContent = t("send");
     $("btn-ko").setAttribute("aria-pressed", uiLang === "ko" ? "true" : "false");
     $("btn-zh").setAttribute("aria-pressed", uiLang === "zh" ? "true" : "false");
     render();
     renderGuess();
+    startPlaceholders();
+  }
+  function generateText(container, raw, asHtml) {
+    if (asHtml || reduceMotion || raw.length > 240) {
+      container.innerHTML = asHtml ? raw : escapeHtml(raw);
+      return;
+    }
+    container.className = (container.className + " gen").trim();
+    const parts = raw.split(/(\s+)/);
+    let delay = 0;
+    const cap = 18;
+    parts.forEach((part, i) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { container.appendChild(document.createTextNode(part)); return; }
+      const s = document.createElement("span");
+      s.textContent = part;
+      if (delay < cap) s.style.animationDelay = (delay * 28) + "ms";
+      delay += 1;
+      container.appendChild(s);
+    });
+  }
+  function submitAsk(text) {
+    text = (text || "").trim();
+    if (!text) return;
+    if (reduceMotion || text !== ($("input").value || "").trim()) {
+      ask(text);
+      return;
+    }
+    vanishThen(() => ask(text));
+  }
+  function vanishThen(done) {
+    const ta = $("input");
+    const layer = $("vanish");
+    const bar = $("prompt-bar");
+    const text = ta.value;
+    if (!text) { done(); return; }
+    const style = getComputedStyle(ta);
+    const measure = document.createElement("span");
+    measure.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font:" + style.font + ";letter-spacing:" + style.letterSpacing + ";";
+    bar.appendChild(measure);
+    const origin = ta.getBoundingClientRect();
+    const barBox = bar.getBoundingClientRect();
+    layer.hidden = false;
+    layer.innerHTML = "";
+    let x = 0;
+    const midX = ta.clientWidth / 2;
+    const midY = ta.clientHeight / 2;
+    for (const ch of text) {
+      measure.textContent = ch;
+      const w = measure.offsetWidth || 8;
+      const span = document.createElement("span");
+      span.className = "vanish-char";
+      span.textContent = ch;
+      span.style.left = x + "px";
+      span.style.top = "10px";
+      span.style.font = style.font;
+      const dx = midX - x - w / 2;
+      const dy = midY - 10;
+      span.style.transition = "transform 0.48s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.4s ease";
+      span.style.transitionDelay = Math.min(x / 18, 180) + "ms";
+      layer.appendChild(span);
+      requestAnimationFrame(() => {
+        span.style.transform = "translate(" + dx + "px," + dy + "px) scale(0.2)";
+        span.style.opacity = "0";
+      });
+      x += w;
+      if (x > ta.clientWidth - 8) break;
+    }
+    bar.removeChild(measure);
+    ta.value = "";
+    $("ph").classList.add("hide");
+    bar.classList.add("sending");
+    setTimeout(() => {
+      layer.innerHTML = "";
+      layer.hidden = true;
+      bar.classList.remove("sending");
+      done();
+    }, 560);
   }
   function ask(text) {
     text = (text || "").trim();
@@ -588,6 +668,7 @@ function questionOf(faq, uiLang) {
     history.push(reply);
     $("input").value = "";
     resizeInput();
+    syncPlaceholder();
     render();
     renderGuess();
     window.scrollTo({ top: document.body.scrollHeight, behavior: reduceMotion ? "auto" : "smooth" });
@@ -609,16 +690,17 @@ function questionOf(faq, uiLang) {
     if (!history.length) {
       const card = document.createElement("div");
       card.className = "card";
-      card.innerHTML = `<p>${escapeHtml(t("welcome"))}</p>`;
+      const p = document.createElement("p");
+      generateText(p, t("welcome"), false);
+      card.appendChild(p);
       const remaining = EXAMPLES[uiLang].filter((q) => !wasSearched(q));
       if (remaining.length) {
         const ex = document.createElement("div");
         ex.className = "examples";
-        for (const q of remaining) ex.appendChild(makeChip(q, () => ask(q)));
+        for (const q of remaining) ex.appendChild(makeChip(q, () => submitAsk(q)));
         card.appendChild(ex);
       }
       root.appendChild(card);
-      attachTilt(card);
       return;
     }
     history.forEach((item, idx) => {
@@ -628,12 +710,11 @@ function questionOf(faq, uiLang) {
         card.style.animationDelay = (Math.max(0, idx - history.length + 2) * 60) + "ms";
         card.innerHTML = `<p>${escapeHtml(item.text)}</p>`;
         root.appendChild(card);
-        attachTilt(card);
         return;
       }
       const card = document.createElement("div");
       card.className = "card";
-      card.style.animationDelay = "80ms";
+      card.style.animationDelay = "90ms";
       if (item.kind === "match") {
         const filled = isFilled(item.answer);
         const checked = (item.faq.checked_at || "").trim();
@@ -645,7 +726,9 @@ function questionOf(faq, uiLang) {
         lead.className = "lead";
         lead.textContent = t("lead");
         const body = document.createElement("p");
-        body.innerHTML = linkify(item.answer);
+        generateText(body, item.answer, false);
+        // relink URLs after generateText plain text — if answer has urls, use linkify without generate
+        if (/https?:\/\//.test(item.answer)) body.innerHTML = linkify(item.answer);
         card.append(badge, lead, body);
         if (item.fellBack) {
           const fb = document.createElement("div");
@@ -669,13 +752,13 @@ function questionOf(faq, uiLang) {
           chips.className = "chips";
           for (const faq of related) {
             const q = questionOf(faq, uiLang);
-            chips.appendChild(makeChip(q, () => ask(q)));
+            chips.appendChild(makeChip(q, () => submitAsk(q)));
           }
           card.append(lab, chips);
         }
       } else {
         const body = document.createElement("p");
-        body.textContent = t("no_answer");
+        generateText(body, t("no_answer"), false);
         card.appendChild(body);
         const suggestions = (item.suggestions || []).filter(unusedQuestion);
         if (suggestions.length) {
@@ -686,13 +769,12 @@ function questionOf(faq, uiLang) {
           chips.className = "chips";
           for (const faq of suggestions) {
             const q = questionOf(faq, uiLang);
-            chips.appendChild(makeChip(q, () => ask(q)));
+            chips.appendChild(makeChip(q, () => submitAsk(q)));
           }
           card.append(lab, chips);
         }
       }
       root.appendChild(card);
-      attachTilt(card);
     });
   }
   function resizeInput() {
@@ -700,28 +782,102 @@ function questionOf(faq, uiLang) {
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 120) + "px";
   }
-  function setupFx() {
+  let phIdx = 0, phTimer = 0;
+  function syncPlaceholder() {
+    const ph = $("ph");
+    const filled = !!$("input").value.trim();
+    ph.classList.toggle("hide", filled);
+    if (filled) ph.classList.remove("in", "out");
+  }
+  function startPlaceholders() {
+    const ph = $("ph");
+    const list = EXAMPLES[uiLang];
+    clearInterval(phTimer);
+    phIdx = 0;
+    const show = (i) => {
+      if ($("input").value.trim()) return;
+      ph.classList.remove("hide");
+      ph.classList.remove("in");
+      ph.classList.add("out");
+      setTimeout(() => {
+        if ($("input").value.trim()) return;
+        ph.textContent = list[i % list.length];
+        ph.classList.remove("out");
+        ph.classList.add("in");
+      }, 280);
+    };
+    ph.textContent = list[0];
+    ph.classList.remove("out", "hide");
+    ph.classList.add("in");
+    if (!reduceMotion) phTimer = setInterval(() => { phIdx += 1; show(phIdx); }, 2800);
+    syncPlaceholder();
+  }
+  function setupAurora() {
+    const c = $("aurora");
+    if (!c || !c.getContext) return;
+    const ctx = c.getContext("2d", { alpha: true });
+    const W = 128, H = 72;
+    c.width = W;
+    c.height = H;
+    const hash = (ix, iy) => {
+      let n = Math.imul(ix, 374761393) + Math.imul(iy, 668265263);
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+    };
+    const noise = (x, y) => {
+      const ix = Math.floor(x), iy = Math.floor(y);
+      const fx = x - ix, fy = y - iy;
+      const u = fx * fx * (3 - 2 * fx);
+      const v = fy * fy * (3 - 2 * fy);
+      const a = hash(ix, iy), b = hash(ix + 1, iy), cc = hash(ix, iy + 1), d = hash(ix + 1, iy + 1);
+      return a + (b - a) * u + (cc - a) * v + (a - b - cc + d) * u * v;
+    };
+    const fbm = (x, y) => noise(x, y) * 0.62 + noise(x * 2.1, y * 2.1) * 0.28 + noise(x * 4.2, y * 4.2) * 0.1;
+    const img = ctx.createImageData(W, H);
+    let time = 0;
+    const draw = () => {
+      const d = img.data;
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const nx = x / W, ny = y / H;
+          const n = fbm(nx * 2.4 + time, ny * 3.2 + time * 0.35);
+          const cy = 0.44 + 0.10 * n + 0.035 * Math.sin(time * 0.7 + nx * 2.2);
+          const band = Math.exp(-((ny - cy) * 4.4) * ((ny - cy) * 4.4));
+          const mix = Math.min(1, Math.max(0, nx + (n - 0.5) * 0.45));
+          const r = 255 * (1 - mix) + 130 * mix;
+          const g = 168 * (1 - mix) + 198 * mix;
+          const b = 214 * (1 - mix) + 255 * mix;
+          const i = (y * W + x) * 4;
+          d[i] = r;
+          d[i + 1] = g;
+          d[i + 2] = b;
+          d[i + 3] = band * 0.40 * 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    };
+    draw();
     if (reduceMotion) return;
-    const box = $("meteors");
-    for (let i = 0; i < 10; i++) {
-      const m = document.createElement("span");
-      m.className = "meteor";
-      m.style.left = (Math.random() * 100) + "%";
-      m.style.animationDuration = (5 + Math.random() * 6) + "s";
-      m.style.animationDelay = (Math.random() * 8) + "s";
-      m.style.height = (60 + Math.random() * 80) + "px";
-      box.appendChild(m);
-    }
-    let tx = window.innerWidth / 2, ty = 120, mx = tx, my = ty;
     const tick = () => {
-      mx += (tx - mx) * 0.16;
-      my += (ty - my) * 0.16;
-      document.documentElement.style.setProperty("--mx", mx + "px");
-      document.documentElement.style.setProperty("--my", my + "px");
+      time += 0.0032;
+      draw();
       requestAnimationFrame(tick);
     };
-    window.addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; }, { passive: true });
-    tick();
+    requestAnimationFrame(tick);
+  }
+  function setupSpotlights() {
+    if (reduceMotion) return;
+    window.addEventListener("pointermove", (e) => {
+      document.querySelectorAll(".card").forEach((card) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--sx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--sy", (e.clientY - r.top) + "px");
+        const dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right);
+        const dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom);
+        const prox = Math.max(0, 1 - Math.hypot(dx, dy) / 90);
+        card.style.setProperty("--spot", prox.toFixed(3));
+      });
+    }, { passive: true });
   }
   $("btn-ko").addEventListener("click", () => setLang("ko"));
   $("btn-zh").addEventListener("click", () => setLang("zh"));
@@ -732,12 +888,16 @@ function questionOf(faq, uiLang) {
     render();
     renderGuess();
   });
-  $("form").addEventListener("submit", (e) => { e.preventDefault(); ask($("input").value); });
-  $("input").addEventListener("input", () => { resizeInput(); renderGuess(); });
+  attachMagnet($("btn-clear"), 0.18);
+  attachMagnet($("btn-ko"), 0.16);
+  attachMagnet($("btn-zh"), 0.16);
+  $("form").addEventListener("submit", (e) => { e.preventDefault(); submitAsk($("input").value); });
+  $("input").addEventListener("input", () => { resizeInput(); renderGuess(); syncPlaceholder(); });
   $("input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask($("input").value); }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitAsk($("input").value); }
   });
-  setupFx();
+  setupAurora();
+  setupSpotlights();
   setLang(uiLang);
   </script>
 </body>
