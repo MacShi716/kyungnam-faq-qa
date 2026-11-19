@@ -150,6 +150,14 @@ h1.blur-title {
   font: inherit; font-weight: 700; font-size: 0.86rem;
   padding: 4px 0 0; cursor: pointer;
 }
+.answer-notes {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  margin-top: 8px;
+  position: relative;
+  z-index: 1;
+}
 .fallback { color: var(--muted); font-size: 0.82rem; margin-top: 8px; }
 .examples, .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .examples button, .chips button, .guess-item {
@@ -489,6 +497,38 @@ function questionOf(faq, uiLang) {
     el.classList.remove("clamp");
     return o;
   }
+  function isShortParenLabel(inner, lang) {
+    const s = (inner || "").trim();
+    if (!s) return true;
+    if (/[0-9０-９,，、;；:：.．\-–—<《>》/]/.test(s)) return false;
+    if (Array.from(s).length >= 4) return false;
+    const hasKo = /[\uac00-\ud7af]/.test(s);
+    const hasZh = /[\u4e00-\u9fff]/.test(s);
+    if (lang === "zh" && hasKo) return false;
+    if (lang === "ko" && hasZh) return false;
+    return true;
+  }
+  function splitNotes(text, lang) {
+    const notes = [];
+    let body = String(text || "").replace(/[（(]([^（）()]*)[）)]/g, (m, inner, offset, str) => {
+      const s = String(inner).trim();
+      if (!s) return "";
+      if (isShortParenLabel(s, lang)) return m;
+      notes.push(s);
+      const prev = str[offset - 1] || "";
+      const next = str[offset + m.length] || "";
+      if (/[\u4e00-\u9fff\uac00-\ud7af]/.test(prev) && /[A-Za-z0-9]/.test(next)) return " ";
+      if (/[A-Za-z0-9]/.test(prev) && /[\u4e00-\u9fff\uac00-\ud7af]/.test(next)) return " ";
+      return "";
+    });
+    body = body.replace(/[ \t]+/g, " ")
+      .replace(/ +([，。；、,.!？?])/g, "$1")
+      .replace(/([，。；、])\1+/g, "$1")
+      .replace(/\s{2,}/g, " ")
+      .replace(/^[，。；、]+/, "")
+      .trim();
+    return { body, notes };
+  }
   function markSearched(text, faq) {
     const add = (v) => { const n = normalize(v); if (n) searchedNorm.add(n); };
     add(text);
@@ -797,9 +837,10 @@ function questionOf(faq, uiLang) {
         const badge = document.createElement("div");
         badge.className = "badge " + (verified ? "ok" : "warn");
         badge.textContent = verified ? t("verified", { checked }) : t("unverified");
+        const split = splitNotes(answer, uiLang);
         const body = document.createElement("p");
         body.className = "answer-body";
-        body.innerHTML = linkify(answer);
+        body.innerHTML = linkify(split.body);
         card.append(badge, body);
         if (fellBack) {
           const fb = document.createElement("div");
@@ -829,6 +870,12 @@ function questionOf(faq, uiLang) {
           checked: escapeHtml(checked || t("checked_unknown")),
         });
         card.appendChild(meta);
+        if (split.notes.length) {
+          const notesEl = document.createElement("div");
+          notesEl.className = "answer-notes";
+          notesEl.textContent = split.notes.join(" · ");
+          card.appendChild(notesEl);
+        }
         requestAnimationFrame(() => {
           if (overflowsClamp(body)) { more.hidden = false; syncClamp(); }
         });
