@@ -473,12 +473,43 @@ function questionOf(faq, uiLang) {
     if (i < 0) return escapeHtml(text);
     return escapeHtml(text.slice(0, i)) + "<mark>" + escapeHtml(text.slice(i, i + raw.length)) + "</mark>" + escapeHtml(text.slice(i + raw.length));
   }
+  function visibleChipFaqs() {
+    const out = [];
+    const seen = new Set();
+    const add = (text, faq) => {
+      if (!text || wasSearched(text, faq)) return;
+      const key = (faq && faq.id) || normalize(text) || text;
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ text, faq });
+    };
+    if (!history.length) {
+      for (const q of EXAMPLES[uiLang]) add(q, null);
+      return out;
+    }
+    for (const item of history) {
+      if (item.role !== "bot") continue;
+      const faqs = item.kind === "match" ? (item.related || []) : (item.suggestions || []);
+      for (const faq of faqs) {
+        if (unusedQuestion(faq)) add(questionOf(faq, uiLang), faq);
+      }
+    }
+    return out;
+  }
+  function overlapsVisibleChip(text, faq) {
+    for (const c of visibleChipFaqs()) {
+      if (faq && c.faq && c.faq.id === faq.id) return true;
+      const a = normalize(text), b = normalize(c.text);
+      if (a && b && a === b) return true;
+    }
+    return false;
+  }
   function liveGuess(input) {
     const q = (input || "").trim();
     const used = new Set();
     const out = [];
     const push = (text, faq) => {
-      if (!text || wasSearched(text, faq)) return;
+      if (!text || wasSearched(text, faq) || overlapsVisibleChip(text, faq)) return;
       const key = normalize(text) || text;
       if (used.has(key)) return;
       used.add(key);
@@ -515,12 +546,13 @@ function questionOf(faq, uiLang) {
     });
   }
   function renderGuess() {
-    const items = liveGuess($("input").value);
+    const raw = $("input").value;
+    const items = liveGuess(raw);
     const box = $("guess");
     const list = $("guess-list");
     $("guess-label").textContent = t("guess");
     list.innerHTML = "";
-    if (!items.length) { box.hidden = true; return; }
+    if (!items.length || (!(raw || "").trim() && visibleChipFaqs().length)) { box.hidden = true; return; }
     box.hidden = false;
     const q = $("input").value;
     items.forEach((item, i) => {
