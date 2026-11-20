@@ -16,6 +16,7 @@ function loadApi() {
       searchFaqs,
       matchConfidence: typeof matchConfidence === "function" ? matchConfidence : undefined,
       acceptedFaq: typeof acceptedFaq === "function" ? acceptedFaq : undefined,
+      suggestedFaqs: typeof suggestedFaqs === "function" ? suggestedFaqs : undefined,
     };
   `)();
   api.html = html;
@@ -94,6 +95,49 @@ test("school questions and paraphrases still select the same FAQ", () => {
   expectId("수강신청은 언제 해요?", "ko", "F04");
   expectId("正门在哪？", "zh", "F42");
   expectId("有TOPIK报名费补助吗？", "zh", "F33");
+});
+
+test("generic questions do not recommend unrelated FAQ chips", () => {
+  const api = loadApi();
+  assert.equal(typeof api.suggestedFaqs, "function");
+  const generics = [
+    ["ko", "내가 누구인지 어떻게 알아요?"],
+    ["ko", "나는 누구인가요?"],
+    ["ko", "당신은 누구예요?"],
+    ["ko", "어떻게 알아요?"],
+    ["ko", "알려주세요"],
+    ["ko", "어디에 있어요?"],
+    ["ko", "뭐예요?"],
+    ["zh", "你怎么知道我是谁"],
+    ["zh", "你是谁"],
+    ["zh", "怎么走？"],
+    ["zh", "在哪"],
+    ["zh", "怎么办"],
+    ["zh", "你好"],
+  ];
+  for (const [lang, q] of generics) {
+    assert.deepEqual(api.suggestedFaqs(q, lang).map((faq) => faq.id), [], q);
+  }
+});
+
+test("school queries still recommend relevant FAQs", () => {
+  const api = loadApi();
+  const ids = (q, lang) => api.suggestedFaqs(q, lang).map((faq) => faq.id);
+  const leave = ids("휴학", "ko");
+  assert.equal(leave[0], "F01");
+  assert.ok(leave.includes("F28"));
+  assert.equal(leave.includes("F76"), false);
+  const halls = ids("工学馆", "zh");
+  assert.equal(halls[0], "F13");
+  assert.ok(halls.includes("F53"));
+  assert.equal(halls.includes("F67"), false);
+  const library = ids("도서관", "ko");
+  assert.ok(library.includes("F26"));
+  assert.ok(library.includes("F36"));
+  assert.equal(ids("签证", "zh")[0], "F09");
+  const design = ids("디자인관 어떻게 가요?", "ko");
+  assert.equal(design[0], "F76");
+  assert.ok(design.includes("F85"));
 });
 
 test("stored questions keep their current retrieval result", () => {

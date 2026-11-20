@@ -216,5 +216,60 @@ for (const viewport of VIEWPORTS) {
       await expect(bot(page)).toContainText(ZH_AI_BADGE);
       await expect(bot(page)).not.toContainText(ZH_VERIFIED);
     });
+
+    test("identity questions show no unrelated FAQ chips while typing or after an AI answer", async ({ page }) => {
+      await installAi(page, (route, _n, body) => {
+        const lang = JSON.parse(body).lang;
+        return fulfillJson(route, 200, { answer: lang === "ko" ? MOCK_KO : MOCK_ZH });
+      });
+      await page.goto("/");
+      await page.locator("#input").fill("你怎么知道我是谁");
+      await expect(page.locator("#guess")).toBeHidden();
+      await page.locator("#btn-send").click();
+      await expect(bot(page)).toContainText(MOCK_ZH);
+      await expect(bot(page)).toContainText(ZH_AI_BADGE);
+      await expect(bot(page)).not.toContainText("山北");
+      await expect(bot(page)).not.toContainText("你是不是想问");
+
+      await page.locator("#btn-clear").click();
+      await page.locator("#btn-ko").click();
+      await page.locator("#input").fill("내가 누구인지 어떻게 알아요?");
+      await expect(page.locator("#guess")).toBeHidden();
+      await page.locator("#input").fill("나는 누구인가요?");
+      await expect(page.locator("#guess")).toBeHidden();
+      await page.locator("#btn-send").click();
+      await expect(bot(page)).toContainText(MOCK_KO);
+      await expect(bot(page)).toContainText(KO_AI_BADGE);
+      await expect(bot(page)).not.toContainText("디자인관");
+      await expect(bot(page)).not.toContainText("혹시 이런 질문인가요?");
+    });
+
+    test("school queries keep relevant typing and follow-up chips", async ({ page }) => {
+      const posts = await installAi(page, (route) => route.abort("failed"));
+      await page.goto("/");
+      await page.locator("#btn-ko").click();
+      await page.locator("#input").fill("휴학");
+      await expect(page.locator("#guess")).toContainText("휴학 중에 주소나 전화번호가 바뀌면");
+      await expect(page.locator("#guess")).not.toContainText("디자인관");
+      await page.locator("#btn-send").click();
+      const card = bot(page);
+      await expect(card).toContainText("일반휴학");
+      await expect(card).not.toContainText(KO_AI_BADGE);
+      await expect(card.locator(".chips")).toContainText("휴학 중에 주소나 전화번호가 바뀌면");
+      await expect(card).not.toContainText("디자인관");
+      expect(posts).toHaveLength(0);
+
+      await page.locator("#btn-clear").click();
+      await page.locator("#btn-zh").click();
+      await page.locator("#input").fill("工学馆");
+      await expect(page.locator("#guess")).toContainText("第一工学馆在哪？");
+      await expect(page.locator("#guess")).toContainText("第二工学馆在哪？");
+      await expect(page.locator("#guess")).not.toContainText("山北");
+      await page.locator("#btn-send").click();
+      await expect(bot(page)).toContainText(ZH_VERIFIED);
+      await expect(bot(page).locator(".chips")).toContainText("第二工学馆在哪？");
+      await expect(bot(page)).not.toContainText("山北");
+      expect(posts).toHaveLength(0);
+    });
   });
 }

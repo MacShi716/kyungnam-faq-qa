@@ -519,6 +519,19 @@ function acceptedFaq(query, lang) {
   const best = searchFaqs(query, lang, 1)[0];
   return isConfidentMatch(query, best, lang) ? best.faq : null;
 }
+function suggestedFaqs(query, lang, limit) {
+  lang = lang || detectLang(query);
+  const cap = limit == null ? 6 : limit;
+  if (cap <= 0) return [];
+  const ranked = searchFaqs(query, lang, FAQ_DATA.length);
+  const out = [];
+  for (const row of ranked) {
+    if (!isConfidentMatch(query, row, lang)) continue;
+    out.push(row.faq);
+    if (out.length >= cap) break;
+  }
+  return out;
+}
 
   let uiLang = localStorage.getItem("faq_ui_lang") === "ko" ? "ko" : "zh";
   let history = [];
@@ -671,9 +684,8 @@ function acceptedFaq(query, lang) {
       }
       return out.slice(0, 5);
     }
-    const ranked = searchFaqs(q, detectLang(q), 12);
-    for (const r of ranked) {
-      push(questionOf(r.faq, uiLang), r.faq);
+    for (const faq of suggestedFaqs(q, detectLang(q), 5)) {
+      push(questionOf(faq, uiLang), faq);
       if (out.length >= 5) break;
     }
     return out;
@@ -861,10 +873,13 @@ function acceptedFaq(query, lang) {
     const best = ranked[0];
     if (isConfidentMatch(text, best, qLang)) {
       const { text: answer, fellBack } = answerFor(best.faq, uiLang);
-      const related = ranked.filter(r => r.faq.id !== best.faq.id && unusedQuestion(r.faq)).slice(0, 2);
-      return { role: "bot", kind: "match", faq: best.faq, answer, fellBack, related: related.map(r => r.faq) };
+      const related = suggestedFaqs(text, qLang, 8)
+        .filter((faq) => faq.id !== best.faq.id && unusedQuestion(faq))
+        .slice(0, 2);
+      return { role: "bot", kind: "match", faq: best.faq, answer, fellBack, related };
     }
-    return { role: "bot", kind: "ai", question: text, ai: {}, suggestions: (ranked || []).map(r => r.faq).filter(unusedQuestion) };
+    const suggestions = suggestedFaqs(text, qLang, 6).filter(unusedQuestion);
+    return { role: "bot", kind: "ai", question: text, ai: {}, suggestions };
   }
   function requestAi(item, lang) {
     if (item.ai[lang]) return;
