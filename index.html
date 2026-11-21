@@ -34,7 +34,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-body { padding: 28px 18px 176px; overflow-x: hidden; }
+body { padding: 28px 18px 176px; overflow-x: hidden; overflow-anchor: none; }
 .fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 #aurora {
   position: absolute;
@@ -705,6 +705,26 @@ function suggestedFaqs(query, lang, limit) {
       el.style.transform = "";
     });
   }
+  let dockHeight = 0;
+  function syncDock() {
+    const dock = document.querySelector(".dock");
+    if (!dock) return;
+    const vv = window.visualViewport;
+    const lift = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0;
+    dock.style.bottom = lift ? lift + "px" : "";
+    document.body.style.paddingBottom = (dock.offsetHeight + lift + 12) + "px";
+    const next = dock.offsetHeight;
+    const grew = dockHeight ? next - dockHeight : 0;
+    dockHeight = next;
+    if (grew > 1) {
+      const scroller = document.scrollingElement || document.documentElement;
+      scroller.scrollTop += grew;
+    }
+  }
+  function scrollToEnd() {
+    const scroller = document.scrollingElement || document.documentElement;
+    scroller.scrollTop = scroller.scrollHeight;
+  }
   function renderGuess() {
     const raw = $("input").value;
     const items = liveGuess(raw);
@@ -712,7 +732,7 @@ function suggestedFaqs(query, lang, limit) {
     const list = $("guess-list");
     $("guess-label").textContent = t("guess");
     list.innerHTML = "";
-    if (!items.length || (!(raw || "").trim() && visibleChipFaqs().length)) { box.hidden = true; return; }
+    if (!items.length || !(raw || "").trim()) { box.hidden = true; syncDock(); return; }
     box.hidden = false;
     const q = $("input").value;
     items.forEach((item, i) => {
@@ -725,6 +745,7 @@ function suggestedFaqs(query, lang, limit) {
       attachMagnet(b, 0.2);
       list.appendChild(b);
     });
+    syncDock();
   }
   function makeChip(label, onClick) {
     const b = document.createElement("button");
@@ -865,7 +886,7 @@ function suggestedFaqs(query, lang, limit) {
     syncPlaceholder();
     render();
     renderGuess();
-    window.scrollTo({ top: document.body.scrollHeight, behavior: reduceMotion ? "auto" : "smooth" });
+    scrollToEnd();
   }
   function buildReply(text) {
     const qLang = detectLang(text);
@@ -885,27 +906,41 @@ function suggestedFaqs(query, lang, limit) {
     if (item.ai[lang]) return;
     item.ai[lang] = { state: "pending" };
     const ctrl = typeof AbortController === "function" ? new AbortController() : null;
-    const timer = setTimeout(() => { if (ctrl) ctrl.abort(); finish(null); }, AI_TIMEOUT_MS);
     let done = false;
-    function finish(answer) {
+    let timedOut = false;
+    function finish(answer, reason) {
       if (done) return;
       done = true;
       clearTimeout(timer);
-      item.ai[lang] = answer ? { state: "done", answer } : { state: "failed" };
+      item.ai[lang] = answer ? { state: "done", answer } : { state: "failed", reason: reason || "unknown" };
       if (!history.includes(item)) return;
       skipEnter = true;
       render();
+      renderGuess();
+      scrollToEnd();
       skipEnter = false;
     }
+    const timer = setTimeout(() => {
+      timedOut = true;
+      if (ctrl) ctrl.abort();
+      finish(null, "timeout");
+    }, AI_TIMEOUT_MS);
     fetch(AI_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question: item.question.slice(0, 300), lang }),
       signal: ctrl ? ctrl.signal : undefined,
     })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => finish(d && typeof d.answer === "string" && d.answer.trim() ? d.answer.trim() : null))
-      .catch(() => finish(null));
+      .then(async (r) => {
+        if (!r.ok) return finish(null, "http");
+        let data;
+        try { data = await r.json(); }
+        catch { return finish(null, "bad_body"); }
+        const answer = data && typeof data.answer === "string" ? data.answer.trim() : "";
+        if (!answer) return finish(null, "bad_body");
+        finish(answer);
+      })
+      .catch(() => finish(null, timedOut ? "timeout" : "network"));
   }
   function otherAiLang(lang) {
     return lang === "ko" ? "zh" : "ko";
@@ -921,6 +956,9 @@ function suggestedFaqs(query, lang, limit) {
     const other = item.ai[otherAiLang(lang)];
     if (other && other.state === "pending") return "pending";
     return "failed";
+  }
+  function aiRecord(item, lang) {
+    return item.ai[lang] || item.ai[otherAiLang(lang)] || {};
   }
   function retryAi(item) {
     delete item.ai[uiLang];
@@ -1076,6 +1114,7 @@ function suggestedFaqs(query, lang, limit) {
         } else {
           const body = document.createElement("p");
           body.dataset.state = "ai-error";
+          body.dataset.reason = aiRecord(item, uiLang).reason || "unknown";
           body.textContent = t("ai_error");
           const chips = document.createElement("div");
           chips.className = "chips";
@@ -1221,6 +1260,8 @@ function suggestedFaqs(query, lang, limit) {
   });
   setupAurora();
   setupSpotlights();
+  window.addEventListener("resize", syncDock);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", syncDock);
   setLang(uiLang);
   </script>
 </body>
