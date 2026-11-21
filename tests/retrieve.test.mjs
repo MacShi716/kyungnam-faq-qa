@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-const AI_ENDPOINT = "https://kyungnam-faq-ai-bisozsckxu.cn-hongkong.fcapp.run";
+const AI_ENDPOINT = "https://kyungnam-faq-zhipu-relay.vercel.app/api/ask";
 
 function loadApi() {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
@@ -28,9 +28,10 @@ function variants(faq, lang) {
   return String(field || "").split("|").map((s) => s.trim()).filter(Boolean);
 }
 
-test("keeps the existing AI endpoint and verified FAQ facts", () => {
+test("page AI endpoint is the Vercel ask route and verified FAQ facts stay", () => {
   const api = loadApi();
-  assert.match(api.html, new RegExp(AI_ENDPOINT.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  const found = [...api.html.matchAll(/const AI_ENDPOINT = "([^"]*)";/g)].map((m) => m[1]);
+  assert.deepEqual(found, [AI_ENDPOINT]);
   const f13 = api.FAQ_DATA.find((f) => f.id === "F13");
   const f76 = api.FAQ_DATA.find((f) => f.id === "F76");
   assert.equal(f13.checked_at, "2026-10-28");

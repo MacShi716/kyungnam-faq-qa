@@ -22,7 +22,7 @@ Checked against Vercel documentation for Functions limits, regions, duration, an
 2. Set the project Root Directory to `relay-vercel`. Framework Preset: Other. Node.js Version: 24.x.
 3. Add environment variable `ZHIPU_API_KEY` in the Vercel dashboard for Production. Mark it sensitive. Do not commit it and do not paste it into Git.
 4. Deploy. The public route is `POST https://<deployment-host>/api/ask`.
-5. Leave the static page `AI_ENDPOINT` unchanged until that deployment URL is real.
+5. The static page `AI_ENDPOINT` is `https://kyungnam-faq-zhipu-relay.vercel.app/api/ask`. Publishing GitHub Pages is a separate step and is not part of this directory.
 
 Local check, with no upstream call:
 

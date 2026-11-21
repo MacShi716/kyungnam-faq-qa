@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const AI_HOST = /fcapp\.run/i;
+const AI_ENDPOINT = "https://kyungnam-faq-zhipu-relay.vercel.app/api/ask";
+const AI_HOST = /kyungnam-faq-zhipu-relay\.vercel\.app\/api\/ask/i;
 const VIEWPORTS = [
   { name: "mobile", width: 390, height: 844 },
   { name: "desktop", width: 1280, height: 800 },
@@ -30,6 +31,7 @@ function cors(headers = {}) {
 
 async function installAi(page, onPost) {
   const posts = [];
+  await page.route(/fcapp\.run/i, (route) => route.abort("failed"));
   await page.route(AI_HOST, async (route) => {
     const req = route.request();
     if (req.method() === "OPTIONS") {
@@ -116,7 +118,7 @@ for (const viewport of VIEWPORTS) {
         await expect(bot(page)).not.toContainText("AccessDenied");
         await expect(bot(page)).not.toContainText("upstream failed");
         expect(posts.length, name).toBeGreaterThan(0);
-        expect(posts.every((p) => p.url.startsWith("https://kyungnam-faq-ai-bisozsckxu.cn-hongkong.fcapp.run")), name).toBe(true);
+        expect(posts.every((p) => p.url === AI_ENDPOINT), name).toBe(true);
         await page.locator("#btn-clear").click();
       }
     });
