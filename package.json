@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/retrieve.test.mjs",
+    "test:browser": "playwright test",
+    "test:all": "node --test tests/retrieve.test.mjs && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}
