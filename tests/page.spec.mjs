@@ -275,3 +275,74 @@ for (const viewport of VIEWPORTS) {
     });
   });
 }
+
+async function layoutBoxes(page) {
+  return page.evaluate(() => {
+    const last = document.querySelector("#thread .card:last-child");
+    const guess = document.getElementById("guess");
+    const dock = document.querySelector(".dock");
+    const error = document.querySelector("[data-state='ai-error']");
+    const box = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, hidden: !!el.hidden || getComputedStyle(el).display === "none" };
+    };
+    const lastBox = box(last);
+    const dockBox = box(dock);
+    const guessBox = box(guess);
+    const errorBox = box(error);
+    const covered = (a, b) => a && b && !b.hidden ? Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)) : 0;
+    return {
+      last: lastBox,
+      dock: dockBox,
+      guess: guessBox,
+      error: errorBox,
+      lastUnderDock: covered(lastBox, dockBox),
+      errorUnderGuess: covered(errorBox, guessBox),
+      reason: error ? error.dataset.reason || "" : "",
+    };
+  });
+}
+
+for (const size of [
+  { name: "ipad", width: 1024, height: 712 },
+  { name: "ipad-keyboard", width: 1024, height: 480 },
+]) {
+  test.describe(`dock layout ${size.name}`, () => {
+    test.use({ viewport: { width: size.width, height: size.height } });
+
+    test("an AI error after a FAQ answer stays above the composer", async ({ page }) => {
+      await installAi(page, (route) => fulfillJson(route, 500, { answer: "hidden upstream" }));
+      await page.goto("/");
+      await ask(page, "什么时候可以申请休学？");
+      await expect(bot(page)).toContainText("一般休学");
+      await ask(page, "你几岁了");
+      const error = bot(page).locator("[data-state='ai-error']");
+      await expect(error).toContainText(ZH_ERROR);
+      await expect(error).toHaveAttribute("data-reason", "http");
+      await expect(bot(page).getByRole("button", { name: ZH_RETRY })).toBeVisible();
+      await expect(page.locator("#guess")).toBeHidden();
+      const boxes = await layoutBoxes(page);
+      expect(boxes.lastUnderDock).toBe(0);
+      expect(boxes.errorUnderGuess).toBe(0);
+      await page.locator("#input").fill("工学馆");
+      await expect(page.locator("#guess")).toContainText("第一工学馆");
+      const typing = await layoutBoxes(page);
+      expect(typing.lastUnderDock).toBe(0);
+      expect(typing.errorUnderGuess).toBe(0);
+    });
+  });
+}
+
+test("a hung AI request is recorded as a timeout, not a successful answer", async ({ page }) => {
+  await page.clock.install();
+  await installAi(page, () => new Promise(() => {}));
+  await page.goto("/");
+  await ask(page, "你好");
+  await expect(bot(page)).toContainText("AI正在生成回答");
+  await page.clock.fastForward(15000);
+  const error = bot(page).locator("[data-state='ai-error']");
+  await expect(error).toContainText(ZH_ERROR);
+  await expect(error).toHaveAttribute("data-reason", "timeout");
+  await expect(bot(page)).not.toContainText("AI自主回答");
+});
