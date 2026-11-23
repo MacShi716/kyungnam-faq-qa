@@ -347,6 +347,122 @@ test("a hung AI request is recorded as a timeout, not a successful answer", asyn
   await expect(bot(page)).not.toContainText("AI自主回答");
 });
 
+function posted(posts) {
+  return posts.map((p) => JSON.parse(p.body));
+}
+
+test("follow-up AI requests send completed turns, skip failures, and clear with the chat", async ({ page }) => {
+  const posts = await installAi(page, (route, n, body) => {
+    const data = JSON.parse(body);
+    if (n === 1) return fulfillJson(route, 500, { answer: "hidden upstream" });
+    if (data.question === "要很长") return fulfillJson(route, 200, { answer: "答".repeat(800) });
+    return fulfillJson(route, 200, { answer: data.lang === "ko" ? MOCK_KO : MOCK_ZH });
+  });
+  await page.goto("/");
+  await page.evaluate(() => localStorage.removeItem("faq_ui_lang"));
+  await page.goto("/");
+
+  await ask(page, "你几岁了");
+  await expectServiceError(page, "zh");
+  expect(posted(posts)[0].history).toEqual([]);
+  expect(posted(posts)[0].question).toBe("你几岁了");
+
+  await ask(page, "是什么大模型");
+  await expect(bot(page)).toContainText(MOCK_ZH);
+  const afterError = posted(posts).at(-1);
+  expect(afterError.question).toBe("是什么大模型");
+  expect(afterError.lang).toBe("zh");
+  expect(afterError.history).toEqual([{ role: "user", content: "你几岁了" }]);
+  expect(JSON.stringify(afterError.history)).not.toContain("暂时无法获取");
+  expect(JSON.stringify(afterError.history)).not.toContain("hidden upstream");
+  expect(JSON.stringify(afterError.history)).not.toContain("AI正在生成");
+
+  await ask(page, "要很长");
+  await expect(bot(page)).toContainText("答".repeat(20));
+  await ask(page, "你不是智谱吗");
+  await expect(bot(page)).toContainText(MOCK_ZH);
+  const follow = posted(posts).at(-1);
+  expect(follow.question).toBe("你不是智谱吗");
+  expect(follow.history.map((m) => m.role)).toEqual(["user", "user", "assistant", "user", "assistant"]);
+  expect(follow.history[0]).toEqual({ role: "user", content: "你几岁了" });
+  expect(follow.history[1]).toEqual({ role: "user", content: "是什么大模型" });
+  expect(follow.history[2]).toEqual({ role: "assistant", content: MOCK_ZH });
+  expect(follow.history[3]).toEqual({ role: "user", content: "要很长" });
+  expect(follow.history[4].content).toBe("答".repeat(500));
+  expect(follow.history.some((m) => m.content === follow.question)).toBe(false);
+  expect(posts.every((p) => p.url === AI_ENDPOINT)).toBe(true);
+
+  await page.locator("#btn-clear").click();
+  await expect(page.locator("#thread")).toContainText("你好！想了解什么？");
+  await ask(page, "你几岁了");
+  await expect(bot(page)).toContainText(MOCK_ZH);
+  expect(posted(posts).at(-1).history).toEqual([]);
+  expect(posted(posts).at(-1).question).toBe("你几岁了");
+});
+
+test("a pending AI reply is left out of the next request", async ({ page }) => {
+  let release = () => {};
+  const gate = new Promise((resolve) => { release = resolve; });
+  const posts = await installAi(page, async (route, _n, body) => {
+    const data = JSON.parse(body);
+    if (data.question === "你几岁了") {
+      await gate;
+      return fulfillJson(route, 200, { answer: "晚到的回答" });
+    }
+    return fulfillJson(route, 200, { answer: MOCK_ZH });
+  });
+  await page.goto("/");
+  await ask(page, "你几岁了");
+  await expect(bot(page)).toContainText("AI正在生成回答");
+  await ask(page, "是什么大模型");
+  await expect(bot(page)).toContainText(MOCK_ZH);
+  const follow = posted(posts).at(-1);
+  expect(follow.question).toBe("是什么大模型");
+  expect(follow.history).toEqual([{ role: "user", content: "你几岁了" }]);
+  expect(JSON.stringify(follow)).not.toContain("AI正在生成");
+  expect(JSON.stringify(follow)).not.toContain("晚到的回答");
+  release();
+});
+
+test("FAQ answers are prior turns, and Korean follow-ups keep that language", async ({ page }) => {
+  const posts = await installAi(page, (route, _n, body) => {
+    const lang = JSON.parse(body).lang;
+    return fulfillJson(route, 200, { answer: lang === "ko" ? MOCK_KO : MOCK_ZH });
+  });
+  await page.goto("/");
+  await ask(page, "什么时候可以申请休学？");
+  await expect(bot(page)).toContainText("一般休学");
+  expect(posts).toHaveLength(0);
+  await ask(page, "你几岁了");
+  await expect(bot(page)).toContainText(MOCK_ZH);
+  const zh = posted(posts).at(-1);
+  expect(zh.question).toBe("你几岁了");
+  expect(zh.lang).toBe("zh");
+  expect(zh.history.map((m) => m.role)).toEqual(["user", "assistant"]);
+  expect(zh.history[0]).toEqual({ role: "user", content: "什么时候可以申请休学？" });
+  expect(zh.history[1].content).toContain("一般休学");
+  expect(zh.history[1].content).toContain("学事管理组");
+  expect(zh.history[1].content).not.toContain("https://");
+  expect(zh.history[1].content).not.toContain("你可能还想问");
+  expect(zh.history[1].content.length).toBeLessThanOrEqual(500);
+
+  await page.locator("#btn-clear").click();
+  await page.locator("#btn-ko").click();
+  await ask(page, "나는 누구인가요?");
+  await expect(bot(page)).toContainText(MOCK_KO);
+  expect(posted(posts).at(-1).history).toEqual([]);
+  expect(posted(posts).at(-1).lang).toBe("ko");
+  await ask(page, "너 몇 살이야?");
+  await expect(bot(page)).toContainText(MOCK_KO);
+  const ko = posted(posts).at(-1);
+  expect(ko.lang).toBe("ko");
+  expect(ko.question).toBe("너 몇 살이야?");
+  expect(ko.history).toEqual([
+    { role: "user", content: "나는 누구인가요?" },
+    { role: "assistant", content: MOCK_KO },
+  ]);
+});
+
 const switcher = (page) => page.locator("#theme-switch");
 
 async function themeOf(page) {
