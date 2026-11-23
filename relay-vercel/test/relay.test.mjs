@@ -95,7 +95,8 @@ test("system prompts are language-specific and keep the school boundaries", () =
   assert.match(ko, /너 몇 살이야\?/);
   assert.match(ko, /사용자 나이를 묻는 말이 아니다/);
   assert.match(ko, /智谱/);
-  assert.match(ko, /지피유/);
+  assert.match(ko, /Zhipu\(즈푸\) GLM \(glm-4-flash\)/);
+  assert.doesNotMatch(ko, /지피유/);
   assert.match(ko, /glm-4-flash/);
   assert.match(ko, /부정하지 말/);
   assert.match(ko, /학번/);
