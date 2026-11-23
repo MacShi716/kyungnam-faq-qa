@@ -24,83 +24,105 @@
   initial-value: 1;
 }
 :root {
-  --bg: #F7F7F8;
-  --ink: #111827;
-  --muted: #667085;
-  --line: rgba(17, 24, 39, 0.08);
-  --card: #ffffff;
-  --brand: #2563EB;
-  --brand-soft: rgba(37, 99, 235, 0.12);
-  --user: #F3F6FF;
-  --ok: #0F8A5F;
-  --warn: #C45C16;
-  --shadow: 0 1px 2px rgba(17,24,39,0.04), 0 10px 28px rgba(17,24,39,0.06);
-  --glass: rgba(255,255,255,0.78);
-  --card-bg: rgba(255,255,255,0.88);
-  --chip: rgba(255,255,255,0.92);
-  --chip-hover: #fff;
-  --prompt: rgba(255,255,255,0.94);
-  --user-bg: linear-gradient(180deg, #F7F8FF 0%, #F3F6FF 100%);
-  --user-line: rgba(37,99,235,0.14);
-  --dock-fade: rgba(247,247,248,0);
-  --ph: #98A2B3;
-  --send: #111827;
-  --send-hover: #1D4ED8;
-  --send-ink: #fff;
-  --pressed-bg: #111827;
-  --pressed-ink: #fff;
-  --badge-warn-bg: #FDE8D5;
-  --badge-ok-bg: #D9F3E8;
-  --badge-ai-bg: #FEF3C7;
-  --badge-ai-ink: #92400E;
-  --badge-ai-line: #FBBF24;
-  --ai-ink: #92400E;
-  --dot: #F59E0B;
-  --mark: rgba(37,99,235,0.14);
-  --aurora-opacity: 0.85;
+  --bg: #F6F1E8;
+  --bg-2: #EFE7DB;
+  --ink: #1C1814;
+  --muted: #6E675F;
+  --line: rgba(72, 48, 24, 0.12);
+  --card: #FFFCF7;
+  --brand: #9A5B16;
+  --brand-soft: rgba(214, 148, 48, 0.16);
+  --user: #FFF8EE;
+  --ok: #0E7A4E;
+  --warn: #9A5410;
+  --shadow: 0 1px 0 rgba(255,255,255,0.72) inset, 0 10px 28px rgba(72, 42, 16, 0.06);
+  --glass: rgba(255, 252, 247, 0.62);
+  --card-bg: rgba(255, 252, 247, 0.72);
+  --chip: rgba(255, 252, 247, 0.7);
+  --chip-hover: rgba(255, 250, 242, 0.92);
+  --prompt: rgba(255, 252, 247, 0.78);
+  --user-bg: rgba(255, 250, 244, 0.8);
+  --user-line: rgba(176, 120, 48, 0.22);
+  --dock-fade: rgba(246, 241, 232, 0);
+  --ph: #9A9084;
+  --send: #1C1814;
+  --send-hover: #3A2A18;
+  --send-ink: #FFFCF7;
+  --pressed-bg: rgba(255, 252, 247, 0.96);
+  --pressed-ink: #1C1814;
+  --badge-warn-bg: rgba(214, 148, 42, 0.16);
+  --badge-ok-bg: rgba(16, 138, 90, 0.14);
+  --badge-ai-bg: rgba(62, 92, 168, 0.1);
+  --badge-ai-ink: #24386E;
+  --badge-ai-line: rgba(62, 92, 168, 0.38);
+  --ai-ink: #24386E;
+  --dot: #C4842A;
+  --mark: rgba(214, 148, 48, 0.22);
+  --danger: #9E2B22;
+  --danger-bg: rgba(180, 42, 32, 0.08);
+  --danger-line: rgba(180, 42, 32, 0.42);
+  --hairline: rgba(255, 255, 255, 0.92);
+  --rim: rgba(214, 148, 42, 0.9);
+  --rim-soft: rgba(255, 186, 84, 0.45);
+  --spot-core: rgba(255, 214, 150, 0.55);
+  --ambient-a: rgba(255, 206, 150, 0.55);
+  --ambient-b: rgba(255, 244, 228, 0.7);
+  --ambient-c: rgba(232, 176, 110, 0.22);
+  --aurora-opacity: 0;
   --pos: 1;
-  --spring: cubic-bezier(0.22, 1.2, 0.36, 1);
+  --spring: cubic-bezier(0.22, 1, 0.36, 1);
   --ease: cubic-bezier(.23, 1, .32, 1);
   --sx: 50%;
-  --sy: 50%;
+  --sy: 30%;
   --spot: 0;
   color-scheme: light;
 }
 html[data-theme="dark"] {
-  --bg: #101114;
-  --ink: #F4F6FB;
+  --bg: #0C0E12;
+  --bg-2: #12151B;
+  --ink: #F4F7FB;
   --muted: #A7B0C0;
-  --line: rgba(255,255,255,0.12);
-  --card: #1A1D24;
-  --brand: #8EB4FF;
-  --brand-soft: rgba(142,180,255,0.18);
-  --user: #1A2233;
-  --ok: #7DDBB0;
-  --warn: #F0B27A;
-  --shadow: 0 1px 2px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.32);
-  --glass: rgba(28,31,38,0.78);
-  --card-bg: rgba(26,29,36,0.92);
-  --chip: rgba(34,38,48,0.94);
-  --chip-hover: #323846;
-  --prompt: rgba(22,25,32,0.94);
-  --user-bg: linear-gradient(180deg, #1C2436 0%, #171E2C 100%);
-  --user-line: rgba(142,180,255,0.24);
-  --dock-fade: rgba(16,17,20,0);
-  --ph: #8B93A7;
-  --send: #F4F6FB;
-  --send-hover: #D7DEEA;
-  --send-ink: #111318;
-  --pressed-bg: #F4F6FB;
-  --pressed-ink: #111318;
-  --badge-warn-bg: #3A2A1C;
-  --badge-ok-bg: #163528;
-  --badge-ai-bg: #3A3014;
-  --badge-ai-ink: #F6D98A;
-  --badge-ai-line: #A07D20;
-  --ai-ink: #F6D98A;
-  --dot: #E0B15A;
-  --mark: rgba(142,180,255,0.24);
-  --aurora-opacity: 0.38;
+  --line: rgba(255, 255, 255, 0.1);
+  --card: #171B22;
+  --brand: #C9DCFF;
+  --brand-soft: rgba(150, 190, 255, 0.16);
+  --user: #1A2230;
+  --ok: #8AE8C0;
+  --warn: #F0C07A;
+  --shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 16px 36px rgba(0, 0, 0, 0.28);
+  --glass: rgba(18, 22, 30, 0.58);
+  --card-bg: rgba(20, 24, 32, 0.62);
+  --chip: rgba(28, 34, 46, 0.66);
+  --chip-hover: rgba(40, 48, 64, 0.82);
+  --prompt: rgba(14, 17, 24, 0.72);
+  --user-bg: rgba(28, 36, 52, 0.7);
+  --user-line: rgba(170, 204, 255, 0.22);
+  --dock-fade: rgba(12, 14, 18, 0);
+  --ph: #8E97A8;
+  --send: #F4F7FB;
+  --send-hover: #DCE6F5;
+  --send-ink: #12141A;
+  --pressed-bg: rgba(255, 255, 255, 0.14);
+  --pressed-ink: #F4F7FB;
+  --badge-warn-bg: rgba(240, 176, 80, 0.16);
+  --badge-ok-bg: rgba(90, 210, 160, 0.16);
+  --badge-ai-bg: rgba(140, 176, 255, 0.14);
+  --badge-ai-ink: #D7E4FF;
+  --badge-ai-line: rgba(168, 198, 255, 0.5);
+  --ai-ink: #D7E4FF;
+  --dot: #9EBEFF;
+  --mark: rgba(160, 196, 255, 0.24);
+  --danger: #FFB4AC;
+  --danger-bg: rgba(255, 110, 96, 0.12);
+  --danger-line: rgba(255, 150, 140, 0.5);
+  --hairline: rgba(255, 255, 255, 0.22);
+  --rim: rgba(186, 216, 255, 0.92);
+  --rim-soft: rgba(140, 186, 255, 0.42);
+  --spot-core: rgba(190, 216, 255, 0.28);
+  --ambient-a: rgba(88, 130, 196, 0.2);
+  --ambient-b: rgba(40, 64, 110, 0.16);
+  --ambient-c: rgba(150, 190, 255, 0.08);
+  --aurora-opacity: 0;
   --pos: 0;
   color-scheme: dark;
 }
@@ -109,159 +131,272 @@ html, body {
   margin: 0;
   min-height: 100%;
   color: var(--ink);
-  background: var(--bg);
   transition: background-color .18s var(--ease), color .18s var(--ease);
   font-family: "Pretendard", "Noto Sans KR", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-body { padding: 28px 18px 176px; overflow-x: hidden; overflow-anchor: none; }
-.fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-#aurora {
-  position: absolute;
-  inset: -8% 0;
-  width: 100%;
-  height: 116%;
-  display: block;
-  opacity: var(--aurora-opacity);
+html { background: var(--bg); }
+body {
+  min-height: 100dvh;
+  padding: 24px 18px 176px;
+  overflow-x: hidden;
+  overflow-anchor: none;
+  background: transparent;
 }
-.fx::after {
-  content: "";
-  position: absolute;
+.fx {
+  position: fixed;
   inset: 0;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
-  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(70vmax 52vmax at 12% 0%, var(--ambient-a), transparent 70%),
+    radial-gradient(58vmax 46vmax at 90% 96%, var(--ambient-c), transparent 72%);
 }
+#aurora { display: none; }
 .wrap, .dock { position: relative; z-index: 1; }
 .wrap { max-width: 720px; margin: 0 auto; }
-header.top { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
-.top-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: 0 0 auto; max-width: 100%; }
+header.top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  margin-bottom: 8px;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+  flex: 0 1 auto;
+  max-width: 100%;
+}
 h1.blur-title {
-  flex: 1 1 180px;
+  flex: 1 1 200px;
   min-width: 0;
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 760;
-  letter-spacing: -0.045em;
-  line-height: 1.35;
+  letter-spacing: -0.04em;
+  line-height: 1.3;
   color: var(--ink);
 }
-.blur-word {
-  display: inline-block;
-  will-change: filter, transform, opacity;
-}
-.play .blur-word {
-  animation: unblur 0.8s var(--spring) both;
-}
+.blur-word { display: inline-block; }
+.play .blur-word { animation: unblur 0.35s var(--ease) both; }
 @keyframes unblur {
-  from { filter: blur(10px); opacity: 0; transform: translateY(10px); }
-  to { filter: blur(0); opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
 }
-.hint { color: var(--muted); font-size: 0.92rem; line-height: 1.6; margin: 0 0 22px; max-width: 38em; }
+.hint {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0 0 18px;
+  max-width: 40em;
+}
 .lang {
   display: inline-flex;
+  align-items: center;
   background: var(--glass);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
   border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 var(--hairline);
   border-radius: 999px;
   padding: 3px;
   flex-shrink: 0;
 }
 .lang button, .clear-btn {
-  border: 0; background: transparent; color: var(--ink);
-  font: inherit; font-weight: 650; font-size: 0.86rem;
-  cursor: pointer; min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 650;
+  font-size: 0.86rem;
+  line-height: 1.25;
+  cursor: pointer;
+  min-height: 44px;
 }
-.lang button { padding: 0 13px; border-radius: 999px; transition: background .28s var(--ease), color .28s var(--ease); }
-.lang button[aria-pressed="true"] { background: var(--pressed-bg); color: var(--pressed-ink); }
+.lang button {
+  padding: 0 13px;
+  border-radius: 999px;
+  transition: background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.lang button[aria-pressed="true"] {
+  background: var(--pressed-bg);
+  color: var(--pressed-ink);
+  box-shadow: inset 0 1px 0 var(--hairline), 0 0 0 1px var(--line);
+}
+.lang button:focus-visible, .clear-btn:focus-visible, .composer button.send:focus-visible,
+.examples button:focus-visible, .chips button:focus-visible, .guess-item:focus-visible, .more-btn:focus-visible {
+  outline: 2px solid var(--rim);
+  outline-offset: 2px;
+}
 .clear-btn {
-  padding: 0 13px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--glass); backdrop-filter: blur(12px);
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: inset 0 1px 0 var(--hairline);
   white-space: nowrap;
-  transition: transform .35s var(--spring), border-color .2s var(--ease), background .2s var(--ease);
+  transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
 }
-.clear-btn:hover { border-color: rgba(17,24,39,0.16); background: var(--chip-hover); }
+.clear-btn:hover, .lang button:hover {
+  border-color: var(--rim);
+  box-shadow: inset 0 1px 0 var(--hairline), 0 0 0 1px var(--rim), 0 0 16px var(--rim-soft);
+}
 .theme-switch {
   --travel: 30px;
-  width: 68px; height: 44px; padding: 0;
-  border: 0; background: transparent; color: var(--ink);
-  display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; flex: 0 0 auto; touch-action: pan-y; user-select: none;
+  width: 68px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: 0 0 auto;
+  touch-action: pan-y;
+  user-select: none;
   border-radius: 999px;
 }
-.theme-switch:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.theme-switch:focus-visible { outline: 2px solid var(--rim); outline-offset: 3px; }
 .theme-track {
-  position: relative; width: 64px; height: 34px; border-radius: 17px;
-  background: color-mix(in srgb, #14161c calc((1 - var(--pos)) * 100%), #fff4e4 calc(var(--pos) * 100%));
+  position: relative;
+  width: 64px;
+  height: 34px;
+  border-radius: 17px;
+  background: color-mix(in srgb, #101218 calc((1 - var(--pos)) * 100%), #F7F2E9 calc(var(--pos) * 100%));
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, rgba(186,214,255,0.9) calc((1 - var(--pos)) * 100%), rgba(255,176,64,0.95) calc(var(--pos) * 100%)),
-    0 0 16px rgba(150, 196, 255, calc(0.85 * (1 - var(--pos)))),
-    0 0 18px rgba(255, 154, 32, calc(0.95 * var(--pos)));
+    inset 0 0 0 1px color-mix(in srgb, rgba(255,255,255,0.08) calc((1 - var(--pos)) * 100%), rgba(120, 78, 32, 0.16) calc(var(--pos) * 100%)),
+    inset 0 1px 0 color-mix(in srgb, rgba(255,255,255,0.05) calc((1 - var(--pos)) * 100%), rgba(255,255,255,0.85) calc(var(--pos) * 100%));
   transition: background .18s var(--ease), box-shadow .18s var(--ease);
 }
 .theme-thumb {
-  position: absolute; left: 3px; top: 3px; width: 28px; height: 28px;
-  border-radius: 10px; display: grid; place-items: center;
-  background: color-mix(in srgb, rgba(255,255,255,0.16) calc((1 - var(--pos)) * 100%), #fff calc(var(--pos) * 100%));
-  border: 1px solid color-mix(in srgb, rgba(255,255,255,0.48) calc((1 - var(--pos)) * 100%), rgba(255,255,255,0.92) calc(var(--pos) * 100%));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 4px 10px rgba(16,18,28,0.16);
-  backdrop-filter: blur(8px);
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  background: color-mix(in srgb, rgba(255,255,255,0.16) calc((1 - var(--pos)) * 100%), rgba(255,252,247,0.94) calc(var(--pos) * 100%));
+  border: 1px solid color-mix(in srgb, rgba(255,255,255,0.38) calc((1 - var(--pos)) * 100%), rgba(255,255,255,0.95) calc(var(--pos) * 100%));
+  box-shadow:
+    calc((var(--pos) * 10px) - 8px) calc(6px - (var(--pos) * 12px)) 14px color-mix(in srgb, rgba(150, 198, 255, 0.9) calc((1 - var(--pos)) * 100%), rgba(255, 168, 48, 0.88) calc(var(--pos) * 100%)),
+    inset 0 1px 0 color-mix(in srgb, rgba(255,255,255,0.28) calc((1 - var(--pos)) * 100%), rgba(255,255,255,0.85) calc(var(--pos) * 100%)),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
   transform: translateX(calc(var(--pos) * var(--travel)));
-  transition: transform .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease);
+  transition: transform .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease);
 }
-.pix { position: absolute; width: 16px; height: 16px; display: block; transition: opacity .18s var(--ease); }
+.theme-thumb::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    14px 16px at calc(12% + (var(--pos) * 76%)) calc(82% - (var(--pos) * 74%)),
+    color-mix(in srgb, rgba(214, 232, 255, 0.95) calc((1 - var(--pos)) * 100%), rgba(255, 206, 120, 0.98) calc(var(--pos) * 100%)),
+    transparent 72%
+  );
+}
+.pix { position: absolute; width: 20px; height: 20px; display: block; transition: opacity .18s var(--ease); }
 .pix.moon { color: #fff; opacity: calc(1 - var(--pos)); }
-.pix.sun { color: #24180f; opacity: var(--pos); }
+.pix.sun { color: #24180C; opacity: var(--pos); }
+.pix .dim { opacity: 0.38; }
 .theme-switch.dragging .theme-track,
 .theme-switch.dragging .theme-thumb,
 .theme-switch.dragging .pix { transition: none; }
 .card {
-  --sx: 50%; --sy: 40%; --spot: 0;
+  --sx: 50%;
+  --sy: 28%;
+  --spot: 0;
   position: relative;
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
+  background:
+    linear-gradient(180deg, var(--hairline), transparent 16px),
+    var(--card-bg);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 12px 16px;
-  margin: 0 0 8px;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin: 0 0 10px;
   box-shadow: var(--shadow);
   overflow: hidden;
-  animation: springIn 0.7s var(--spring) both;
+  animation: springIn 0.4s var(--ease) both;
 }
 .card.no-anim { animation: none; }
-.card::before, .card::after {
+.card:not(.user)::before,
+.card:not(.user)::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   border-radius: inherit;
   pointer-events: none;
   opacity: var(--spot);
-  transition: opacity .25s var(--ease);
+  transition: opacity .2s var(--ease);
 }
-.card::before {
-  background: radial-gradient(240px circle at var(--sx) var(--sy), rgba(16,24,27,0.10), transparent 58%);
+.card:not(.user)::before {
+  background: radial-gradient(220px circle at var(--sx) var(--sy), var(--spot-core), transparent 62%);
 }
-.card::after {
-  background: radial-gradient(220px circle at var(--sx) var(--sy), rgba(255,255,255,0.72), transparent 46%);
-  mix-blend-mode: soft-light;
+.card:not(.user)::after {
+  padding: 1px;
+  background: radial-gradient(110px circle at var(--sx) var(--sy), var(--rim), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
 }
-.card.user { background: var(--user-bg); border-color: var(--user-line); box-shadow: none; }
-.card p { margin: 0; line-height: 1.55; white-space: pre-wrap; position: relative; z-index: 1; }
+.card.user {
+  width: fit-content;
+  max-width: min(100%, 34em);
+  margin-left: auto;
+  margin-right: 0;
+  padding: 12px 16px;
+  border-radius: 18px 18px 6px 18px;
+  background:
+    linear-gradient(180deg, var(--hairline), transparent 12px),
+    var(--user-bg);
+  border-color: var(--user-line);
+  box-shadow: inset 0 1px 0 var(--hairline);
+}
+.card p { margin: 0; line-height: 1.65; white-space: pre-wrap; position: relative; z-index: 1; overflow-wrap: anywhere; }
+.card a { color: var(--brand); text-underline-offset: 2px; }
 .lead { font-weight: 650; margin-bottom: 6px; letter-spacing: -0.02em; }
 .badge, .meta, .fallback, .related-label, .examples, .chips, .gen, .more-btn { position: relative; z-index: 1; }
-.badge { display: inline-block; font-size: 0.76rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin: 0 0 6px; }
-.badge.warn { background: var(--badge-warn-bg); color: var(--warn); }
-.badge.ok { background: var(--badge-ok-bg); color: var(--ok); }
-.badge.ai { background: var(--badge-ai-bg); color: var(--badge-ai-ink); border: 1px solid var(--badge-ai-line); }
-.ai-loading { display: flex; align-items: center; gap: 10px; color: var(--ai-ink); position: relative; z-index: 1; margin: 0; }
+.badge {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin: 0 0 8px;
+  border: 1px solid transparent;
+}
+.badge.warn { background: var(--badge-warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.badge.ok { background: var(--badge-ok-bg); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.badge.ai { background: var(--badge-ai-bg); color: var(--badge-ai-ink); border-color: var(--badge-ai-line); }
+.ai-loading { display: flex; align-items: center; gap: 10px; color: var(--ai-ink); position: relative; z-index: 1; margin: 0; line-height: 1.5; }
 .ai-dots { display: inline-flex; gap: 4px; }
 .ai-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--dot); animation: aiDot 1.1s ease-in-out infinite; }
 .ai-dots i:nth-child(2) { animation-delay: .15s; }
 .ai-dots i:nth-child(3) { animation-delay: .3s; }
-@keyframes aiDot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
-.meta { color: var(--muted); font-size: 0.78rem; margin-top: 8px; line-height: 1.45; }
+@keyframes aiDot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+.meta { color: var(--muted); font-size: 0.78rem; margin-top: 10px; line-height: 1.5; }
 .meta a { color: inherit; font-weight: 600; overflow-wrap: anywhere; }
+.answer-body { font-size: 0.98rem; }
 .answer-body.clamp {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -270,64 +405,111 @@ h1.blur-title {
 }
 .more-btn {
   display: inline-block;
-  border: 0; background: none; color: var(--brand);
-  font: inherit; font-weight: 700; font-size: 0.86rem;
-  padding: 4px 0 0; cursor: pointer;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  padding: 6px 0 0;
+  cursor: pointer;
 }
 .answer-notes {
   color: var(--muted);
   font-size: 0.75rem;
-  line-height: 1.45;
+  line-height: 1.5;
   margin-top: 8px;
   position: relative;
   z-index: 1;
 }
 .fallback { color: var(--muted); font-size: 0.82rem; margin-top: 8px; }
-.examples, .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+[data-state="ai-error"] {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  line-height: 1.6;
+}
+.examples, .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .examples button, .chips button, .guess-item {
-  font: inherit; font-weight: 600; text-align: left; line-height: 1.4;
-  min-height: 44px; padding: 9px 15px; border-radius: 14px;
-  border: 1px solid var(--line); background: var(--chip);
-  box-shadow: 0 1px 2px rgba(17,24,39,0.04); cursor: pointer; color: var(--ink);
-  will-change: transform;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  line-height: 1.4;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--chip);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow: inset 0 1px 0 var(--hairline);
+  cursor: pointer;
+  color: var(--ink);
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
 }
-.examples button:hover, .chips button:hover, .guess-item:hover {
-  border-color: rgba(17,24,39,0.16);
+.examples button:hover, .chips button:hover, .guess-item:hover,
+.examples button:focus-visible, .chips button:focus-visible, .guess-item:focus-visible {
+  border-color: var(--rim);
   background: var(--chip-hover);
-  box-shadow: 0 8px 18px rgba(17,24,39,0.06);
+  box-shadow: inset 0 1px 0 var(--hairline), 0 0 0 1px var(--rim), 0 0 16px var(--rim-soft);
 }
-.related-label, .examples-label, .guess-label { color: var(--muted); font-size: 0.82rem; margin-top: 10px; }
-.gen span { display: inline; animation: wordIn .5s var(--ease) both; }
-@keyframes wordIn { from { opacity: 0; filter: blur(4px); } to { opacity: 1; filter: none; } }
-.dock { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px 20px; background: linear-gradient(to top, var(--bg) 68%, var(--dock-fade)); }
+.card:has([data-state="ai-error"]) .chips button {
+  color: var(--danger);
+  border-color: var(--danger-line);
+  background: var(--danger-bg);
+}
+.card:has([data-state="ai-error"]) .chips button:hover,
+.card:has([data-state="ai-error"]) .chips button:focus-visible {
+  box-shadow: inset 0 1px 0 var(--hairline), 0 0 0 1px var(--danger), 0 0 16px color-mix(in srgb, var(--danger) 35%, transparent);
+}
+.related-label, .examples-label, .guess-label { color: var(--muted); font-size: 0.82rem; margin-top: 12px; }
+.gen span { display: inline; animation: wordIn .35s var(--ease) both; }
+@keyframes wordIn { from { opacity: 0; } to { opacity: 1; } }
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 16px 16px;
+  background: linear-gradient(to top, var(--bg) 62%, var(--dock-fade));
+}
 .guess { max-width: 720px; margin: 0 auto 8px; }
 .guess[hidden] { display: none !important; }
 .guess-label { margin: 0 0 8px; padding-left: 4px; font-weight: 650; }
 .guess-list { display: flex; flex-wrap: wrap; gap: 8px; }
-.guess-item { animation: springIn .55s var(--spring) both; background: var(--chip); backdrop-filter: blur(10px); }
+.guess-item { animation: springIn .35s var(--ease) both; }
 .guess-item mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1px; }
 .prompt-bar {
-  max-width: 720px; margin: 0 auto;
+  max-width: 720px;
+  margin: 0 auto;
   position: relative;
-  display: flex; gap: 8px; align-items: flex-end;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
   background: var(--prompt);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
   border: 1px solid var(--line);
-  border-radius: 26px;
-  padding: 10px 10px 10px 20px;
-  box-shadow: 0 10px 32px rgba(17,24,39,0.08);
-  transition: transform .45s var(--spring), box-shadow .3s var(--ease), border-color .2s var(--ease);
+  border-radius: 28px;
+  padding: 8px 8px 8px 18px;
+  box-shadow: inset 0 1px 0 var(--hairline), 0 12px 32px rgba(20, 16, 12, 0.08);
+  transition: box-shadow .2s var(--ease), border-color .2s var(--ease);
 }
 .prompt-bar:focus-within {
-  transform: scale(1.012);
-  border-color: rgba(17,24,39,0.14);
-  box-shadow: 0 0 0 4px var(--brand-soft), 0 14px 36px rgba(17,24,39,0.10);
+  border-color: var(--rim);
+  box-shadow: inset 0 1px 0 var(--hairline), 0 0 0 1px var(--rim), 0 0 22px var(--rim-soft), 0 12px 32px rgba(20, 16, 12, 0.08);
 }
-.prompt-bar.sending { transform: scale(0.985); }
 .ph {
   position: absolute;
-  left: 20px; right: 90px; top: 50%;
+  left: 18px;
+  right: 92px;
+  top: 50%;
   transform: translateY(-50%);
   color: var(--ph);
   font-weight: 500;
@@ -335,51 +517,75 @@ h1.blur-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity .35s var(--ease), transform .35s var(--spring);
+  transition: opacity .2s var(--ease);
 }
-.ph.out { opacity: 0; transform: translateY(-12px); }
-.ph.in { opacity: 1; transform: translateY(-50%); }
+.ph.out { opacity: 0; }
+.ph.in { opacity: 1; }
 .ph.hide { opacity: 0; visibility: hidden; }
 .composer textarea {
-  flex: 1; border: 0; resize: none; font: inherit; line-height: 1.55;
-  max-height: 120px; outline: none; background: transparent; color: var(--ink);
-  position: relative; z-index: 1;
+  flex: 1;
+  border: 0;
+  resize: none;
+  font: inherit;
+  line-height: 1.5;
+  max-height: 120px;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  position: relative;
+  z-index: 1;
+  padding: 8px 0;
 }
 .composer button.send {
-  border: 0; background: var(--send); color: var(--send-ink); font: inherit; font-weight: 700; font-size: 0.9rem;
-  border-radius: 18px; padding: 10px 16px; cursor: pointer; min-height: 42px; z-index: 1;
-  transition: transform .3s var(--spring), background .2s var(--ease), opacity .2s var(--ease);
+  border: 0;
+  background: var(--send);
+  color: var(--send-ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  border-radius: 18px;
+  padding: 10px 16px;
+  cursor: pointer;
+  min-height: 42px;
+  z-index: 1;
+  transition: background .2s var(--ease), opacity .2s var(--ease);
 }
 .composer button.send:hover { background: var(--send-hover); }
-.composer button.send:active { transform: scale(.96); }
-.composer button.send:disabled { opacity: 0.4; cursor: default; transform: none; }
+.composer button.send:disabled { opacity: 0.4; cursor: default; }
 .vanish-layer {
-  position: absolute; inset: 0 90px 0 20px;
-  pointer-events: none; overflow: hidden; z-index: 2;
-}
-.vanish-char {
   position: absolute;
-  white-space: pre;
-  color: var(--ink);
-  will-change: transform, opacity;
+  inset: 0 90px 0 18px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
 }
+.vanish-char { position: absolute; white-space: pre; color: var(--ink); }
 @keyframes springIn {
-  0% { opacity: 0; transform: translateY(16px) scale(.97); }
-  58% { opacity: 1; transform: translateY(-3px) scale(1.01); }
-  100% { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
-@media (max-width: 640px) { h1.blur-title { font-size: 1.22rem; } body { padding-top: 16px; } }
+@media (max-width: 720px) {
+  h1.blur-title { font-size: 1.2rem; }
+  body { padding: 14px 14px 168px; }
+  header.top { align-items: flex-start; gap: 10px; }
+  .top-actions { margin-left: 0; }
+}
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .card:not(.user)::before,
+  .card:not(.user)::after { opacity: 0 !important; transition: none !important; }
+}
 @media (prefers-reduced-motion: reduce) {
   .blur-word, .card, .guess-item, .gen span, .ph, .prompt-bar, .composer button.send, .clear-btn,
-  .theme-track, .theme-thumb, .pix, html, body {
-    animation: none !important; transition: none !important; filter: none !important;
+  .theme-track, .theme-thumb, .pix, html, body, .lang button {
+    animation: none !important;
+    transition: none !important;
   }
   .play .blur-word { opacity: 1; transform: none; }
   .ai-dots i { animation: none !important; opacity: .7; }
-  #aurora { opacity: 0.45; }
-  html[data-theme="dark"] #aurora { opacity: 0.26; }
 }
 </style>
+
 </head>
 <body>
   <div class="fx" aria-hidden="true">
@@ -392,29 +598,115 @@ h1.blur-title {
         <button type="button" id="theme-switch" class="theme-switch" role="switch" aria-checked="true">
           <span class="theme-track" aria-hidden="true">
             <span class="theme-thumb">
-              <svg class="pix moon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <svg class="pix moon" viewBox="0 0 21 21" width="20" height="20" aria-hidden="true">
                 <g fill="currentColor">
-                  <rect x="6" y="0" width="4" height="2"></rect>
-                  <rect x="4" y="2" width="4" height="2"></rect>
-                  <rect x="2" y="4" width="4" height="2"></rect>
-                  <rect x="2" y="6" width="4" height="2"></rect>
-                  <rect x="2" y="8" width="4" height="2"></rect>
-                  <rect x="2" y="10" width="4" height="2"></rect>
-                  <rect x="4" y="12" width="4" height="2"></rect>
-                  <rect x="6" y="14" width="4" height="2"></rect>
+                  <rect x="10" y="3" width="1" height="1"></rect>
+                  <rect x="11" y="3" width="1" height="1"></rect>
+                  <rect x="8" y="4" width="1" height="1"></rect>
+                  <rect x="9" y="4" width="1" height="1"></rect>
+                  <rect x="10" y="4" width="1" height="1"></rect>
+                  <rect x="11" y="4" width="1" height="1"></rect>
+                  <rect x="12" y="4" width="1" height="1"></rect>
+                  <rect x="7" y="5" width="1" height="1"></rect>
+                  <rect x="8" y="5" width="1" height="1"></rect>
+                  <rect x="9" y="5" width="1" height="1"></rect>
+                  <rect x="10" y="5" width="1" height="1"></rect>
+                  <rect x="6" y="6" width="1" height="1"></rect>
+                  <rect x="7" y="6" width="1" height="1"></rect>
+                  <rect x="8" y="6" width="1" height="1"></rect>
+                  <rect x="9" y="6" width="1" height="1"></rect>
+                  <rect x="5" y="7" width="1" height="1"></rect>
+                  <rect x="6" y="7" width="1" height="1"></rect>
+                  <rect x="7" y="7" width="1" height="1"></rect>
+                  <rect x="8" y="7" width="1" height="1"></rect>
+                  <rect x="5" y="8" width="1" height="1"></rect>
+                  <rect x="6" y="8" width="1" height="1"></rect>
+                  <rect x="7" y="8" width="1" height="1"></rect>
+                  <rect x="4" y="9" width="1" height="1"></rect>
+                  <rect x="5" y="9" width="1" height="1"></rect>
+                  <rect x="6" y="9" width="1" height="1"></rect>
+                  <rect x="7" y="9" width="1" height="1"></rect>
+                  <rect x="4" y="10" width="1" height="1"></rect>
+                  <rect x="5" y="10" width="1" height="1"></rect>
+                  <rect x="6" y="10" width="1" height="1"></rect>
+                  <rect x="7" y="10" width="1" height="1"></rect>
+                  <rect x="4" y="11" width="1" height="1"></rect>
+                  <rect x="5" y="11" width="1" height="1"></rect>
+                  <rect x="6" y="11" width="1" height="1"></rect>
+                  <rect x="7" y="11" width="1" height="1"></rect>
+                  <rect x="5" y="12" width="1" height="1"></rect>
+                  <rect x="6" y="12" width="1" height="1"></rect>
+                  <rect x="7" y="12" width="1" height="1"></rect>
+                  <rect x="5" y="13" width="1" height="1"></rect>
+                  <rect x="6" y="13" width="1" height="1"></rect>
+                  <rect x="7" y="13" width="1" height="1"></rect>
+                  <rect x="8" y="13" width="1" height="1"></rect>
+                  <rect x="6" y="14" width="1" height="1"></rect>
+                  <rect x="7" y="14" width="1" height="1"></rect>
+                  <rect x="8" y="14" width="1" height="1"></rect>
+                  <rect x="9" y="14" width="1" height="1"></rect>
+                  <rect x="7" y="15" width="1" height="1"></rect>
+                  <rect x="8" y="15" width="1" height="1"></rect>
+                  <rect x="9" y="15" width="1" height="1"></rect>
+                  <rect x="10" y="15" width="1" height="1"></rect>
+                  <rect x="8" y="16" width="1" height="1"></rect>
+                  <rect x="9" y="16" width="1" height="1"></rect>
+                  <rect x="10" y="16" width="1" height="1"></rect>
+                  <rect x="11" y="16" width="1" height="1"></rect>
+                  <rect x="12" y="16" width="1" height="1"></rect>
+                  <rect x="10" y="17" width="1" height="1"></rect>
+                  <rect x="11" y="17" width="1" height="1"></rect>
+                </g>
+                <g class="dim" fill="currentColor">
+                  <rect x="12" y="6" width="1" height="1"></rect>
+                  <rect x="11" y="7" width="1" height="1"></rect>
+                  <rect x="14" y="7" width="1" height="1"></rect>
+                  <rect x="12" y="8" width="1" height="1"></rect>
+                  <rect x="13" y="9" width="1" height="1"></rect>
+                  <rect x="11" y="10" width="1" height="1"></rect>
+                  <rect x="15" y="10" width="1" height="1"></rect>
+                  <rect x="13" y="11" width="1" height="1"></rect>
+                  <rect x="12" y="12" width="1" height="1"></rect>
+                  <rect x="11" y="13" width="1" height="1"></rect>
+                  <rect x="13" y="14" width="1" height="1"></rect>
+                  <rect x="15" y="5" width="1" height="1"></rect>
+                  <rect x="14" y="16" width="1" height="1"></rect>
                 </g>
               </svg>
-              <svg class="pix sun" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <svg class="pix sun" viewBox="0 0 21 21" width="20" height="20" aria-hidden="true">
                 <g fill="currentColor">
-                  <rect x="6" y="0" width="4" height="2"></rect>
-                  <rect x="6" y="14" width="4" height="2"></rect>
-                  <rect x="0" y="6" width="2" height="4"></rect>
-                  <rect x="14" y="6" width="2" height="4"></rect>
-                  <rect x="2" y="2" width="2" height="2"></rect>
-                  <rect x="12" y="2" width="2" height="2"></rect>
-                  <rect x="2" y="12" width="2" height="2"></rect>
-                  <rect x="12" y="12" width="2" height="2"></rect>
-                  <rect x="5" y="5" width="6" height="6"></rect>
+                  <rect x="7" y="7" width="1" height="1"></rect>
+                  <rect x="7" y="9" width="1" height="1"></rect>
+                  <rect x="7" y="11" width="1" height="1"></rect>
+                  <rect x="7" y="13" width="1" height="1"></rect>
+                  <rect x="9" y="7" width="1" height="1"></rect>
+                  <rect x="9" y="9" width="1" height="1"></rect>
+                  <rect x="9" y="11" width="1" height="1"></rect>
+                  <rect x="9" y="13" width="1" height="1"></rect>
+                  <rect x="11" y="7" width="1" height="1"></rect>
+                  <rect x="11" y="9" width="1" height="1"></rect>
+                  <rect x="11" y="11" width="1" height="1"></rect>
+                  <rect x="11" y="13" width="1" height="1"></rect>
+                  <rect x="13" y="7" width="1" height="1"></rect>
+                  <rect x="13" y="9" width="1" height="1"></rect>
+                  <rect x="13" y="11" width="1" height="1"></rect>
+                  <rect x="13" y="13" width="1" height="1"></rect>
+                  <rect x="10" y="1" width="1" height="1"></rect>
+                  <rect x="10" y="3" width="1" height="1"></rect>
+                  <rect x="10" y="17" width="1" height="1"></rect>
+                  <rect x="10" y="19" width="1" height="1"></rect>
+                  <rect x="1" y="10" width="1" height="1"></rect>
+                  <rect x="3" y="10" width="1" height="1"></rect>
+                  <rect x="17" y="10" width="1" height="1"></rect>
+                  <rect x="19" y="10" width="1" height="1"></rect>
+                  <rect x="3" y="3" width="1" height="1"></rect>
+                  <rect x="5" y="5" width="1" height="1"></rect>
+                  <rect x="17" y="3" width="1" height="1"></rect>
+                  <rect x="15" y="5" width="1" height="1"></rect>
+                  <rect x="3" y="17" width="1" height="1"></rect>
+                  <rect x="5" y="15" width="1" height="1"></rect>
+                  <rect x="17" y="17" width="1" height="1"></rect>
+                  <rect x="15" y="15" width="1" height="1"></rect>
                 </g>
               </svg>
             </span>
@@ -842,21 +1134,7 @@ function suggestedFaqs(query, lang, limit) {
     }
     return out;
   }
-  function attachMagnet(el, strength) {
-    if (reduceMotion || window.matchMedia("(pointer: coarse)").matches) return;
-    const k = strength == null ? 0.22 : strength;
-    el.addEventListener("pointermove", (e) => {
-      const r = el.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      el.style.transition = "transform 0.16s linear";
-      el.style.transform = "translate(" + (dx * k).toFixed(2) + "px," + (dy * k).toFixed(2) + "px)";
-    });
-    el.addEventListener("pointerleave", () => {
-      el.style.transition = "transform 0.55s cubic-bezier(0.22, 1.2, 0.36, 1)";
-      el.style.transform = "";
-    });
-  }
+  function attachMagnet() {}
   let dockHeight = 0;
   function syncDock() {
     const dock = document.querySelector(".dock");
@@ -972,60 +1250,7 @@ function suggestedFaqs(query, lang, limit) {
   function submitAsk(text) {
     text = (text || "").trim();
     if (!text) return;
-    if (reduceMotion || text !== ($("input").value || "").trim()) {
-      ask(text);
-      return;
-    }
-    vanishThen(() => ask(text));
-  }
-  function vanishThen(done) {
-    const ta = $("input");
-    const layer = $("vanish");
-    const bar = $("prompt-bar");
-    const text = ta.value;
-    if (!text) { done(); return; }
-    const style = getComputedStyle(ta);
-    const measure = document.createElement("span");
-    measure.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font:" + style.font + ";letter-spacing:" + style.letterSpacing + ";";
-    bar.appendChild(measure);
-    const origin = ta.getBoundingClientRect();
-    const barBox = bar.getBoundingClientRect();
-    layer.hidden = false;
-    layer.innerHTML = "";
-    let x = 0;
-    const midX = ta.clientWidth / 2;
-    const midY = ta.clientHeight / 2;
-    for (const ch of text) {
-      measure.textContent = ch;
-      const w = measure.offsetWidth || 8;
-      const span = document.createElement("span");
-      span.className = "vanish-char";
-      span.textContent = ch;
-      span.style.left = x + "px";
-      span.style.top = "10px";
-      span.style.font = style.font;
-      const dx = midX - x - w / 2;
-      const dy = midY - 10;
-      span.style.transition = "transform 0.48s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.4s ease";
-      span.style.transitionDelay = Math.min(x / 18, 180) + "ms";
-      layer.appendChild(span);
-      requestAnimationFrame(() => {
-        span.style.transform = "translate(" + dx + "px," + dy + "px) scale(0.2)";
-        span.style.opacity = "0";
-      });
-      x += w;
-      if (x > ta.clientWidth - 8) break;
-    }
-    bar.removeChild(measure);
-    ta.value = "";
-    $("ph").classList.add("hide");
-    bar.classList.add("sending");
-    setTimeout(() => {
-      layer.innerHTML = "";
-      layer.hidden = true;
-      bar.classList.remove("sending");
-      done();
-    }, 560);
+    ask(text);
   }
   function ask(text) {
     text = (text || "").trim();
@@ -1447,72 +1672,33 @@ function suggestedFaqs(query, lang, limit) {
     };
     if (mq.addEventListener) mq.addEventListener("change", onSystem);
   }
-  function setupAurora() {
-    const c = $("aurora");
-    if (!c || !c.getContext) return;
-    const ctx = c.getContext("2d", { alpha: true });
-    const W = 128, H = 72;
-    c.width = W;
-    c.height = H;
-    const hash = (ix, iy) => {
-      let n = Math.imul(ix, 374761393) + Math.imul(iy, 668265263);
-      n = Math.imul(n ^ (n >>> 13), 1274126177);
-      return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
-    };
-    const noise = (x, y) => {
-      const ix = Math.floor(x), iy = Math.floor(y);
-      const fx = x - ix, fy = y - iy;
-      const u = fx * fx * (3 - 2 * fx);
-      const v = fy * fy * (3 - 2 * fy);
-      const a = hash(ix, iy), b = hash(ix + 1, iy), cc = hash(ix, iy + 1), d = hash(ix + 1, iy + 1);
-      return a + (b - a) * u + (cc - a) * v + (a - b - cc + d) * u * v;
-    };
-    const fbm = (x, y) => noise(x, y) * 0.62 + noise(x * 2.1, y * 2.1) * 0.28 + noise(x * 4.2, y * 4.2) * 0.1;
-    const img = ctx.createImageData(W, H);
-    let time = 0;
-    const draw = () => {
-      const d = img.data;
-      for (let y = 0; y < H; y++) {
-        for (let x = 0; x < W; x++) {
-          const nx = x / W, ny = y / H;
-          const n = fbm(nx * 2.4 + time, ny * 3.2 + time * 0.35);
-          const cy = 0.44 + 0.10 * n + 0.035 * Math.sin(time * 0.7 + nx * 2.2);
-          const band = Math.exp(-((ny - cy) * 4.4) * ((ny - cy) * 4.4));
-          const mix = Math.min(1, Math.max(0, nx + (n - 0.5) * 0.45));
-          const r = 255 * (1 - mix) + 130 * mix;
-          const g = 168 * (1 - mix) + 198 * mix;
-          const b = 214 * (1 - mix) + 255 * mix;
-          const i = (y * W + x) * 4;
-          d[i] = r;
-          d[i + 1] = g;
-          d[i + 2] = b;
-          d[i + 3] = band * 0.40 * 255;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-    };
-    draw();
-    if (reduceMotion) return;
-    const tick = () => {
-      time += 0.0032;
-      draw();
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
+  function setupAurora() {}
   function setupSpotlights() {
-    if (reduceMotion) return;
-    window.addEventListener("pointermove", (e) => {
-      document.querySelectorAll(".card").forEach((card) => {
-        const r = card.getBoundingClientRect();
-        card.style.setProperty("--sx", (e.clientX - r.left) + "px");
-        card.style.setProperty("--sy", (e.clientY - r.top) + "px");
-        const dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right);
-        const dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom);
-        const prox = Math.max(0, 1 - Math.hypot(dx, dy) / 90);
-        card.style.setProperty("--spot", prox.toFixed(3));
-      });
+    if (reduceMotion || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const thread = $("thread");
+    let current = null;
+    const clearSpot = (card) => { if (card) card.style.setProperty("--spot", "0"); };
+    thread.addEventListener("pointerover", (e) => {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      const card = e.target.closest ? e.target.closest(".card:not(.user)") : null;
+      if (card === current) return;
+      clearSpot(current);
+      current = card;
+      if (current) current.style.setProperty("--spot", "1");
+    });
+    thread.addEventListener("pointermove", (e) => {
+      if (!current || (e.pointerType && e.pointerType !== "mouse")) return;
+      const r = current.getBoundingClientRect();
+      current.style.setProperty("--sx", (e.clientX - r.left) + "px");
+      current.style.setProperty("--sy", (e.clientY - r.top) + "px");
     }, { passive: true });
+    thread.addEventListener("pointerout", (e) => {
+      if (!current) return;
+      const next = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest(".card:not(.user)") : null;
+      if (next === current) return;
+      clearSpot(current);
+      current = null;
+    });
   }
   $("btn-ko").addEventListener("click", () => setLang("ko"));
   $("btn-zh").addEventListener("click", () => setLang("zh"));

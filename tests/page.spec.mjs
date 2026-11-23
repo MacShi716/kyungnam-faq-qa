@@ -553,3 +553,228 @@ for (const size of [
     });
   });
 }
+
+function channels(color) {
+  const match = String(color).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) throw new Error("unparsed color " + color);
+  return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) };
+}
+
+function luminance(color) {
+  const { r, g, b } = channels(color);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+async function pageChrome(page) {
+  return page.evaluate(() => {
+    const body = getComputedStyle(document.body);
+    const card = getComputedStyle(document.querySelector("#thread .card"));
+    const bar = getComputedStyle(document.querySelector(".prompt-bar"));
+    const lang = getComputedStyle(document.querySelector(".lang"));
+    const dock = getComputedStyle(document.querySelector(".dock"));
+    return {
+      bg: getComputedStyle(document.documentElement).backgroundColor,
+      ink: body.color,
+      cardBlur: card.backdropFilter || card.webkitBackdropFilter || "",
+      barBlur: bar.backdropFilter || bar.webkitBackdropFilter || "",
+      langBlur: lang.backdropFilter || lang.webkitBackdropFilter || "",
+      dockBg: dock.backgroundImage || "",
+      thumbShadow: getComputedStyle(document.querySelector(".theme-thumb")).boxShadow,
+      trackShadow: getComputedStyle(document.querySelector(".theme-track")).boxShadow,
+      moon: document.querySelectorAll(".pix.moon rect").length,
+      sun: document.querySelectorAll(".pix.sun rect").length,
+    };
+  });
+}
+
+test("both themes keep frosted glass, separated rim light, and distinct answer states", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await installAi(page, (route, _n, body) => {
+    const lang = JSON.parse(body).lang;
+    return fulfillJson(route, 200, { answer: lang === "ko" ? MOCK_KO : MOCK_ZH });
+  });
+  await page.goto("/");
+  const light = await pageChrome(page);
+  expect(luminance(light.bg)).toBeGreaterThan(220);
+  expect(luminance(light.ink)).toBeLessThan(50);
+  expect(light.cardBlur).toContain("blur");
+  expect(light.barBlur).toContain("blur");
+  expect(light.langBlur).toContain("blur");
+  expect(light.trackShadow).toContain("inset");
+  expect(light.thumbShadow.split("inset")[0]).toMatch(/-[\d.]+px/);
+  expect(light.moon).toBeGreaterThan(20);
+  expect(light.sun).toBeGreaterThan(20);
+
+  await page.locator("#input").focus();
+  const focused = await page.locator("#prompt-bar").evaluate((el) => getComputedStyle(el).transform);
+  expect(focused === "none" || focused === "matrix(1, 0, 0, 1, 0, 0)").toBe(true);
+  const clearBox = await page.locator("#btn-clear").boundingBox();
+  await page.mouse.move(clearBox.x + 6, clearBox.y + 8);
+  expect(await page.locator("#btn-clear").evaluate((el) => getComputedStyle(el).transform)).toBe("none");
+
+  await ask(page, "第一工学馆在哪？");
+  const verified = channels(await page.locator(".badge.ok").evaluate((el) => getComputedStyle(el).color));
+  expect(verified.g).toBeGreaterThan(verified.r);
+  const bubble = await page.evaluate(() => {
+    const user = document.querySelector(".card.user").getBoundingClientRect();
+    const answer = document.querySelector("#thread .card:not(.user)").getBoundingClientRect();
+    return { userLeft: user.left, answerLeft: answer.left, userRight: user.right, answerRight: answer.right };
+  });
+  expect(bubble.userLeft).toBeGreaterThan(bubble.answerLeft + 8);
+  expect(Math.abs(bubble.userRight - bubble.answerRight)).toBeLessThan(3);
+
+  await page.locator("#btn-clear").click();
+  await ask(page, "什么时候可以申请休学？");
+  const unverified = channels(await page.locator(".badge.warn").evaluate((el) => getComputedStyle(el).color));
+  expect(unverified.r).toBeGreaterThan(unverified.b);
+  expect(unverified.r).not.toBe(verified.r);
+
+  await page.locator("#btn-clear").click();
+  await ask(page, "你怎么知道我是谁");
+  const ai = channels(await page.locator(".badge.ai").evaluate((el) => getComputedStyle(el).color));
+  expect(ai.b).toBeGreaterThan(ai.r);
+  expect(ai.b).not.toBe(unverified.b);
+
+  await page.unroute(AI_HOST).catch(() => {});
+  await installAi(page, (route) => fulfillJson(route, 500, { answer: "hidden" }));
+  await page.locator("#btn-clear").click();
+  await ask(page, "你怎么知道我是谁");
+  const error = page.locator("[data-state='ai-error']");
+  await expect(error).toContainText(ZH_ERROR);
+  await expect(error).not.toContainText(ZH_NO_MATCH);
+  const danger = channels(await error.evaluate((el) => getComputedStyle(el).color));
+  expect(danger.r).toBeGreaterThan(danger.g);
+  expect(danger.r).toBeGreaterThan(danger.b);
+
+  await switcher(page).click();
+  const dark = await pageChrome(page);
+  expect(await themeOf(page)).toBe("dark");
+  expect(luminance(dark.bg)).toBeLessThan(40);
+  expect(luminance(dark.ink)).toBeGreaterThan(200);
+  expect(dark.cardBlur).toContain("blur");
+  expect(dark.barBlur).toContain("blur");
+  const nightGlow = dark.thumbShadow.split("inset")[0];
+  expect(nightGlow).toMatch(/-[\d.]+px/);
+  expect(dark.trackShadow).toContain("inset");
+});
+
+test.describe("card spotlight", () => {
+  test("reduced motion and the composer do not show a card spotlight", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const card = page.locator("#thread .card").first();
+    const box = await card.boundingBox();
+    await page.mouse.move(box.x + 28, box.y + 28);
+    expect(await card.evaluate((el) => el.style.getPropertyValue("--spot") || "0")).toBe("0");
+  });
+
+  test("a fine pointer lights the answer card without tilting it or the input", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    await ask(page, "第一工学馆在哪？");
+    const answer = page.locator("#thread .card:not(.user)").last();
+    const user = page.locator(".card.user").last();
+    await answer.evaluate((el) => { el.style.animation = "none"; });
+    const box = await answer.boundingBox();
+    await page.mouse.move(box.x + 36, box.y + 42);
+    await expect.poll(() => answer.evaluate((el) => el.style.getPropertyValue("--spot"))).toBe("1");
+    const tilt = await answer.evaluate((el) => getComputedStyle(el).transform);
+    expect(tilt === "none" || tilt === "matrix(1, 0, 0, 1, 0, 0)").toBe(true);
+    expect(await answer.evaluate((el) => el.style.transform || "")).toBe("");
+    const userBox = await user.boundingBox();
+    await page.mouse.move(userBox.x + 12, userBox.y + 12);
+    await expect.poll(() => answer.evaluate((el) => el.style.getPropertyValue("--spot") || "0")).toBe("0");
+    expect(await user.evaluate((el) => el.style.getPropertyValue("--spot") || "0")).toBe("0");
+    await page.locator("#input").click();
+    expect(await page.locator("#prompt-bar").evaluate((el) => el.style.getPropertyValue("--spot") || "0")).toBe("0");
+    const zoom = await page.locator("#prompt-bar").evaluate((el) => getComputedStyle(el).transform);
+    expect(zoom === "none" || zoom === "matrix(1, 0, 0, 1, 0, 0)").toBe(true);
+  });
+});
+
+for (const size of [
+  { name: "desktop-1280", width: 1280, height: 800 },
+  { name: "phone-375", width: 375, height: 667 },
+  { name: "phone-390", width: 390, height: 844 },
+  { name: "ipad-712", width: 1024, height: 712 },
+  { name: "ipad-480", width: 1024, height: 480 },
+]) {
+  test.describe(`unified style layout ${size.name}`, () => {
+    test.use({ viewport: { width: size.width, height: size.height } });
+    test("header, answers, and composer stay apart in both themes", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/");
+      const setTheme = (mode) => page.evaluate((next) => {
+        const sw = document.getElementById("theme-switch");
+        if (document.documentElement.getAttribute("data-theme") !== next) sw.click();
+      }, mode);
+      const readLayout = () => page.evaluate(() => {
+        const read = (sel) => {
+          const r = document.querySelector(sel).getBoundingClientRect();
+          return { x: r.x, y: r.y, width: r.width, height: r.height };
+        };
+        const textBox = (sel) => {
+          const el = document.querySelector(sel);
+          const r = el.getBoundingClientRect();
+          return { height: r.height, width: r.width };
+        };
+        const answer = document.querySelector("#thread .card:not(.user)");
+        const guess = document.getElementById("guess");
+        const dock = document.querySelector(".dock");
+        const overlap = (a, b) => {
+          if (!a || !b) return 0;
+          const br = b.getBoundingClientRect();
+          const ar = a.getBoundingClientRect();
+          if (b.hidden || getComputedStyle(b).display === "none") return 0;
+          return Math.max(0, Math.min(ar.bottom, br.bottom) - Math.max(ar.top, br.top));
+        };
+        return {
+          sw: read("#theme-switch"),
+          lang: read(".lang"),
+          clear: read("#btn-clear"),
+          header: read("header.top"),
+          dock: read(".dock"),
+          title: textBox("#title"),
+          scrollWidth: document.documentElement.scrollWidth,
+          clientWidth: document.documentElement.clientWidth,
+          answerUnderDock: overlap(answer, dock),
+          answerUnderGuess: overlap(answer, guess),
+        };
+      });
+      for (const mode of ["light", "dark"]) {
+        await setTheme(mode);
+        expect(await themeOf(page)).toBe(mode);
+        let boxes = await readLayout();
+        expect(boxesOverlap(boxes.sw, boxes.lang)).toBe(false);
+        expect(boxesOverlap(boxes.lang, boxes.clear)).toBe(false);
+        expect(boxesOverlap(boxes.header, boxes.dock)).toBe(false);
+        expect(boxes.sw.height).toBeGreaterThanOrEqual(44);
+        expect(boxes.clear.height).toBeGreaterThanOrEqual(44);
+        expect(boxes.lang.height).toBeGreaterThanOrEqual(44);
+        expect(boxes.title.height).toBeGreaterThanOrEqual(22);
+        expect(boxes.scrollWidth).toBeLessThanOrEqual(boxes.clientWidth + 1);
+        expect(boxes.sw.x).toBeGreaterThanOrEqual(-1);
+        expect(boxes.clear.x + boxes.clear.width).toBeLessThanOrEqual(size.width + 1);
+      }
+      await ask(page, "第一工学馆在哪？");
+      await expect(bot(page)).toContainText("11");
+      await expect(page.locator("#guess")).toBeHidden();
+      for (const mode of ["light", "dark"]) {
+        await setTheme(mode);
+        let boxes = await readLayout();
+        expect(boxes.answerUnderDock).toBe(0);
+        expect(boxes.answerUnderGuess).toBe(0);
+        expect(boxes.scrollWidth).toBeLessThanOrEqual(boxes.clientWidth + 1);
+        expect(boxesOverlap(boxes.header, boxes.dock)).toBe(false);
+        await page.locator("#input").fill("工学馆");
+        await expect(page.locator("#guess")).toContainText("工学馆");
+        boxes = await readLayout();
+        expect(boxes.answerUnderDock).toBe(0);
+        expect(boxes.answerUnderGuess).toBe(0);
+        expect(boxes.scrollWidth).toBeLessThanOrEqual(boxes.clientWidth + 1);
+        await page.locator("#input").fill("");
+        await expect(page.locator("#guess")).toBeHidden();
+      }
+    });
+  });
+}
