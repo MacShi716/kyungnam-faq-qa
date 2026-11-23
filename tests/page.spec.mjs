@@ -1439,3 +1439,230 @@ test("a cancelled language drag does not swallow the next tap", async ({ page })
   await page.locator("#btn-zh").click();
   await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
 });
+
+const ZH_STARTERS = ["什么时候可以申请休学？", "什么时候选课？", "签证续签要多久"];
+const KO_STARTERS = ["휴학 신청은 언제 해요?", "수강신청은 언제 해요?", "비자 연장은 어떻게 해요?"];
+
+function placeholderText(page) {
+  return page.locator("#ph").evaluate((el) => (el.textContent || "").trim());
+}
+
+async function textOutsideAnchors(locator) {
+  return locator.evaluate((el) => {
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll("a").forEach((node) => node.remove());
+    return clone.textContent || "";
+  });
+}
+
+async function rotatePlaceholder(page) {
+  await page.clock.fastForward(2800);
+  await page.clock.fastForward(300);
+}
+
+test.describe("composer placeholder sending", () => {
+  test("empty click sends the first starter and Enter sends the rotated one", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.clock.install();
+    await page.goto("/");
+    const input = page.locator("#input");
+    await expect(input).toHaveValue("");
+    expect(await input.getAttribute("required")).toBeNull();
+    expect(await input.evaluate((el) => el.validity.valueMissing)).toBe(false);
+    expect(await page.evaluate(() => document.body.dataset.chatState)).toBe("empty");
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[0]);
+
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[0]);
+    await expect(bot(page)).toContainText("一般休学");
+    expect(await page.evaluate(() => document.body.dataset.chatState)).toBe("active");
+    await expect(input).toHaveValue("");
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[1]);
+
+    await page.locator("#btn-clear").click();
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[0]);
+    await rotatePlaceholder(page);
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[1]);
+    await input.press("Enter");
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[1]);
+    await expect(bot(page)).toContainText("选课");
+    await expect(bot(page)).not.toContainText("一般休学");
+  });
+
+  test("empty Enter sends the first starter and click sends the rotated one", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.clock.install();
+    await page.goto("/");
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[0]);
+    await page.locator("#input").press("Enter");
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[0]);
+    await expect(bot(page)).toContainText("一般休学");
+
+    await page.locator("#btn-clear").click();
+    await rotatePlaceholder(page);
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[1]);
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[1]);
+    await expect(bot(page)).toContainText("选课");
+    await expect(bot(page)).not.toContainText("一般休学");
+  });
+
+  test("Shift+Enter and IME composition never send", async ({ page }) => {
+    await page.goto("/");
+    const input = page.locator("#input");
+    const shown = await placeholderText(page);
+    await input.focus();
+    await input.evaluate((el) => {
+      el.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        bubbles: true,
+        cancelable: true,
+        isComposing: true,
+      }));
+      const legacy = new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(legacy, "isComposing", { get: () => false });
+      Object.defineProperty(legacy, "keyCode", { get: () => 229 });
+      el.dispatchEvent(legacy);
+    });
+    await expect(page.locator(".card.user")).toHaveCount(0);
+
+    await input.evaluate((el) => el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true })));
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".card.user")).toHaveCount(0);
+    await input.evaluate((el) => el.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true })));
+
+    await page.keyboard.press("Shift+Enter");
+    await expect(page.locator(".card.user")).toHaveCount(0);
+    expect((await input.inputValue()).trim()).toBe("");
+
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".card.user")).toHaveText(shown);
+    await expect(bot(page)).toContainText("一般休学");
+  });
+
+  test("typed text wins over the placeholder and whitespace falls back to it", async ({ page }) => {
+    await page.goto("/");
+    const input = page.locator("#input");
+    await input.fill("第一工学馆在哪？");
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText("第一工学馆在哪？");
+    await expect(page.locator(".card.user")).not.toHaveText(ZH_STARTERS[0]);
+    await expect(bot(page)).toContainText("11");
+
+    await page.locator("#btn-clear").click();
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[0]);
+    await input.fill("  \n\t  ");
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[0]);
+    await expect(bot(page)).toContainText("一般休学");
+  });
+
+  test("Korean empty send uses the current #lang-switch, not the obsolete #btn-ko", async ({ page }) => {
+    await page.goto("/");
+    const langSwitch = page.locator("#lang-switch");
+    await expect(langSwitch).toBeVisible();
+    await langSwitch.locator('[data-lang="ko"]').click();
+    await expect(langSwitch.locator('[data-lang="ko"]')).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("#input")).toHaveAttribute("aria-label", "궁금한 내용을 입력하세요 (한국어 / 中文)");
+    expect(await placeholderText(page)).toBe(KO_STARTERS[0]);
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(KO_STARTERS[0]);
+    await expect(bot(page)).toContainText("일반휴학");
+    expect(await placeholderText(page)).toBe(KO_STARTERS[1]);
+  });
+
+  test("clearing chat returns to the empty state and the first starter question", async ({ page }) => {
+    await page.goto("/");
+    expect(await page.evaluate(() => document.body.dataset.chatState)).toBe("empty");
+    await page.locator("#btn-send").click();
+    expect(await page.evaluate(() => document.body.dataset.chatState)).toBe("active");
+    expect(await placeholderText(page)).not.toBe(ZH_STARTERS[0]);
+    await page.locator("#btn-clear").click();
+    expect(await page.evaluate(() => document.body.dataset.chatState)).toBe("empty");
+    await expect(page.locator(".card.user")).toHaveCount(0);
+    await expect(page.locator("#thread")).toContainText("你好");
+    expect(await placeholderText(page)).toBe(ZH_STARTERS[0]);
+  });
+});
+
+test.describe("link escaping", () => {
+  test("F23 keeps the URL apart from the following Chinese and Korean prose", async ({ page }) => {
+    await page.goto("/");
+    await ask(page, "怎么登录学生信息系统？");
+    const body = bot(page).locator(".answer-body");
+    const pill = body.locator(".link-pill");
+    await expect(pill).toHaveCount(1);
+    expect(await pill.getAttribute("href")).toBe("https://sugang.kyungnam.ac.kr");
+    await expect(pill).toHaveText("sugang.kyungnam.ac.kr");
+    const anchor = await pill.innerHTML();
+    expect(anchor).not.toContain("xn--");
+    expect(anchor).not.toMatch(/[\u4e00-\u9fff\uac00-\ud7af]/);
+    const outside = await textOutsideAnchors(body);
+    expect(outside).toContain("预选课篮子申请");
+    expect(outside).toContain("学籍管理");
+    expect(outside).not.toContain("sugang.kyungnam.ac.kr");
+
+    await page.locator('#lang-switch [data-lang="ko"]').click();
+    const koBody = bot(page).locator(".answer-body");
+    const koPill = koBody.locator(".link-pill");
+    await expect(koPill).toHaveCount(1);
+    expect(await koPill.getAttribute("href")).toBe("https://sugang.kyungnam.ac.kr");
+    await expect(koPill).toHaveText("sugang.kyungnam.ac.kr");
+    const koAnchor = await koPill.innerHTML();
+    expect(koAnchor).not.toContain("이며");
+    expect(koAnchor).not.toMatch(/[\u4e00-\u9fff\uac00-\ud7af]/);
+    const koOutside = await textOutsideAnchors(koBody);
+    expect(koOutside).toContain("이며, 수강바구니");
+    expect(koOutside).not.toContain("sugang.kyungnam.ac.kr");
+  });
+
+  test("an AI answer keeps query ampersands and trailing Chinese outside the pill", async ({ page }) => {
+    const answer = "https://www.kyungnam.ac.kr/test?a=1&b=2，请查看";
+    await installAi(page, (route) => fulfillJson(route, 200, { answer }));
+    await page.goto("/");
+    await ask(page, "你怎么知道我是谁");
+    const body = bot(page).locator(".answer-body");
+    const pill = body.locator(".link-pill");
+    await expect(pill).toHaveCount(1);
+    expect(await pill.getAttribute("href")).toBe("https://www.kyungnam.ac.kr/test?a=1&b=2");
+    const html = await pill.evaluate((el) => el.outerHTML);
+    expect(html).not.toContain("&amp;amp;");
+    expect(html).toContain("a=1&amp;b=2");
+    await expect(pill).not.toContainText("请查看");
+    await expect(pill).not.toContainText("，");
+    const outside = await textOutsideAnchors(body);
+    expect(outside).toContain("，请查看");
+    const style = await pill.evaluate((el) => ({
+      className: el.className,
+      shadow: getComputedStyle(el).boxShadow,
+    }));
+    expect(style.className).toContain("link-pill");
+    expect(style.shadow).not.toBe("none");
+  });
+
+  test("compactSource links ASCII URLs once and leaves prose outside them", async ({ page }) => {
+    await page.goto("/");
+    const source = await page.evaluate(() => {
+      const html = compactSource("출처 https://example.com/a?x=1&y=2 ; 설명 https://example.com/b，뒤");
+      const box = document.createElement("div");
+      box.innerHTML = html;
+      return {
+        html,
+        hrefs: Array.from(box.querySelectorAll("a")).map((a) => a.getAttribute("href")),
+        anchors: Array.from(box.querySelectorAll("a")).map((a) => a.textContent || ""),
+        text: box.textContent || "",
+      };
+    });
+    expect(source.hrefs).toEqual(["https://example.com/a?x=1&y=2", "https://example.com/b"]);
+    expect(source.html).not.toContain("&amp;amp;");
+    expect(source.html).toContain("x=1&amp;y=2");
+    expect(source.text).toContain("，뒤");
+    expect(source.anchors[1]).not.toContain("뒤");
+  });
+});
