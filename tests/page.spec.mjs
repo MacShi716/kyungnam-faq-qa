@@ -540,7 +540,7 @@ test.describe("theme switch", () => {
     const y = box.y + box.height / 2;
     await page.mouse.move(box.x + 6, y);
     await page.mouse.down();
-    await page.mouse.move(box.x + 18, y, { steps: 6 });
+    await page.mouse.move(box.x + 14, y, { steps: 4 });
     await page.mouse.up();
     expect(await themeOf(page)).toBe("dark");
     expect(await thumbSide(page)).toBe("left");
@@ -579,6 +579,31 @@ test.describe("theme switch", () => {
     });
     expect(await themeOf(page)).toBe("dark");
     expect(await page.evaluate(() => localStorage.getItem("faq_theme"))).toBe("dark");
+    await switcher(page).click();
+    expect(await themeOf(page)).toBe("light");
+  });
+
+  test("a third of the theme travel flicks day and night, and a full drag does too", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("faq_theme", "dark"));
+    await page.goto("/");
+    const travel = await page.evaluate(() => {
+      const track = document.querySelector(".theme-track");
+      const thumb = document.querySelector(".theme-thumb");
+      return Math.max(1, track.clientWidth - thumb.offsetWidth - 6);
+    });
+    const box = await page.locator(".theme-track").boundingBox();
+    const y = box.y + box.height / 2;
+    await page.mouse.move(box.x + 8, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 8 + travel * 0.35, y, { steps: 8 });
+    await page.mouse.up();
+    expect(await themeOf(page)).toBe("light");
+    await expect.poll(() => thumbSide(page)).toBe("right");
+    await dragTrack(page, 0.92, 0.08);
+    expect(await themeOf(page)).toBe("dark");
+    await expect.poll(() => thumbSide(page)).toBe("left");
+    const touch = await page.locator("#theme-switch").evaluate((el) => getComputedStyle(el).touchAction);
+    expect(touch).toBe("none");
   });
 
   test("saved theme survives reload and system theme applies only before a choice", async ({ page }) => {
@@ -1014,7 +1039,7 @@ test.describe("language glass slider", () => {
           expect(slide.zhH, label).toBeGreaterThanOrEqual(44);
           expect(Math.abs(slide.thumbW - slide.expectW), label).toBeLessThan(1.5);
           expect(slide.overflow, label).toBe("visible");
-          expect(slide.touch, label).toContain("pan-y");
+          expect(slide.touch, label).toBe("none");
           expect(slide.pe, label).toBe("none");
           expect(slide.hidden, label).toBe("true");
           expect(slide.blur, label).toMatch(/blur\(10px\)/);
@@ -1106,6 +1131,18 @@ test.describe("language glass slider", () => {
     await page.mouse.up();
     await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
     expect((await langSlide(page)).pos).toBe("1");
+
+    const travel = (await langSlide(page)).thumbW;
+    const flick = await page.locator(".lang").boundingBox();
+    const fy = flick.y + flick.height / 2;
+    await page.mouse.move(flick.x + flick.width - 12, fy);
+    await page.mouse.down();
+    await page.mouse.move(flick.x + flick.width - 12 - travel * 0.35, fy, { steps: 8 });
+    await page.mouse.up();
+    await expect(page.locator("#btn-ko")).toHaveAttribute("aria-pressed", "true");
+    expect((await langSlide(page)).pos).toBe("0");
+    const langTouch = await page.locator(".lang button").first().evaluate((el) => getComputedStyle(el).touchAction);
+    expect(langTouch).toBe("none");
   });
 });
 
@@ -1213,3 +1250,192 @@ function hasBlue(shadow) {
 function hasAmber(shadow) {
   return colorsIn(shadow).some((c) => c.a > 0.15 && c.r > c.b + 30 && c.g > 80 && c.r > c.g);
 }
+
+test("header controls share one height and stay on one row at 375", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto("/");
+  const boxes = await page.evaluate(() => {
+    const read = (sel) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right };
+    };
+    return {
+      sw: read("#theme-switch"),
+      lang: read(".lang"),
+      clear: read("#btn-clear"),
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    };
+  });
+  expect(boxes.sw.height).toBeGreaterThanOrEqual(44);
+  expect(Math.abs(boxes.sw.height - boxes.lang.height)).toBeLessThan(1);
+  expect(Math.abs(boxes.lang.height - boxes.clear.height)).toBeLessThan(1);
+  expect(Math.abs(boxes.sw.y - boxes.lang.y)).toBeLessThan(1);
+  expect(Math.abs(boxes.lang.y - boxes.clear.y)).toBeLessThan(1);
+  expect(boxes.sw.x).toBeGreaterThanOrEqual(-1);
+  expect(boxes.clear.right).toBeLessThanOrEqual(boxes.clientWidth + 1);
+  expect(boxes.scrollWidth).toBeLessThanOrEqual(boxes.clientWidth + 1);
+  expect(boxesOverlap(boxes.sw, boxes.lang)).toBe(false);
+  expect(boxesOverlap(boxes.lang, boxes.clear)).toBe(false);
+  await page.locator("#btn-ko").click();
+  const korean = await page.evaluate(() => {
+    const read = (sel) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      return { y: r.y, right: r.right, height: r.height };
+    };
+    return {
+      sw: read("#theme-switch"),
+      lang: read(".lang"),
+      clear: read("#btn-clear"),
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    };
+  });
+  expect(Math.abs(korean.sw.height - korean.lang.height)).toBeLessThan(1);
+  expect(Math.abs(korean.sw.y - korean.clear.y)).toBeLessThan(1);
+  expect(korean.clear.right).toBeLessThanOrEqual(korean.clientWidth + 1);
+  expect(korean.scrollWidth).toBeLessThanOrEqual(korean.clientWidth + 1);
+});
+
+async function stackMetrics(page) {
+  return page.evaluate(() => {
+    const docTop = (sel) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      return { top: r.top + window.scrollY, bottom: r.bottom + window.scrollY, height: r.height, viewTop: r.top };
+    };
+    return {
+      state: document.body.dataset.chatState,
+      header: docTop("header.top"),
+      card: docTop("#thread .card"),
+      dock: docTop(".dock"),
+      dockPos: getComputedStyle(document.querySelector(".dock")).position,
+      scrollY: window.scrollY,
+      scrollHeight: document.documentElement.scrollHeight,
+      clientHeight: document.documentElement.clientHeight,
+    };
+  });
+}
+
+for (const size of [
+  { name: "short-ipad", width: 1024, height: 480 },
+  { name: "phone-375", width: 375, height: 667 },
+]) {
+  test(`empty chat centers, then docks, then clears on ${size.name}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    let metrics = await stackMetrics(page);
+    expect(metrics.state).toBe("empty");
+    expect(metrics.scrollY).toBe(0);
+    expect(metrics.header.viewTop).toBeGreaterThanOrEqual(-1);
+    expect(metrics.header.top).toBeLessThan(metrics.card.top);
+    expect(metrics.card.top).toBeLessThan(metrics.dock.top);
+    expect(metrics.dockPos).not.toBe("fixed");
+    expect(metrics.header.top).toBeGreaterThanOrEqual(0);
+    expect(metrics.dock.bottom).toBeLessThanOrEqual(metrics.scrollHeight + 1);
+    expect(metrics.header.height).toBeGreaterThan(0);
+    expect(metrics.dock.height).toBeGreaterThan(0);
+
+    await ask(page, "第一工学馆在哪？");
+    await expect(bot(page)).toContainText("11");
+    metrics = await stackMetrics(page);
+    expect(metrics.state).toBe("active");
+    expect(metrics.dockPos).toBe("fixed");
+    const overlap = await page.evaluate(() => {
+      const answer = document.querySelector("#thread .card:not(.user)");
+      const dock = document.querySelector(".dock");
+      const ar = answer.getBoundingClientRect();
+      const dr = dock.getBoundingClientRect();
+      return Math.max(0, Math.min(ar.bottom, dr.bottom) - Math.max(ar.top, dr.top));
+    });
+    expect(overlap).toBe(0);
+
+    await page.locator("#btn-clear").click();
+    await expect(page.locator("#thread .card.user")).toHaveCount(0);
+    metrics = await stackMetrics(page);
+    expect(metrics.state).toBe("empty");
+    expect(metrics.dockPos).not.toBe("fixed");
+    expect(metrics.header.viewTop).toBeGreaterThanOrEqual(-1);
+    expect(metrics.card.top).toBeLessThan(metrics.dock.top);
+  });
+}
+
+test("answer links stay real hrefs and the copy button confirms in both languages", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    window.__copied = "";
+    const clip = navigator.clipboard || {};
+    clip.writeText = async (text) => { window.__copied = text; };
+    navigator.clipboard = clip;
+  });
+  await ask(page, "第一工学馆在哪？");
+  const link = page.locator(".answer-body a.link-pill").first();
+  const href = "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517";
+  await expect(link).toHaveAttribute("href", href);
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("rel", /noopener/);
+  await expect(link).toHaveAttribute("title", href);
+  await expect(link).toContainText("查看庆南大学校园地图");
+  await expect(link.locator("svg")).toHaveCount(1);
+  const copy = page.locator(".copy-btn");
+  await expect(copy).toContainText("复制");
+  await expect(page.locator(".card.user .copy-btn")).toHaveCount(0);
+  await copy.click();
+  await expect.poll(() => page.evaluate(() => window.__copied)).toContain(href);
+  await expect.poll(() => page.evaluate(() => window.__copied)).toContain("11");
+  await expect(copy).toContainText("已复制");
+  await page.locator("#btn-ko").click();
+  await expect(page.locator(".answer-body a.link-pill").first()).toHaveAttribute("href", href);
+  await expect(page.locator(".answer-body a.link-pill").first()).toContainText("경남대 캠퍼스맵 보기");
+  await expect(page.locator(".copy-btn")).toContainText("복사");
+  await page.locator("#btn-clear").click();
+  await expect(page.locator(".copy-btn")).toHaveCount(0);
+});
+
+test("a cancelled language drag does not swallow the next tap", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
+  await page.evaluate(() => {
+    const el = document.querySelector(".lang");
+    const r = el.getBoundingClientRect();
+    const y = r.top + r.height / 2;
+    const fire = (type, x, yy) => el.dispatchEvent(new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 9,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      buttons: type === "pointercancel" ? 0 : 1,
+      clientX: x,
+      clientY: yy,
+    }));
+    fire("pointerdown", r.left + 24, y);
+    fire("pointermove", r.right - 16, y);
+    fire("pointercancel", r.right - 16, y);
+  });
+  await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#btn-ko").click();
+  await expect(page.locator("#btn-ko")).toHaveAttribute("aria-pressed", "true");
+  expect(await page.evaluate(() => document.documentElement.lang)).toBe("ko");
+  await page.evaluate(() => {
+    const el = document.querySelector(".lang");
+    const r = el.getBoundingClientRect();
+    const y = r.top + r.height / 2;
+    const fire = (type, x, yy) => el.dispatchEvent(new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 11,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      buttons: type === "pointercancel" ? 0 : 1,
+      clientX: x,
+      clientY: yy,
+    }));
+    fire("pointerdown", r.left + 12, y);
+    fire("pointermove", r.left + 14, y + 70);
+    fire("pointercancel", r.left + 14, y + 70);
+  });
+  await page.locator("#btn-zh").click();
+  await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
+});
