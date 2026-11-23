@@ -573,7 +573,7 @@ async function pageChrome(page) {
     const lang = getComputedStyle(document.querySelector(".lang"));
     const dock = getComputedStyle(document.querySelector(".dock"));
     return {
-      bg: body.backgroundColor,
+      bg: getComputedStyle(document.documentElement).backgroundColor,
       ink: body.color,
       cardBlur: card.backdropFilter || card.webkitBackdropFilter || "",
       barBlur: bar.backdropFilter || bar.webkitBackdropFilter || "",
