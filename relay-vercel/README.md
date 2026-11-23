@@ -2,9 +2,9 @@
 
 Isolated Node.js relay for the static FAQ page. It does not change the live page endpoint. Deploy this directory as its own Vercel project, then point the page at the resulting URL only after that URL exists.
 
-The function accepts `POST /api/ask` with JSON `{ "question": string, "lang": "zh" | "ko" }` and returns `200 { "answer": string }`. `question` is at most 300 characters. A missing `lang` means Chinese. Any other failure is a non-200 JSON error with a short code, not the upstream body.
+The function accepts `POST /api/ask` with JSON `{ "question": string, "lang": "zh" | "ko", "history"?: { "role": "user" | "assistant", "content": string }[] }` and returns `200 { "answer": string }`. `question` is at most 300 characters. A missing `lang` means Chinese. `history` is optional prior turns. When it is missing, empty, or not an array, the request behaves as a single turn. Malformed entries are dropped. Only `user` and `assistant` are kept, at most the last 8 messages, each collapsed to a single line and cut at 500 characters. A full valid payload fits under 16 KB. Any other failure is a non-200 JSON error with a short code, not the upstream body.
 
-Upstream is `POST https://open.bigmodel.cn/api/paas/v4/chat/completions` with model `glm-4-flash`. The only secret is the environment variable `ZHIPU_API_KEY`. This repository does not contain a key.
+Upstream is `POST https://open.bigmodel.cn/api/paas/v4/chat/completions` with model `glm-4-flash` and temperature `0.5`. The only secret is the environment variable `ZHIPU_API_KEY`. This repository does not contain a key.
 
 ## Hobby settings from current Vercel docs
 
