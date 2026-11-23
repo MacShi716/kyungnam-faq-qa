@@ -346,3 +346,210 @@ test("a hung AI request is recorded as a timeout, not a successful answer", asyn
   await expect(error).toHaveAttribute("data-reason", "timeout");
   await expect(bot(page)).not.toContainText("AI自主回答");
 });
+
+const switcher = (page) => page.locator("#theme-switch");
+
+async function themeOf(page) {
+  return page.locator("html").getAttribute("data-theme");
+}
+
+async function thumbSide(page) {
+  return page.evaluate(() => {
+    const track = document.querySelector(".theme-track").getBoundingClientRect();
+    const thumb = document.querySelector(".theme-thumb").getBoundingClientRect();
+    return (thumb.left + thumb.width / 2) < (track.left + track.width / 2) ? "left" : "right";
+  });
+}
+
+async function dragTrack(page, fromRatio, toRatio) {
+  const box = await page.locator(".theme-track").boundingBox();
+  const y = box.y + box.height / 2;
+  const x1 = box.x + Math.max(4, box.width * fromRatio);
+  const x2 = box.x + Math.min(box.width - 4, box.width * toRatio);
+  await page.mouse.move(x1, y);
+  await page.mouse.down();
+  await page.mouse.move(x2, y, { steps: 12 });
+  await page.mouse.up();
+}
+
+function boxesOverlap(a, b) {
+  if (!a || !b) return false;
+  return a.x < b.x + b.width - 1 && a.x + a.width > b.x + 1 && a.y < b.y + b.height - 1 && a.y + a.height > b.y + 1;
+}
+
+test.describe("theme switch", () => {
+  test("click, keys, and drags commit the same day and night states", async ({ page }) => {
+    await page.goto("/");
+    const sw = switcher(page);
+    await expect(sw).toHaveAccessibleName("昼夜主题");
+    await expect(sw).toHaveAttribute("aria-checked", "true");
+    expect(await themeOf(page)).toBe("light");
+    expect(await thumbSide(page)).toBe("right");
+
+    await sw.click();
+    await expect(sw).toHaveAttribute("aria-checked", "false");
+    expect(await themeOf(page)).toBe("dark");
+    await expect.poll(() => thumbSide(page)).toBe("left");
+    expect(await page.evaluate(() => localStorage.getItem("faq_theme"))).toBe("dark");
+
+    await sw.focus();
+    await page.keyboard.press("Enter");
+    expect(await themeOf(page)).toBe("light");
+    await page.keyboard.press(" ");
+    expect(await themeOf(page)).toBe("dark");
+    await page.keyboard.press("ArrowRight");
+    expect(await themeOf(page)).toBe("light");
+    await expect.poll(() => thumbSide(page)).toBe("right");
+    await page.keyboard.press("ArrowLeft");
+    expect(await themeOf(page)).toBe("dark");
+    await expect.poll(() => thumbSide(page)).toBe("left");
+
+    await dragTrack(page, 0.08, 0.92);
+    expect(await themeOf(page)).toBe("light");
+    await expect.poll(() => thumbSide(page)).toBe("right");
+    await dragTrack(page, 0.92, 0.08);
+    expect(await themeOf(page)).toBe("dark");
+    await expect.poll(() => thumbSide(page)).toBe("left");
+
+    await page.locator("#btn-ko").click();
+    await expect(sw).toHaveAccessibleName("화면 테마");
+    await expect(sw).toHaveAttribute("aria-checked", "false");
+  });
+
+  test("a short drag snaps back, a vertical drag and cancel keep the saved theme", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("faq_theme", "dark"));
+    await page.goto("/");
+    expect(await themeOf(page)).toBe("dark");
+    const box = await page.locator(".theme-track").boundingBox();
+    const y = box.y + box.height / 2;
+    await page.mouse.move(box.x + 6, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 18, y, { steps: 6 });
+    await page.mouse.up();
+    expect(await themeOf(page)).toBe("dark");
+    expect(await thumbSide(page)).toBe("left");
+
+    await page.mouse.move(box.x + box.width / 2, box.y + 8);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 3, box.y + 96, { steps: 8 });
+    await page.mouse.up();
+    expect(await themeOf(page)).toBe("dark");
+
+    await page.mouse.move(box.x + 8, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 8, y, { steps: 8 });
+    await page.keyboard.press("Escape");
+    await page.mouse.up();
+    expect(await themeOf(page)).toBe("dark");
+    expect(await page.evaluate(() => localStorage.getItem("faq_theme"))).toBe("dark");
+
+    await page.evaluate(() => {
+      const el = document.getElementById("theme-switch");
+      const r = el.getBoundingClientRect();
+      const fire = (type, x) => el.dispatchEvent(new PointerEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        pointerId: 7,
+        pointerType: "touch",
+        isPrimary: true,
+        button: 0,
+        buttons: type === "pointercancel" ? 0 : 1,
+        clientX: x,
+        clientY: r.top + r.height / 2,
+      }));
+      fire("pointerdown", r.left + 8);
+      fire("pointermove", r.right - 8);
+      fire("pointercancel", r.right - 8);
+    });
+    expect(await themeOf(page)).toBe("dark");
+    expect(await page.evaluate(() => localStorage.getItem("faq_theme"))).toBe("dark");
+  });
+
+  test("saved theme survives reload and system theme applies only before a choice", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/");
+    expect(await themeOf(page)).toBe("dark");
+    await switcher(page).click();
+    expect(await themeOf(page)).toBe("light");
+    await page.reload();
+    expect(await themeOf(page)).toBe("light");
+    expect(await page.evaluate(() => localStorage.getItem("faq_theme"))).toBe("light");
+    await page.evaluate(() => localStorage.removeItem("faq_theme"));
+    await page.reload();
+    expect(await themeOf(page)).toBe("dark");
+  });
+
+  test("a stored FAQ answer still renders in the dark theme", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("faq_theme", "dark"));
+    await page.goto("/");
+    await ask(page, "什么时候可以申请休学？");
+    await expect(bot(page)).toContainText("一般休学");
+    expect(await themeOf(page)).toBe("dark");
+    await page.setViewportSize({ width: 390, height: 320 });
+    const session = await page.context().newCDPSession(page);
+    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 180, y: 220, id: 1 }] });
+    await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: 180, y: 70, id: 1 }] });
+    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+    expect(await themeOf(page)).toBe("dark");
+  });
+});
+
+test.describe("theme motion", () => {
+  test("the thumb can animate when motion is allowed", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    const duration = await page.locator(".theme-thumb").evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(duration).not.toBe("0s");
+  });
+
+  test("reduced motion removes the theme transition", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
+    const duration = await page.locator(".theme-thumb").evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(duration).toBe("0s");
+  });
+});
+
+for (const size of [
+  { name: "phone-375", width: 375, height: 667 },
+  { name: "phone-390", width: 390, height: 844 },
+  { name: "ipad-712", width: 1024, height: 712 },
+  { name: "ipad-480", width: 1024, height: 480 },
+]) {
+  test.describe(`theme layout ${size.name}`, () => {
+    test.use({ viewport: { width: size.width, height: size.height } });
+    test("header controls stay apart from each other and the composer", async ({ page }) => {
+      await page.goto("/");
+      for (const mode of ["light", "dark"]) {
+        if (mode === "dark") await switcher(page).click();
+        expect(await themeOf(page)).toBe(mode);
+        const boxes = await page.evaluate(() => {
+          const read = (sel) => {
+            const r = document.querySelector(sel).getBoundingClientRect();
+            return { x: r.x, y: r.y, width: r.width, height: r.height };
+          };
+          return {
+            sw: read("#theme-switch"),
+            lang: read(".lang"),
+            clear: read("#btn-clear"),
+            header: read("header.top"),
+            dock: read(".dock"),
+            scrollWidth: document.documentElement.scrollWidth,
+            clientWidth: document.documentElement.clientWidth,
+          };
+        });
+        expect(boxesOverlap(boxes.sw, boxes.lang)).toBe(false);
+        expect(boxesOverlap(boxes.sw, boxes.clear)).toBe(false);
+        expect(boxesOverlap(boxes.lang, boxes.clear)).toBe(false);
+        expect(boxesOverlap(boxes.header, boxes.dock)).toBe(false);
+        expect(boxes.sw.x).toBeGreaterThanOrEqual(0);
+        expect(boxes.sw.x + boxes.sw.width).toBeLessThanOrEqual(size.width + 1);
+        expect(boxes.clear.x + boxes.clear.width).toBeLessThanOrEqual(size.width + 1);
+        expect(boxes.sw.height).toBeGreaterThanOrEqual(44);
+        expect(boxes.scrollWidth).toBeLessThanOrEqual(boxes.clientWidth + 1);
+      }
+    });
+  });
+}
