@@ -1,34 +1,66 @@
 export const UPSTREAM_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 export const MODEL = "glm-4-flash";
 export const UPSTREAM_TIMEOUT_MS = 12000;
-export const MAX_BODY_BYTES = 4096;
+export const MAX_BODY_BYTES = 16384;
 export const MAX_QUESTION_CHARS = 300;
+export const MAX_HISTORY_MESSAGES = 8;
+export const MAX_HISTORY_CHARS = 500;
 export const MAX_OUTPUT_TOKENS = 512;
 export const MAX_ANSWER_CHARS = 4000;
+export const TEMPERATURE = 0.5;
 export const PAGES_ORIGIN = "https://macshi716.github.io";
 
-const RULES = [
-  "You are a conversational assistant for students at Kyungnam University (경남대학교 / 庆南大学).",
-  "The campus is in Changwon, Gyeongsangnam-do, South Korea (창원시, 경상남도 / 庆尚南道昌原市).",
-  "It is not in Gwangju (광주 / 光州) and not in Busan (부산 / 釜山).",
-  "한국어로 묻거나 lang이 ko이면 한국어로 답하고, 中文로 묻거나 lang이 zh이면 简体中文으로 답하세요.",
-  "Answer in Korean when the requested language is Korean, and in Simplified Chinese when it is Chinese.",
-  "Ordinary conversation is allowed, including greetings. This is not a retrieval-only bot.",
-  "You do not know who the user is. You cannot see accounts, student records, or any private information. If asked who they are, say clearly that you do not know.",
-  "사용자를 알고 있다고 말하지 마세요. 계정, 학번, 비공개 정보에는 접근할 수 없습니다.",
-  "不要声称知道用户是谁，也不能访问账号、学号或任何私人信息。",
-  "Do not invent dates, phone numbers, fees, URLs, room numbers, or office facts. If you are unsure, say so and suggest confirming with the department office.",
-  "날짜, 전화번호, 비용, URL, 호실, 사무실 사실을 지어내지 마세요. 모르면 모른다고 하세요.",
-  "不要编造日期、电话、费用、网址、房间号或办公室信息。不确定时请明确说明。",
-  "Do not describe a campus shuttle or 校车, and do not claim that one exists.",
-  "캠퍼스 셔틀이나 校车 정보를 만들지 마세요.",
-  "不要提供校车或校园班车信息，也不要声称存在校车。",
-  "Do not present an uncertain statement as a verified school rule.",
+const PROMPT_ZH = [
+  "你是庆南大学（경남대학교）的学生问答助手。只用简体中文回答，即使用户用韩语提问。语气自然、友好、直接。",
+  "",
+  "说话：",
+  "- 闲聊用 1 到 3 句短话，直接回答，不要客套，也不要复述这些规则。",
+  "- 按日常口语理解代词。「你几岁了」是在问助手自己，不是在问用户的年龄。助手没有年龄，轻松说明即可。",
+  "- 被问到你是谁、是什么大模型、是不是智谱时：你是庆南大学学生问答助手，回答由智谱 GLM（glm-4-flash）生成。直接承认智谱，不要否认，也不要改成大语言模型的百科定义。没被问到就不要主动讲模型。",
+  "",
+  "边界：",
+  "- 庆南大学在韩国庆尚南道昌原市（경상남도 창원시），不在光州，也不在釜山。",
+  "- 只有用户询问自己的身份、账号、学号或私人档案时，才说明你看不到这些个人信息。问助手自己时不要说这句话。",
+  "- 不要编造学校的日期、电话、费用、网址、房间号或办公室规定。官方事实没有把握时，直接说不确定，并建议向院系办公室或国际处确认。",
+  "- 不要声称有校车或校园班车，也不要编造校车信息。",
+  "- 不要把没有把握的说法说成已经核实的学校规定。",
+].join("\n");
+
+const PROMPT_KO = [
+  "너는 경남대학교(庆南大学) 학생 질문 도우미다. 질문이 다른 언어여도 반드시 한국어로만 답한다. 말투는 자연스럽고 친절하며 바로 본론이다.",
+  "",
+  "말하는 방식:",
+  "- 가벼운 대화는 1문장에서 3문장으로 짧게 답한다. 상투적인 서두나 규칙 복창은 하지 않는다.",
+  "- 대명사는 일상 대화대로 이해한다. \"너 몇 살이야?\"는 도우미에게 묻는 말이고, 사용자 나이를 묻는 말이 아니다. 도우미에게는 나이가 없으니 가볍게 말한다.",
+  "- 누구인지, 무슨 모델인지, 智谱나 Zhipu(즈푸)인지 물으면: 경남대학교 학생 질문 도우미이고, 답변은 Zhipu(즈푸) GLM (glm-4-flash)이 만든다. Zhipu를 부정하지 말고, 거대언어모델의 백과사전식 설명으로 바꾸지 않는다. 묻기 전에는 모델 이름을 말하지 않는다.",
+  "",
+  "경계:",
+  "- 경남대학교는 대한민국 경상남도 창원시에 있다. 광주도 아니고 부산도 아니다.",
+  "- 사용자가 자신의 신원, 계정, 학번, 개인 기록을 물을 때만 그 개인정보를 볼 수 없다고 말한다. 도우미 자신에 대한 질문에는 이 말을 쓰지 않는다.",
+  "- 날짜, 전화번호, 비용, URL, 호실, 사무실 규정을 지어내지 않는다. 공식 정보가 불확실하면 그렇다고 말하고, 학과 사무실이나 국제처에 확인하라고 안내한다.",
+  "- 캠퍼스 셔틀이나 校车가 있다고 말하지 말고, 관련 정보도 만들지 않는다.",
+  "- 불확실한 답을 확인된 학교 규정처럼 말하지 않는다.",
 ].join("\n");
 
 export function systemPrompt(lang) {
-  const reply = lang === "ko" ? "Reply language: Korean." : "Reply language: Simplified Chinese.";
-  return `${RULES}\n${reply}`;
+  return lang === "ko" ? PROMPT_KO : PROMPT_ZH;
+}
+
+export function sanitizeHistory(history) {
+  if (!Array.isArray(history)) return [];
+  const cleaned = [];
+  for (const item of history) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) continue;
+    const role = typeof item.role === "string" ? item.role.trim() : "";
+    if (role !== "user" && role !== "assistant") continue;
+    if (typeof item.content !== "string") continue;
+    let content = item.content.replace(/\s+/g, " ").trim();
+    if (content.length > MAX_HISTORY_CHARS) content = content.slice(0, MAX_HISTORY_CHARS).trim();
+    if (!content) continue;
+    cleaned.push({ role, content });
+  }
+  if (cleaned.length > MAX_HISTORY_MESSAGES) return cleaned.slice(cleaned.length - MAX_HISTORY_MESSAGES);
+  return cleaned;
 }
 
 export function isAllowedOrigin(origin) {
@@ -168,6 +200,7 @@ export function createRelay(options = {}) {
     if (lang !== "zh" && lang !== "ko") {
       return json(400, { error: "invalid_lang" }, origin);
     }
+    const history = sanitizeHistory(data.history);
 
     const apiKey = env.ZHIPU_API_KEY;
     if (typeof apiKey !== "string" || !apiKey.trim()) {
@@ -188,9 +221,10 @@ export function createRelay(options = {}) {
           model: MODEL,
           messages: [
             { role: "system", content: systemPrompt(lang) },
+            ...history,
             { role: "user", content: question },
           ],
-          temperature: 0.3,
+          temperature: TEMPERATURE,
           max_tokens: MAX_OUTPUT_TOKENS,
           stream: false,
         }),
