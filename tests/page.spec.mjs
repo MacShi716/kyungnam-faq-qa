@@ -692,6 +692,183 @@ test.describe("card spotlight", () => {
   });
 });
 
+const ZH_STARTERS = ["什么时候可以申请休学？", "什么时候选课？", "签证续签要多久"];
+const KO_STARTERS = ["휴학 신청은 언제 해요?", "수강신청은 언제 해요?", "비자 연장은 어떻게 해요?"];
+
+function phText(page) {
+  return page.locator("#ph").evaluate((el) => (el.textContent || "").trim());
+}
+
+async function textOutsideAnchors(locator) {
+  return locator.evaluate((el) => {
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll("a").forEach((node) => node.remove());
+    return clone.textContent || "";
+  });
+}
+
+test.describe("placeholder submit", () => {
+  test("an empty composer sends the visible recommended question", async ({ page }) => {
+    await page.goto("/");
+    const input = page.locator("#input");
+    await expect(input).toHaveValue("");
+    expect(await input.getAttribute("required")).toBeNull();
+    await expect(input).toHaveAttribute("aria-label", "请输入你想了解的内容（中文 / 한국어）");
+    expect(await input.evaluate((el) => el.validity.valueMissing)).toBe(false);
+    await expect(page.locator("html")).toHaveAttribute("data-chat-state", "empty");
+    expect(await phText(page)).toBe(ZH_STARTERS[0]);
+
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[0]);
+    await expect(bot(page)).toContainText("一般休学");
+    await expect(page.locator("html")).toHaveAttribute("data-chat-state", "active");
+    await expect(input).toHaveValue("");
+    expect(await input.evaluate((el) => el.validity.valid)).toBe(true);
+    const next = await phText(page);
+    expect(next).toBe(ZH_STARTERS[1]);
+    expect(next).not.toBe(ZH_STARTERS[0]);
+  });
+
+  test("Enter sends the placeholder, Shift+Enter and IME composition do not", async ({ page }) => {
+    await page.goto("/");
+    const shown = await phText(page);
+    const input = page.locator("#input");
+    await input.focus();
+    await input.evaluate((el) => {
+      el.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        bubbles: true,
+        cancelable: true,
+        isComposing: true,
+      }));
+      const legacy = new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(legacy, "isComposing", { get: () => false });
+      Object.defineProperty(legacy, "keyCode", { get: () => 229 });
+      el.dispatchEvent(legacy);
+    });
+    await expect(page.locator(".card.user")).toHaveCount(0);
+
+    await page.keyboard.press("Shift+Enter");
+    await expect(page.locator(".card.user")).toHaveCount(0);
+    expect((await input.inputValue()).trim()).toBe("");
+
+    await input.fill("");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".card.user")).toHaveText(shown);
+    await expect(bot(page)).toContainText("一般休学");
+    expect(await phText(page)).not.toBe(shown);
+  });
+
+  test("send uses the rotated placeholder, not always the first question", async ({ page }) => {
+    test.setTimeout(20000);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    expect(await phText(page)).toBe(ZH_STARTERS[0]);
+    await expect.poll(() => phText(page), { timeout: 10000 }).toBe(ZH_STARTERS[1]);
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[1]);
+    await expect(bot(page)).toContainText("选课");
+    await expect(bot(page)).not.toContainText("一般休学");
+    expect(await phText(page)).not.toBe(ZH_STARTERS[1]);
+  });
+
+  test("Korean placeholder is submitted when the input is empty", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#btn-ko").click();
+    await expect(page.locator("#input")).toHaveAttribute("aria-label", "궁금한 내용을 입력하세요 (한국어 / 中文)");
+    expect(await phText(page)).toBe(KO_STARTERS[0]);
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(KO_STARTERS[0]);
+    await expect(bot(page)).toContainText("일반휴학");
+    expect(await phText(page)).toBe(KO_STARTERS[1]);
+  });
+
+  test("typed text is sent instead of the placeholder, and whitespace falls back to it", async ({ page }) => {
+    await page.goto("/");
+    const shown = await phText(page);
+    await page.locator("#input").fill("第一工学馆在哪？");
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText("第一工学馆在哪？");
+    await expect(page.locator(".card.user")).not.toHaveText(shown);
+    await expect(bot(page)).toContainText("11");
+
+    await page.locator("#btn-clear").click();
+    expect(await phText(page)).toBe(ZH_STARTERS[0]);
+    await page.locator("#input").fill("  \n\t  ");
+    await page.locator("#btn-send").click();
+    await expect(page.locator(".card.user")).toHaveText(ZH_STARTERS[0]);
+    await expect(bot(page)).toContainText("一般休学");
+  });
+
+  test("clearing chat restores the empty state and the first starter question", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-chat-state", "empty");
+    await page.locator("#btn-send").click();
+    await expect(page.locator("html")).toHaveAttribute("data-chat-state", "active");
+    expect(await phText(page)).not.toBe(ZH_STARTERS[0]);
+    await page.locator("#btn-clear").click();
+    await expect(page.locator("html")).toHaveAttribute("data-chat-state", "empty");
+    await expect(page.locator(".card.user")).toHaveCount(0);
+    await expect(page.locator("#thread")).toContainText("你好");
+    expect(await phText(page)).toBe(ZH_STARTERS[0]);
+  });
+});
+
+test.describe("answer links", () => {
+  test("F23 keeps the URL and the following Chinese or Korean sentence apart", async ({ page }) => {
+    await page.goto("/");
+    await ask(page, "怎么登录学生信息系统？");
+    const body = bot(page).locator(".answer-body");
+    const pill = body.locator(".link-pill");
+    await expect(pill).toHaveCount(1);
+    expect(await pill.getAttribute("href")).toBe("https://sugang.kyungnam.ac.kr");
+    await expect(pill).toHaveText("sugang.kyungnam.ac.kr");
+    const anchor = await pill.innerHTML();
+    expect(anchor).not.toContain("xn--");
+    expect(anchor).not.toMatch(/[\u4e00-\u9fff]/);
+    const zhOutside = await textOutsideAnchors(body);
+    expect(zhOutside).toContain("预选课篮子申请");
+    expect(zhOutside).toContain("学籍管理");
+    expect(zhOutside).not.toContain("sugang.kyungnam.ac.kr");
+
+    await page.locator("#btn-ko").click();
+    const koBody = bot(page).locator(".answer-body");
+    const koPill = koBody.locator(".link-pill");
+    await expect(koPill).toHaveCount(1);
+    expect(await koPill.getAttribute("href")).toBe("https://sugang.kyungnam.ac.kr");
+    await expect(koPill).toHaveText("sugang.kyungnam.ac.kr");
+    const koAnchor = await koPill.innerHTML();
+    expect(koAnchor).not.toContain("이며");
+    const koOutside = await textOutsideAnchors(koBody);
+    expect(koOutside).toContain("이며, 수강바구니");
+    expect(koOutside).not.toContain("sugang.kyungnam.ac.kr");
+  });
+
+  test("an AI answer keeps query ampersands and trailing Chinese outside the pill", async ({ page }) => {
+    const answer = "https://www.kyungnam.ac.kr/test?a=1&b=2，请查看";
+    await installAi(page, (route) => fulfillJson(route, 200, { answer }));
+    await page.goto("/");
+    await ask(page, "你怎么知道我是谁");
+    const body = bot(page).locator(".answer-body");
+    const pill = body.locator(".link-pill");
+    await expect(pill).toHaveCount(1);
+    expect(await pill.getAttribute("href")).toBe("https://www.kyungnam.ac.kr/test?a=1&b=2");
+    const html = await pill.evaluate((el) => el.outerHTML);
+    expect(html).not.toContain("&amp;amp;");
+    expect(html).toContain("a=1&amp;b=2");
+    await expect(pill).not.toContainText("请查看");
+    await expect(pill).not.toContainText("，");
+    const outside = await textOutsideAnchors(body);
+    expect(outside).toContain("，请查看");
+  });
+});
+
 for (const size of [
   { name: "desktop-1280", width: 1280, height: 800 },
   { name: "phone-375", width: 375, height: 667 },
