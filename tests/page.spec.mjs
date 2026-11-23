@@ -501,6 +501,11 @@ test.describe("theme motion", () => {
     await page.goto("/");
     const duration = await page.locator(".theme-thumb").evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(duration).not.toBe("0s");
+    const langDuration = await page.locator(".lang-thumb").evaluate((el) => getComputedStyle(el).transitionDuration);
+    const langProp = await page.locator(".lang-thumb").evaluate((el) => getComputedStyle(el).transitionProperty);
+    expect(langDuration).not.toBe("0s");
+    expect(langProp).toContain("transform");
+    expect(langProp).not.toContain("width");
   });
 
   test("reduced motion removes the theme transition", async ({ page }) => {
@@ -509,6 +514,8 @@ test.describe("theme motion", () => {
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
     const duration = await page.locator(".theme-thumb").evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(duration).toBe("0s");
+    const langDuration = await page.locator(".lang-thumb").evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(langDuration).toBe("0s");
   });
 });
 
@@ -777,4 +784,316 @@ for (const size of [
       }
     });
   });
+}
+
+function shadowParts(shadow) {
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  const text = String(shadow);
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "(") depth += 1;
+    else if (ch === ")") depth -= 1;
+    else if (ch === "," && depth === 0) {
+      parts.push(text.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(text.slice(start));
+  return parts;
+}
+
+function colorsIn(text) {
+  const out = [];
+  const re = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/g;
+  let match;
+  while ((match = re.exec(String(text)))) {
+    out.push({ r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] == null ? 1 : Number(match[4]) });
+  }
+  return out;
+}
+
+function outerGlowText(shadow) {
+  return shadowParts(shadow).filter((part) => !/\binset\b/.test(part)).join(" ");
+}
+
+function hasWarmGlow(shadow) {
+  return colorsIn(outerGlowText(shadow)).some((c) => c.a > 0.15 && c.r > c.b + 30 && c.r > 150);
+}
+
+function hasCoolGlow(shadow) {
+  return colorsIn(outerGlowText(shadow)).some((c) => c.a > 0.15 && c.b > c.r + 30 && c.b > 150);
+}
+
+function hasBlurGlow(shadow) {
+  return shadowParts(shadow).filter((part) => !/\binset\b/.test(part)).some((part) => {
+    const px = part.match(/-?\d+(?:\.\d+)?px/g) || [];
+    return px.length >= 3 && parseFloat(px[2]) >= 8;
+  });
+}
+
+async function langSlide(page) {
+  return page.evaluate(() => {
+    const lang = document.querySelector(".lang");
+    const thumb = document.querySelector(".lang-thumb");
+    const ko = document.getElementById("btn-ko");
+    const zh = document.getElementById("btn-zh");
+    const lr = lang.getBoundingClientRect();
+    const tr = thumb.getBoundingClientRect();
+    const kr = ko.getBoundingClientRect();
+    const zr = zh.getBoundingClientRect();
+    const style = getComputedStyle(lang);
+    const thumbStyle = getComputedStyle(thumb);
+    const border = parseFloat(style.borderLeftWidth) || 0;
+    const borderR = parseFloat(style.borderRightWidth) || 0;
+    const active = lang.querySelector('button[aria-pressed="true"]');
+    const idle = lang.querySelector('button[aria-pressed="false"]');
+    return {
+      pos: lang.style.getPropertyValue("--lang-pos"),
+      koW: kr.width,
+      zhW: zr.width,
+      koH: kr.height,
+      zhH: zr.height,
+      insetLeft: tr.left - lr.left - border,
+      rightGap: lr.right - borderR - tr.right,
+      thumbW: tr.width,
+      expectW: lang.clientWidth / 2 - 3,
+      mid: tr.left + tr.width / 2,
+      split: (kr.right + zr.left) / 2,
+      overflow: style.overflow,
+      touch: style.touchAction,
+      blur: thumbStyle.backdropFilter || thumbStyle.webkitBackdropFilter || "",
+      bg: thumbStyle.backgroundColor,
+      shadow: thumbStyle.boxShadow,
+      active: getComputedStyle(active).color,
+      idle: getComputedStyle(idle).color,
+      pe: thumbStyle.pointerEvents,
+      hidden: thumb.getAttribute("aria-hidden"),
+    };
+  });
+}
+
+test.describe("language glass slider", () => {
+  test("the glass thumb tracks each half in both themes without resizing", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const sizes = [
+      [1280, 800],
+      [375, 667],
+      [390, 844],
+      [1024, 712],
+      [1024, 480],
+    ];
+    for (const [width, height] of sizes) {
+      await page.setViewportSize({ width, height });
+      for (const mode of ["light", "dark"]) {
+        if ((await themeOf(page)) !== mode) await switcher(page).click();
+        for (const id of ["#btn-zh", "#btn-ko"]) {
+          await page.locator(id).click();
+          const slide = await langSlide(page);
+          const label = width + "x" + height + " " + mode + " " + id;
+          expect(Math.abs(slide.koW - slide.zhW), label).toBeLessThan(1.25);
+          expect(slide.koH, label).toBeGreaterThanOrEqual(44);
+          expect(slide.zhH, label).toBeGreaterThanOrEqual(44);
+          expect(Math.abs(slide.thumbW - slide.expectW), label).toBeLessThan(1.5);
+          expect(slide.overflow, label).toBe("visible");
+          expect(slide.touch, label).toContain("pan-y");
+          expect(slide.pe, label).toBe("none");
+          expect(slide.hidden, label).toBe("true");
+          expect(slide.blur, label).toMatch(/blur\(10px\)/);
+          const bg = colorsIn(slide.bg)[0];
+          if (id === "#btn-ko") {
+            expect(slide.pos, label).toBe("0");
+            expect(Math.abs(slide.insetLeft - 3), label).toBeLessThan(1.5);
+            expect(slide.mid, label).toBeLessThan(slide.split - 4);
+          } else {
+            expect(slide.pos, label).toBe("1");
+            expect(Math.abs(slide.rightGap - 3), label).toBeLessThan(1.5);
+            expect(slide.mid, label).toBeGreaterThan(slide.split + 4);
+          }
+          if (mode === "light") {
+            expect(bg.r, label).toBe(255);
+            expect(bg.g, label).toBe(253);
+            expect(bg.b, label).toBe(249);
+            expect(Math.abs(bg.a - 0.96), label).toBeLessThan(0.03);
+            expect(slide.active, label).toBe("rgb(28, 24, 20)");
+            expect(slide.idle, label).toBe("rgb(124, 113, 100)");
+            expect(hasWarmGlow(slide.shadow), label).toBe(true);
+          } else {
+            expect(bg.r, label).toBe(255);
+            expect(bg.g, label).toBe(255);
+            expect(bg.b, label).toBe(255);
+            expect(Math.abs(bg.a - 0.16), label).toBeLessThan(0.03);
+            expect(slide.active, label).toBe("rgb(248, 251, 255)");
+            expect(slide.idle, label).toBe("rgb(138, 149, 168)");
+            expect(hasCoolGlow(slide.shadow), label).toBe(true);
+          }
+          expect(hasBlurGlow(slide.shadow), label).toBe(true);
+        }
+      }
+    }
+    await page.setViewportSize({ width: 800, height: 700 });
+    await page.evaluate(() => document.fonts.ready);
+    const settled = await langSlide(page);
+    expect(Math.abs(settled.koW - settled.zhW)).toBeLessThan(1.25);
+    expect(Math.abs(settled.thumbW - settled.expectW)).toBeLessThan(1.5);
+  });
+
+  test("clicks, arrows, and horizontal drags snap the language thumb", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
+    const slideAcross = async (fromRatio, toRatio) => {
+      const box = await page.locator(".lang").boundingBox();
+      const y = box.y + box.height / 2;
+      await page.mouse.move(box.x + box.width * fromRatio, y);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width * toRatio, y, { steps: 12 });
+      await page.mouse.up();
+    };
+    await slideAcross(0.86, 0.12);
+    await expect(page.locator("#btn-ko")).toHaveAttribute("aria-pressed", "true");
+    expect(await page.evaluate(() => document.documentElement.lang)).toBe("ko");
+    expect((await langSlide(page)).pos).toBe("0");
+    const before = (await langSlide(page)).thumbW;
+
+    const nudge = await page.locator(".lang").boundingBox();
+    const y = nudge.y + nudge.height / 2;
+    await page.mouse.move(nudge.x + 14, y);
+    await page.mouse.down();
+    await page.mouse.move(nudge.x + 28, y, { steps: 4 });
+    await page.mouse.up();
+    await expect(page.locator("#btn-ko")).toHaveAttribute("aria-pressed", "true");
+    expect((await langSlide(page)).pos).toBe("0");
+
+    await page.mouse.move(nudge.x + nudge.width / 2, y);
+    await page.mouse.down();
+    await page.mouse.move(nudge.x + nudge.width / 2 + 3, y + 88, { steps: 8 });
+    await page.mouse.up();
+    await expect(page.locator("#btn-ko")).toHaveAttribute("aria-pressed", "true");
+
+    await page.locator("#btn-zh").click();
+    await expect(page.locator("#title")).toContainText("院系");
+    await page.locator("#btn-zh").focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect(page.locator("#btn-ko")).toHaveAttribute("aria-pressed", "true");
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
+    expect((await langSlide(page)).thumbW).toBe(before);
+
+    const box = await page.locator(".lang").boundingBox();
+    await page.mouse.move(box.x + box.width - 12, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 18, box.y + box.height / 2, { steps: 8 });
+    await page.keyboard.press("Escape");
+    await page.mouse.up();
+    await expect(page.locator("#btn-zh")).toHaveAttribute("aria-pressed", "true");
+    expect((await langSlide(page)).pos).toBe("1");
+  });
+});
+
+test("glass surfaces keep a directional rim in both themes", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const readGlow = () => page.evaluate(() => {
+    const css = (sel) => {
+      const el = document.querySelector(sel);
+      return el ? getComputedStyle(el).boxShadow : "";
+    };
+    return {
+      card: css("#thread .card"),
+      clear: css("#btn-clear"),
+      bar: css(".prompt-bar"),
+      send: css(".composer button.send"),
+      chip: css(".examples button, .chips button"),
+      user: css(".card.user"),
+      ok: css(".badge.ok"),
+      warn: css(".badge.warn"),
+      ai: css(".badge.ai"),
+      err: css("[data-state='ai-error']"),
+      retry: css(".card:has([data-state='ai-error']) .chips button"),
+      guess: css("#guess"),
+      guessItem: css(".guess-item"),
+    };
+  });
+  let glow = await readGlow();
+  for (const key of ["card", "clear", "bar", "send", "chip"]) {
+    expect(hasWarmGlow(glow[key]), key).toBe(true);
+    expect(hasBlurGlow(glow[key]), key).toBe(true);
+  }
+  const chipRest = glow.chip;
+  await page.locator(".examples button").first().hover();
+  expect(await page.locator(".examples button").first().evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe(chipRest);
+  await page.locator("#input").focus();
+  const focusedBar = await page.locator("#prompt-bar").evaluate((el) => getComputedStyle(el).boxShadow);
+  expect(focusedBar).not.toBe(glow.bar);
+  const zoom = await page.locator("#prompt-bar").evaluate((el) => getComputedStyle(el).transform);
+  expect(zoom === "none" || zoom === "matrix(1, 0, 0, 1, 0, 0)").toBe(true);
+  const sendRest = await page.locator(".composer button.send").evaluate((el) => getComputedStyle(el).boxShadow);
+  await page.locator(".composer button.send").hover();
+  expect(await page.locator(".composer button.send").evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe(sendRest);
+
+  await ask(page, "第一工学馆在哪？");
+  await expect(bot(page)).toContainText("11");
+  glow = await readGlow();
+  expect(hasWarmGlow(glow.user)).toBe(true);
+  expect(hasGreen(glow.ok)).toBe(true);
+  expect(hasWarmGlow(glow.chip)).toBe(true);
+  await page.locator("#input").fill("工学馆");
+  await expect(page.locator("#guess")).toBeVisible();
+  glow = await readGlow();
+  expect(hasWarmGlow(glow.guess)).toBe(true);
+  expect(hasWarmGlow(glow.guessItem)).toBe(true);
+  await page.locator("#input").fill("");
+
+  await switcher(page).click();
+  expect(await themeOf(page)).toBe("dark");
+  glow = await readGlow();
+  for (const key of ["card", "user", "clear", "bar", "send", "chip"]) {
+    expect(hasCoolGlow(glow[key]), key).toBe(true);
+    expect(hasBlurGlow(glow[key]), key).toBe(true);
+  }
+
+  await page.locator("#btn-clear").click();
+  await ask(page, "什么时候可以申请休学？");
+  glow = await readGlow();
+  expect(hasAmber(glow.warn)).toBe(true);
+
+  await page.unroute(AI_HOST).catch(() => {});
+  await installAi(page, (route) => fulfillJson(route, 500, { answer: "hidden" }));
+  await page.locator("#btn-clear").click();
+  await ask(page, "你怎么知道我是谁");
+  const error = page.locator("[data-state='ai-error']");
+  await expect(error).toContainText(ZH_ERROR);
+  glow = await readGlow();
+  expect(hasRed(glow.err)).toBe(true);
+  expect(hasRed(glow.retry)).toBe(true);
+
+  await page.unroute(AI_HOST).catch(() => {});
+  await installAi(page, (route, _n, body) => {
+    const lang = JSON.parse(body).lang;
+    return fulfillJson(route, 200, { answer: lang === "ko" ? MOCK_KO : MOCK_ZH });
+  });
+  await page.locator("#btn-clear").click();
+  await ask(page, "你怎么知道我是谁");
+  await expect(bot(page)).toContainText(ZH_AI_BADGE);
+  glow = await readGlow();
+  expect(hasBlue(glow.ai)).toBe(true);
+});
+
+function hasGreen(shadow) {
+  return colorsIn(shadow).some((c) => c.a > 0.15 && c.g > c.r + 20 && c.g > c.b);
+}
+
+function hasRed(shadow) {
+  return colorsIn(shadow).some((c) => c.a > 0.15 && c.r > c.g + 30 && c.r > c.b + 20);
+}
+
+function hasBlue(shadow) {
+  return colorsIn(shadow).some((c) => c.a > 0.15 && c.b > c.r + 20 && c.b > c.g);
+}
+
+function hasAmber(shadow) {
+  return colorsIn(shadow).some((c) => c.a > 0.15 && c.r > c.b + 30 && c.g > 80 && c.r > c.g);
 }
