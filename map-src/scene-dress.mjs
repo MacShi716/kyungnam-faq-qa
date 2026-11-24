@@ -12,6 +12,7 @@ import {
   slopeDegrees,
   visualGrid,
 } from "./dressing.mjs";
+import { HAZE_DENSITY, roadCrossSection } from "./ground.mjs";
 import {
   SCHEMATIC_HEIGHT_M,
   measureFootprint,
@@ -315,9 +316,7 @@ function surfaceMat(shell, color, roughness, metalness, extra) {
     roughness,
     metalness,
     envMapIntensity: metalness > 0.15 ? 0.8 : 0.2,
-    polygonOffset: true,
-    polygonOffsetFactor: -2,
-    polygonOffsetUnits: -2,
+    polygonOffset: false,
     ...extra,
   });
   shell.surfaceMaterials.push(mat);
@@ -369,7 +368,7 @@ export function installAtmosphere(shell) {
   scene.add(sky);
   shell.sky = sky;
   paintSky(sky, shell.theme === "dark");
-  scene.fog = new THREE.FogExp2(0xc5d4e2, 0.00115);
+  scene.fog = new THREE.FogExp2(0xc5d4e2, HAZE_DENSITY.light);
   try {
     const pmrem = new THREE.PMREMGenerator(renderer);
     const envScene = new THREE.Scene();
@@ -390,7 +389,7 @@ export function applyAtmosphereTheme(shell) {
   if (shell.sky) paintSky(shell.sky, dark);
   if (shell.scene && shell.scene.fog) {
     shell.scene.fog.color.set(dark ? 0x121820 : 0xc5d4e2);
-    shell.scene.fog.density = dark ? 0.00135 : 0.00112;
+    shell.scene.fog.density = dark ? HAZE_DENSITY.dark : HAZE_DENSITY.light;
   }
   if (shell.renderer) {
     shell.renderer.toneMappingExposure = dark ? 0.78 : 1.02;
@@ -664,7 +663,20 @@ function buildBoundary(shell, sample) {
   shell.boundary = line;
 }
 
-function resampleLine(points, sample, width, lift) {
+function biasNormalsUp(buf, keep) {
+  const k = keep;
+  for (let i = 0; i < buf.nrm.length; i += 3) {
+    const x = buf.nrm[i] * k;
+    const y = buf.nrm[i + 1] * k + (1 - k);
+    const z = buf.nrm[i + 2] * k;
+    const len = Math.hypot(x, y, z) || 1;
+    buf.nrm[i] = x / len;
+    buf.nrm[i + 1] = y / len;
+    buf.nrm[i + 2] = z / len;
+  }
+}
+
+function resampleLine(points, sample, width, lift, lateral = 0) {
   const left = [];
   const right = [];
   const samples = [];
@@ -689,16 +701,21 @@ function resampleLine(points, sample, width, lift) {
     const mag = Math.hypot(tx, tz) || 1;
     tx /= mag;
     tz /= mag;
-    const px = -tz * half;
-    const pz = tx * half;
+    const nx = -tz;
+    const nz = tx;
+    const px = nx * half;
+    const pz = nz * half;
+    const sx = nx * lateral;
+    const sz = nz * lateral;
     const p = samples[i];
     const y = sample(p[0], p[1]) + lift;
-    left.push(p[0] - px, y, p[1] - pz);
-    right.push(p[0] + px, y, p[1] + pz);
+    left.push(p[0] + sx - px, y, p[1] + sz - pz);
+    right.push(p[0] + sx + px, y, p[1] + sz + pz);
   }
   const pos = [];
   const uv = [];
   const nrm = [];
+  const buf = { pos, nrm, uv };
   let dist = 0;
   for (let i = 0; i < samples.length - 1; i++) {
     const ax = left[i * 3];
@@ -714,11 +731,12 @@ function resampleLine(points, sample, width, lift) {
     const dy = right[(i + 1) * 3 + 1];
     const dz = right[(i + 1) * 3 + 2];
     const step = Math.hypot(samples[i + 1][0] - samples[i][0], samples[i + 1][1] - samples[i][1]);
-    pushTri({ pos, nrm, uv }, ax, ay, az, bx, by, bz, dx, dy, dz, 0, dist, 1, dist, 1, dist + step);
-    pushTri({ pos, nrm, uv }, ax, ay, az, dx, dy, dz, cx, cy, cz, 0, dist, 1, dist + step, 0, dist + step);
+    pushTri(buf, ax, ay, az, bx, by, bz, dx, dy, dz, 0, dist, 1, dist, 1, dist + step);
+    pushTri(buf, ax, ay, az, dx, dy, dz, cx, cy, cz, 0, dist, 1, dist + step, 0, dist + step);
     dist += step;
   }
-  return geoFrom({ pos, nrm, uv });
+  biasNormalsUp(buf, 0.18);
+  return geoFrom(buf);
 }
 
 function drapePolygon(points, sample, lift, step) {
@@ -746,6 +764,7 @@ function drapePolygon(points, sample, lift, step) {
     }
   }
   if (buf.pos.length < 9) return null;
+  biasNormalsUp(buf, 0.22);
   return geoFrom(buf);
 }
 
@@ -772,21 +791,56 @@ export function buildCampusLayers(shell) {
   const parkMat = surfaceMat(shell, 0xc6b7a2, 0.9, 0.02, {});
   const lotMat = surfaceMat(shell, 0x4d5158, 0.9, 0.05, { map: parkTex });
   const waterMat = surfaceMat(shell, 0x1a3e46, 0.12, 0.25, {
-    polygonOffsetFactor: -1,
     envMapIntensity: 1,
   });
   const rimMat = surfaceMat(shell, 0x8f877c, 0.9, 0.04, {});
   const roadGeo = [];
   const curbGeo = [];
+  shell.roadMarks = [];
+  shell.roadTrace = [];
+  let longest = null;
+  let longestLen = 0;
   for (const road of layers.roads || []) {
-    const width = Math.max(2.2, road.widthM || 4);
-    roadGeo.push(resampleLine(road.points, sample, width * 0.86, LIFT.road));
-    curbGeo.push(resampleLine(road.points, sample, width, LIFT.curb));
+    let len = 0;
+    for (let i = 1; i < road.points.length; i++) {
+      len += Math.hypot(road.points[i][0] - road.points[i - 1][0], road.points[i][1] - road.points[i - 1][1]);
+    }
+    if (len > longestLen) {
+      longest = road;
+      longestLen = len;
+    }
+  }
+  (layers.roads || []).forEach((road, index) => {
+    const section = roadCrossSection(road.widthM || 4);
+    const lift = LIFT.road + (index % 3) * 0.04;
+    roadGeo.push(resampleLine(road.points, sample, section.road, lift, 0));
+    if (section.shoulder >= 0.12) {
+      curbGeo.push(resampleLine(road.points, sample, section.shoulder, lift - 0.04, section.lateral));
+      curbGeo.push(resampleLine(road.points, sample, section.shoulder, lift - 0.04, -section.lateral));
+    }
+    const mid = road.points[Math.floor(road.points.length / 2)];
+    if (mid) shell.roadMarks.push({ x: mid[0], y: sample(mid[0], mid[1]) + lift + 0.15, z: mid[1] });
+  });
+  if (longest) {
+    let carried = 0;
+    for (let i = 1; i < longest.points.length; i++) {
+      const a = longest.points[i - 1];
+      const b = longest.points[i];
+      const seg = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      while (carried < seg) {
+        const t = carried / seg;
+        const x = a[0] + (b[0] - a[0]) * t;
+        const z = a[1] + (b[1] - a[1]) * t;
+        shell.roadTrace.push({ x, y: sample(x, z) + LIFT.road + 0.2, z });
+        carried += 8;
+      }
+      carried -= seg;
+    }
   }
   const pathGeo = (layers.paths || []).map((path) => resampleLine(path.points, sample, Math.max(1.4, path.widthM || 1.8), LIFT.path));
-  mergeAndAdd(shell, curbGeo, curbMat, false);
-  mergeAndAdd(shell, roadGeo, roadMat, false);
-  mergeAndAdd(shell, pathGeo, pathMat, false);
+  mergeAndAdd(shell, curbGeo, curbMat, false, "curb");
+  mergeAndAdd(shell, roadGeo, roadMat, false, "road");
+  mergeAndAdd(shell, pathGeo, pathMat, false, "path");
   const buckets = { turf: [], track: [], park: [], lot: [] };
   for (const pitch of layers.pitches || []) {
     const geo = drapePolygon(pitch.points, sample, LIFT.pitch, 3.2);
@@ -824,9 +878,9 @@ export function buildCampusLayers(shell) {
   };
 }
 
-function mergeAndAdd(shell, geos, mat, shadow) {
+function mergeAndAdd(shell, geos, mat, shadow, layer) {
   const parts = geos.filter(Boolean);
-  if (!parts.length) return;
+  if (!parts.length) return null;
   let count = 0;
   for (const geo of parts) count += geo.attributes.position.count;
   const pos = new Float32Array(count * 3);
@@ -846,7 +900,13 @@ function mergeAndAdd(shell, geos, mat, shadow) {
   merged.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   merged.setAttribute("normal", new THREE.BufferAttribute(nrm, 3));
   merged.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-  addMesh(shell, merged, mat, shadow);
+  const mesh = addMesh(shell, merged, mat, shadow);
+  if (mesh) {
+    mesh.userData.layer = layer || "";
+    if (!shell.layerMeshes) shell.layerMeshes = {};
+    shell.layerMeshes[layer || "surface"] = mesh;
+  }
+  return mesh;
 }
 
 function buildTrees(shell, layers) {

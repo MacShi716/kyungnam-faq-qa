@@ -1588,6 +1588,7 @@ function buildScene(shell) {
     alpha: false,
     powerPreference: "high-performance",
     preserveDrawingBuffer: true,
+    logarithmicDepthBuffer: true,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.shadowMap.enabled = true;
@@ -1720,6 +1721,8 @@ export function debugSnapshot() {
     highColor: at(highI),
     clear: session.renderer ? session.renderer.getClearColor(new THREE.Color()).getHexString() : "",
     toneMapping: session.renderer && session.renderer.toneMapping === THREE.ACESFilmicToneMapping ? "ACESFilmic" : "",
+    logDepth: !!(session.renderer && session.renderer.capabilities && session.renderer.capabilities.logarithmicDepthBuffer),
+    fog: session.scene && session.scene.fog ? session.scene.fog.density : 0,
     trees: session.treeCount || 0,
     roads: session.layerStats ? session.layerStats.roads : 0,
     pbr: !!(session.terrainMesh && session.terrainMesh.material && session.terrainMesh.material.map),
@@ -1950,6 +1953,96 @@ export function debugOcclusion(osmId, mode) {
     if (shell.controls) shell.controls.target.copy(target);
     shell.renderer.render(shell.scene, shell.camera);
   }
+}
+
+function canvasWash(shell) {
+  const gl = shell.renderer.getContext();
+  const w = shell.renderer.domElement.width;
+  const h = shell.renderer.domElement.height;
+  const step = Math.max(4, Math.floor(Math.min(w, h) / 48));
+  const px = new Uint8Array(4);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  let n = 0;
+  let sat = 0;
+  let luma = 0;
+  const x0 = Math.floor(w * 0.18);
+  const x1 = Math.floor(w * 0.82);
+  const y0 = Math.floor(h * 0.22);
+  const y1 = Math.floor(h * 0.78);
+  for (let y = y0; y < y1; y += step) {
+    for (let x = x0; x < x1; x += step) {
+      gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      const r = px[0];
+      const g = px[1];
+      const b = px[2];
+      sat += Math.max(r, g, b) - Math.min(r, g, b);
+      luma += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      n += 1;
+    }
+  }
+  return { sat: n ? sat / n : 0, luma: n ? luma / n : 0, n };
+}
+
+function roadLineContrast(shell) {
+  const marks = shell.roadTrace || [];
+  const ray = new THREE.Raycaster();
+  const lumas = [];
+  const road = shell.layerMeshes && shell.layerMeshes.road;
+  for (let i = 0; i < marks.length; i += 2) {
+    const mark = marks[i];
+    const point = new THREE.Vector3(mark.x, mark.y, mark.z);
+    const dir = point.clone().sub(shell.camera.position);
+    const dist = dir.length();
+    if (dist < 2) continue;
+    dir.multiplyScalar(1 / dist);
+    ray.set(shell.camera.position, dir);
+    ray.near = 0.1;
+    ray.far = dist + 3;
+    const hits = road ? ray.intersectObject(road, false) : [];
+    if (!hits.length || hits[0].distance > dist + 1.5) continue;
+    const v = hits[0].point.clone();
+    const eye = v.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+    if (eye.z > -0.5) continue;
+    v.project(shell.camera);
+    if (Math.abs(v.x) > 0.92 || Math.abs(v.y) > 0.9) continue;
+    const px = readPixel(shell, v);
+    lumas.push(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]);
+  }
+  if (!lumas.length) return { samples: 0, mean: 0, spread: 0 };
+  const sorted = lumas.slice().sort((a, b) => a - b);
+  const mid = sorted[Math.floor(sorted.length / 2)];
+  const spread = lumas.filter((value) => Math.abs(value - mid) > 70).length / lumas.length;
+  const mean = lumas.reduce((sum, value) => sum + value, 0) / lumas.length;
+  return { samples: lumas.length, mean, spread };
+}
+
+export function debugGroundProbe() {
+  const shell = session;
+  if (!shell || !shell.renderer || !shell.camera) return null;
+  shell.renderer.render(shell.scene, shell.camera);
+  const wash = canvasWash(shell);
+  const road = roadLineContrast(shell);
+  const offset = (shell.surfaceMaterials || []).some((mat) => mat.polygonOffset && Math.abs(mat.polygonOffsetFactor) >= 1);
+  return {
+    sat: wash.sat,
+    luma: wash.luma,
+    samples: wash.n,
+    road,
+    fog: shell.scene.fog ? shell.scene.fog.density : 0,
+    logDepth: !!(shell.renderer.capabilities && shell.renderer.capabilities.logarithmicDepthBuffer),
+    offset,
+    distance: shell.controls ? shell.camera.position.distanceTo(shell.controls.target) : 0,
+  };
+}
+
+export function debugShiftView(dx, dy, dz) {
+  const shell = session;
+  if (!shell || !shell.camera) return null;
+  shell.camera.position.x += dx;
+  shell.camera.position.y += dy;
+  shell.camera.position.z += dz;
+  if (shell.controls) shell.controls.update();
+  return debugGroundProbe();
 }
 
 export function close() {

@@ -1,0 +1,42 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import test from "node:test";
+import { HAZE_DENSITY, linearDepthSteps, roadCrossSection } from "../map-src/ground.mjs";
+
+test("an 8cm curb stacked under the road is unresolved on 16-bit depth", () => {
+  const steps = linearDepthSteps({
+    near: 0.5,
+    far: 5000,
+    distance: 250,
+    separation: 0.08,
+    bits: 16,
+  });
+  assert.ok(steps < 1, String(steps));
+});
+
+test("curb shoulders stay beside the asphalt with a gap", () => {
+  for (const width of [2.2, 4, 6.5, 11]) {
+    const section = roadCrossSection(width);
+    const roadEdge = section.road / 2;
+    const shoulderInner = section.lateral - section.shoulder / 2;
+    const shoulderOuter = section.lateral + section.shoulder / 2;
+    assert.ok(shoulderInner >= roadEdge + 0.05, JSON.stringify(section));
+    assert.ok(shoulderOuter <= section.full / 2 + section.gap + 0.001, JSON.stringify(section));
+    assert.ok(section.shoulder >= 0.2, JSON.stringify(section));
+  }
+});
+
+test("overview haze keeps most surface color inside 800m", () => {
+  assert.ok(Math.exp(-HAZE_DENSITY.light * 800) >= 0.78);
+  assert.ok(Math.exp(-HAZE_DENSITY.dark * 800) >= 0.72);
+  assert.ok(HAZE_DENSITY.light < 0.0005);
+});
+
+test("ground materials no longer use a slope polygon offset", () => {
+  const src = fs.readFileSync(new URL("../map-src/scene-dress.mjs", import.meta.url), "utf8");
+  assert.equal(src.includes("polygonOffset: true"), false);
+  assert.equal(src.includes("polygonOffsetFactor: -2"), false);
+  assert.match(src, /roadCrossSection/);
+  const map = fs.readFileSync(new URL("../map-src/campus-map.js", import.meta.url), "utf8");
+  assert.match(map, /logarithmicDepthBuffer:\s*true/);
+});
