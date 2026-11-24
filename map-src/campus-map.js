@@ -18,8 +18,21 @@ import {
 } from "./scene-dress.mjs";
 import {
   SCHEMATIC_HEIGHT_M,
+  pointInRing,
   sampleTerrainY,
 } from "./placement.mjs";
+import {
+  EYE_M,
+  LOOK_HOLD_RPS,
+  LOOK_TAP,
+  WALK_HOLD_MPS,
+  WALK_TAP_M,
+  applyWalkAction,
+  footprintBlocked,
+  outsideStand,
+  poseFrom,
+  yawFromDirection,
+} from "./walk.mjs";
 
 const FAV_KEY = "campus_map_favorites";
 const OFFICIAL_MAP = "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517";
@@ -33,6 +46,10 @@ const PRIORITY2 = new Set(["F49", "F62", "F69", "F57", "F71", "F72", "F73"]);
 const TEXT = {
   zh: {
     close: "关闭", zoomIn: "放大", zoomOut: "缩小", reset: "回到全校", north: "正北复位",
+    walk: "步行", walkHint: "地面行走", walkStop: "结束行走",
+    move: "移动", look: "环顾",
+    forward: "前进", back: "后退", left: "向左", right: "向右",
+    lookUp: "抬头", lookDown: "低头", lookLeft: "向左转", lookRight: "向右转",
     full: "全屏", fullExit: "退出全屏", directory: "目录", search: "搜索地点",
     privacy: "请勿输入学号、手机号等个人信息", clearFav: "清空收藏",
     storage: "仅保存在本机浏览器，公用设备请清空", fav: "收藏", favOn: "已收藏",
@@ -55,6 +72,10 @@ const TEXT = {
   },
   ko: {
     close: "닫기", zoomIn: "확대", zoomOut: "축소", reset: "전체 보기", north: "정북",
+    walk: "걷기", walkHint: "지면 걷기", walkStop: "걷기 종료",
+    move: "이동", look: "둘러보기",
+    forward: "앞으로", back: "뒤로", left: "왼쪽", right: "오른쪽",
+    lookUp: "위로", lookDown: "아래로", lookLeft: "왼쪽으로", lookRight: "오른쪽으로",
     full: "전체 화면", fullExit: "전체 화면 종료", directory: "목록", search: "장소 검색",
     privacy: "학번·전화번호 등 개인정보는 입력하지 마세요", clearFav: "즐겨찾기 비우기",
     storage: "이 브라우저에만 저장됩니다. 공용 기기에서는 비워 주세요", fav: "즐겨찾기", favOn: "즐겨찾기됨",
@@ -87,6 +108,17 @@ const MAP_CSS = `
 .map-toolbar,.map-directory,.map-info{position:absolute;z-index:8}
 .map-labels{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
 .map-toolbar{top:8px;left:8px;right:8px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 16px)}
+.map-walk{position:absolute;left:8px;right:8px;bottom:50px;z-index:9;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}
+.map-walk[hidden]{display:none !important}
+.map-pad{pointer-events:auto;display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;gap:4px;touch-action:none}
+.map-pad-btn{width:44px;height:44px;min-height:44px;padding:0;font-size:1rem;line-height:1}
+.map-pad-btn[data-slot="n"]{grid-column:2;grid-row:1}
+.map-pad-btn[data-slot="w"]{grid-column:1;grid-row:2}
+.map-pad-btn[data-slot="e"]{grid-column:3;grid-row:2}
+.map-pad-btn[data-slot="s"]{grid-column:2;grid-row:3}
+.map-modal.is-narrow:not(.dir-collapsed) .map-walk{bottom:calc(48% + 50px)}
+.map-modal.is-narrow.info-open .map-walk{bottom:calc(min(62vh, 560px) + 52px)}
+.map-modal:not(.is-narrow):not(.dir-collapsed) .map-pad-look{margin-right:324px}
 .map-btn{min-height:44px;padding:0 11px;border-radius:8px;border:1px solid var(--map-line);background:var(--map-panel);color:var(--ink);font:inherit;font-weight:600;font-size:.82rem;letter-spacing:.01em;cursor:pointer;backdrop-filter:blur(18px) saturate(1.2);box-shadow:none}
 .map-btn[aria-pressed="true"]{background:var(--pressed-bg);box-shadow:inset 0 0 0 1px var(--map-line)}
 .map-btn:focus-visible,.map-search:focus-visible,.map-ext-link:focus-visible,.map-osm-link:focus-visible,.map-pill:focus-visible,.map-odbl-link:focus-visible{outline:2px solid var(--rim);outline-offset:2px}
@@ -299,6 +331,10 @@ function createShell(opts) {
   info.hidden = true;
   const labelLayer = document.createElement("div");
   labelLayer.className = "map-labels";
+  const walkUi = document.createElement("div");
+  walkUi.className = "map-walk";
+  walkUi.hidden = true;
+  walkUi.append(makePad("move", MOVE_SLOTS), makePad("look", LOOK_SLOTS));
   const attrib = document.createElement("div");
   attrib.className = "map-attrib";
   const attribBar = document.createElement("div");
@@ -307,10 +343,10 @@ function createShell(opts) {
   license.className = "map-license";
   license.hidden = true;
   attrib.append(attribBar, license);
-  stage.append(canvas, status, fallback, labelLayer, toolbar, directory, info);
+  stage.append(canvas, status, fallback, labelLayer, walkUi, toolbar, directory, info);
   root.append(stage, attrib);
   const shell = {
-    root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, attrib, attribBar, license,
+    root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, attrib, attribBar, license,
     lang, theme: opts.theme === "dark" ? "dark" : "light",
     onOpenFaq: opts.onOpenFaq, faqId: opts.faqId || "",
     favorites: readFavs(), category: "all", query: "", labelsOn: true,
@@ -318,6 +354,7 @@ function createShell(opts) {
     raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
     detailEntries: null, detailFocus: null, detailBuilding: null,
     renderer: null, controls: null, scene: null, camera: null,
+    walk: { active: false, x: 0, z: 0, yaw: 0, pitch: -0.2, held: new Set(), heldAt: 0, t: 0, focusId: null, drag: null, eyeY: 0 },
   };
   paintChrome(shell);
   paintAttribution(shell);
@@ -413,6 +450,7 @@ function paintChrome(shell) {
     ["zoom-out", "-"],
     ["reset", copy.reset],
     ["north", copy.north],
+    ["walk", copy.walk],
     ["full", full ? copy.fullExit : copy.full],
     ["directory", copy.directory],
     ["labels", copy.labels],
@@ -436,8 +474,9 @@ function paintChrome(shell) {
       if (action === "close") close();
       else if (action === "zoom-in") zoomBy(0.82);
       else if (action === "zoom-out") zoomBy(1.22);
-      else if (action === "reset") frameCampus(true);
+      else if (action === "reset") frameCampus();
       else if (action === "north") faceNorth();
+      else if (action === "walk") toggleWalk();
       else if (action === "full") toggleFull();
       else if (action === "directory") {
         session.root.classList.toggle("dir-collapsed");
@@ -472,6 +511,7 @@ function paintChrome(shell) {
   }
   shell.status.textContent = copy.loading;
   if (!shell.fallback.hidden) shell.fallback.textContent = copy.fallback;
+  paintWalkUi(shell);
 }
 
 function mountDirectory(shell) {
@@ -1027,7 +1067,7 @@ function selectBuilding(osmId, faqId) {
     const row = shell.list.querySelector(`[data-faq-id="${faqId}"]`);
     if (row && row.scrollIntoView) row.scrollIntoView({ block: "nearest" });
   }
-  flyTo(record.centroid.x, record.seat.baseY + 4, record.centroid.z);
+  if (shell.camera && shell.terrain) walkToBuilding(record);
 }
 
 function focusFaq(faqId) {
@@ -1038,38 +1078,239 @@ function focusFaq(faqId) {
   activateEntry(entry);
 }
 
-function flyTo(x, y, z) {
+const MOVE_SLOTS = [
+  ["forward", "n", "▲"],
+  ["left", "w", "◀"],
+  ["right", "e", "▶"],
+  ["back", "s", "▼"],
+];
+const LOOK_SLOTS = [
+  ["look-up", "n", "▲"],
+  ["look-left", "w", "◀"],
+  ["look-right", "e", "▶"],
+  ["look-down", "s", "▼"],
+];
+const WALK_KEYS = {
+  KeyW: "forward",
+  ArrowUp: "forward",
+  KeyS: "back",
+  ArrowDown: "back",
+  KeyA: "left",
+  ArrowLeft: "left",
+  KeyD: "right",
+  ArrowRight: "right",
+  KeyQ: "look-left",
+  KeyE: "look-right",
+  KeyR: "look-up",
+  KeyF: "look-down",
+};
+
+function makePad(kind, slots) {
+  const pad = document.createElement("div");
+  pad.className = "map-pad map-pad-" + kind;
+  pad.dataset.pad = kind;
+  pad.setAttribute("role", "group");
+  for (const [action, slot, glyph] of slots) {
+    const node = button(glyph, "map-btn map-pad-btn");
+    node.dataset.walk = action;
+    node.dataset.slot = slot;
+    node.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      try { node.setPointerCapture(event.pointerId); } catch (e) { /* already released */ }
+      holdWalk(action, true);
+    });
+    const release = (event) => {
+      holdWalk(action, false);
+      try {
+        if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+      } catch (e) { /* pointer already gone */ }
+    };
+    node.addEventListener("pointerup", release);
+    node.addEventListener("pointercancel", release);
+    pad.appendChild(node);
+  }
+  return pad;
+}
+
+function paintWalkUi(shell) {
+  if (!shell || !shell.walkUi) return;
+  const copy = TEXT[shell.lang];
+  shell.walkUi.hidden = !(shell.walk && shell.walk.active);
+  const move = shell.walkUi.querySelector(".map-pad-move");
+  const look = shell.walkUi.querySelector(".map-pad-look");
+  if (move) move.setAttribute("aria-label", copy.move);
+  if (look) look.setAttribute("aria-label", copy.look);
+  const labels = {
+    forward: copy.forward,
+    back: copy.back,
+    left: copy.left,
+    right: copy.right,
+    "look-up": copy.lookUp,
+    "look-down": copy.lookDown,
+    "look-left": copy.lookLeft,
+    "look-right": copy.lookRight,
+  };
+  for (const node of shell.walkUi.querySelectorAll("[data-walk]")) {
+    const label = labels[node.dataset.walk] || "";
+    node.setAttribute("aria-label", label);
+    node.title = label;
+  }
+  const walkBtn = shell.toolbar && shell.toolbar.querySelector("[data-map-action='walk']");
+  if (walkBtn) {
+    walkBtn.setAttribute("aria-pressed", shell.walk && shell.walk.active ? "true" : "false");
+    walkBtn.title = shell.walk && shell.walk.active ? copy.walkStop : copy.walkHint;
+  }
+}
+
+function buildingRings(shell) {
+  return shell.buildings.map((record) => record.building.footprintXZ);
+}
+
+function walkBlocked(shell, x, z) {
+  const terrain = shell.terrain;
+  if (!terrain) return true;
+  const x0 = terrain.xM[0] + 2;
+  const x1 = terrain.xM[terrain.xM.length - 1] - 2;
+  const z0 = terrain.zM[0] + 2;
+  const z1 = terrain.zM[terrain.zM.length - 1] - 2;
+  if (x < x0 || x > x1 || z < z0 || z > z1) return true;
+  return footprintBlocked(x, z, buildingRings(shell), 1.15);
+}
+
+function syncWalkCamera(shell) {
+  const eyeY = sampleTerrainY(shell.terrain, shell.walk.x, shell.walk.z) + EYE_M;
+  const pose = poseFrom(shell.walk, eyeY);
+  shell.walk.eyeY = eyeY;
+  shell.camera.position.set(pose.x, pose.y, pose.z);
+  shell.controls.target.set(pose.lookX, pose.lookY, pose.lookZ);
+  shell.camera.lookAt(pose.lookX, pose.lookY, pose.lookZ);
+  poke();
+}
+
+function startWalk(shell, x, z, yaw, pitch, focusId) {
+  if (!shell || !shell.camera || !shell.controls || !shell.terrain) return;
+  if (walkBlocked(shell, x, z)) {
+    const cleared = outsideStand({ x, z }, x + 10, z + 10, (px, pz) => walkBlocked(shell, px, pz));
+    x = cleared.x;
+    z = cleared.z;
+  }
+  shell.walk.active = true;
+  shell.walk.focusId = focusId || null;
+  shell.walk.x = x;
+  shell.walk.z = z;
+  shell.walk.yaw = yaw;
+  shell.walk.pitch = Math.max(-1.05, Math.min(0.85, pitch));
+  shell.walk.held.clear();
+  shell.walk.drag = null;
+  shell.controls.enabled = false;
+  shell.tween = null;
+  syncWalkCamera(shell);
+  paintWalkUi(shell);
+  layoutLabels();
+}
+
+function exitWalk(shell) {
+  if (!shell || !shell.walk) return;
+  if (shell.walk.active && shell.camera && shell.controls) {
+    const eye = shell.camera.position;
+    const yaw = shell.walk.yaw;
+    const dist = 64;
+    shell.controls.target.set(
+      eye.x + Math.sin(yaw) * dist,
+      eye.y - 28,
+      eye.z - Math.cos(yaw) * dist,
+    );
+    shell.controls.enabled = true;
+    shell.controls.update();
+  }
+  shell.walk.active = false;
+  shell.walk.held.clear();
+  shell.walk.focusId = null;
+  shell.walk.drag = null;
+  paintWalkUi(shell);
+  layoutLabels();
+}
+
+function toggleWalk() {
   const shell = session;
-  if (!shell || !shell.controls) return;
-  const target = new THREE.Vector3(x, y, z);
-  const offset = shell.camera.position.clone().sub(shell.controls.target);
-  if (offset.length() < 30) offset.set(36, 48, 64);
-  offset.setLength(THREE.MathUtils.clamp(offset.length() * 0.7, 46, 170));
-  const endPos = target.clone().add(offset);
-  const floorY = sampleTerrainY(shell.terrain, endPos.x, endPos.z) + 12;
-  if (endPos.y < floorY) endPos.y = floorY;
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce) {
-    shell.controls.target.copy(target);
-    shell.camera.position.copy(endPos);
-    shell.tween = null;
+  if (!shell || !shell.camera || !shell.terrain || !shell.controls) return;
+  if (shell.walk.active) {
+    exitWalk(shell);
     poke();
     return;
   }
-  shell.tween = {
-    t0: performance.now(),
-    dur: 680,
-    sT: shell.controls.target.clone(),
-    sP: shell.camera.position.clone(),
-    eT: target,
-    eP: endPos,
-  };
+  const dir = new THREE.Vector3();
+  shell.camera.getWorldDirection(dir);
+  const spot = shell.controls.target;
+  const yaw = yawFromDirection(dir.x, dir.z);
+  const pitched = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
+  startWalk(shell, spot.x, spot.z, yaw, Math.max(-0.35, Math.min(0.2, pitched)), null);
+}
+
+function walkToBuilding(record) {
+  const shell = session;
+  if (!shell || !record || !shell.terrain) return;
+  const prefer = shell.camera ? shell.camera.position : { x: record.centroid.x, z: record.centroid.z + 24 };
+  const stand = outsideStand(record.centroid, prefer.x, prefer.z, (x, z) => walkBlocked(shell, x, z));
+  const yaw = yawFromDirection(record.centroid.x - stand.x, record.centroid.z - stand.z);
+  const eyeY = sampleTerrainY(shell.terrain, stand.x, stand.z) + EYE_M;
+  const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.45;
+  const horiz = Math.max(1, Math.hypot(record.centroid.x - stand.x, record.centroid.z - stand.z));
+  const pitch = Math.max(-0.55, Math.min(0.45, Math.atan2(aimY - eyeY, horiz)));
+  startWalk(shell, stand.x, stand.z, yaw, pitch, record.osmId);
+}
+
+function holdWalk(action, down) {
+  const shell = session;
+  if (!shell || !shell.walk || !shell.walk.active) return;
+  if (down) {
+    if (!shell.walk.held.has(action)) {
+      if (!shell.walk.held.size) shell.walk.heldAt = performance.now();
+      shell.walk.held.add(action);
+      const move = action === "forward" || action === "back" || action === "left" || action === "right";
+      applyWalkAction(shell.walk, action, move ? WALK_TAP_M : LOOK_TAP, (x, z) => walkBlocked(shell, x, z));
+      syncWalkCamera(shell);
+    }
+  } else {
+    shell.walk.held.delete(action);
+  }
   poke();
+}
+
+function stepWalk(shell) {
+  if (!shell.walk || !shell.walk.active || !shell.walk.held.size) return false;
+  const now = performance.now();
+  const prev = shell.walk.t || now;
+  shell.walk.t = now;
+  if (now - shell.walk.heldAt < 180) return true;
+  const dt = Math.min(0.05, (now - prev) / 1000);
+  const blocked = (x, z) => walkBlocked(shell, x, z);
+  let moved = false;
+  for (const action of shell.walk.held) {
+    const move = action === "forward" || action === "back" || action === "left" || action === "right";
+    const amount = move ? WALK_HOLD_MPS * dt : LOOK_HOLD_RPS * dt;
+    if (applyWalkAction(shell.walk, action, amount, blocked)) moved = true;
+  }
+  if (moved) syncWalkCamera(shell);
+  return true;
+}
+
+function onWalkKey(event, down) {
+  if (!session || !session.walk || !session.walk.active) return;
+  const tag = event.target && event.target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || (event.target && event.target.isContentEditable)) return;
+  const action = WALK_KEYS[event.code];
+  if (!action) return;
+  event.preventDefault();
+  if (down && event.repeat) return;
+  holdWalk(action, down);
 }
 
 function frameCampus() {
   const shell = session;
   if (!shell || !shell.controls || !shell.buildings.length) return;
+  exitWalk(shell);
   const box = new THREE.Box3();
   for (const record of shell.buildings) box.expandByObject(record.group);
   const center = box.getCenter(new THREE.Vector3());
@@ -1079,23 +1320,37 @@ function frameCampus() {
   shell.camera.position.set(center.x + radius * 0.46, center.y + radius * 0.42, center.z + radius * 0.74);
   if (shell.sun) shell.sun.target.position.copy(center);
   shell.tween = null;
+  shell.controls.enabled = true;
+  shell.controls.update();
   poke();
 }
 
 function faceNorth() {
   const shell = session;
   if (!shell || !shell.controls) return;
+  if (shell.walk && shell.walk.active) {
+    shell.walk.yaw = 0;
+    shell.walk.pitch = -0.22;
+    syncWalkCamera(shell);
+    return;
+  }
   const target = shell.controls.target;
   const dist = Math.max(80, shell.camera.position.distanceTo(target));
   const phi = 1.02;
   shell.camera.position.set(target.x, target.y + dist * Math.cos(phi), target.z + dist * Math.sin(phi));
   shell.tween = null;
+  shell.controls.update();
   poke();
 }
 
 function zoomBy(scale) {
   const shell = session;
   if (!shell || !shell.controls) return;
+  if (shell.walk && shell.walk.active) {
+    applyWalkAction(shell.walk, scale < 1 ? "forward" : "back", WALK_TAP_M, (x, z) => walkBlocked(shell, x, z));
+    syncWalkCamera(shell);
+    return;
+  }
   if (scale < 1) shell.controls.dollyIn(scale);
   else shell.controls.dollyOut(1 / scale);
   poke();
@@ -1113,7 +1368,7 @@ function toggleFull() {
 
 function keepAbove() {
   const shell = session;
-  if (!shell || !shell.camera || !shell.terrain) return;
+  if (!shell || !shell.camera || !shell.terrain || (shell.walk && shell.walk.active)) return;
   const y = sampleTerrainY(shell.terrain, shell.camera.position.x, shell.camera.position.z);
   if (shell.camera.position.y < y + 8) shell.camera.position.y = y + 8;
 }
@@ -1133,7 +1388,11 @@ function stepTween() {
 function obstacleBoxes(shell) {
   const stage = shell.stage.getBoundingClientRect();
   const boxes = [];
-  for (const node of [shell.toolbar, shell.directory, shell.info, shell.attrib]) {
+  const nodes = [shell.toolbar, shell.directory, shell.info, shell.attrib];
+  if (shell.walkUi && !shell.walkUi.hidden) {
+    for (const pad of shell.walkUi.querySelectorAll(".map-pad")) nodes.push(pad);
+  }
+  for (const node of nodes) {
     if (!node || node.hidden) continue;
     const style = getComputedStyle(node);
     if (style.display === "none" || style.visibility === "hidden") continue;
@@ -1218,11 +1477,12 @@ function tick() {
   if (!shell || !shell.renderer) return;
   shell.raf = 0;
   const tweening = stepTween();
-  const changed = shell.controls ? shell.controls.update() : false;
+  const walking = stepWalk(shell);
+  const changed = shell.controls && shell.controls.enabled ? shell.controls.update() : false;
   keepAbove();
   shell.renderer.render(shell.scene, shell.camera);
   layoutLabels();
-  if (tweening || changed || shell.interacting) poke();
+  if (tweening || changed || shell.interacting || walking) poke();
 }
 
 function resize() {
@@ -1257,14 +1517,31 @@ function bindPointer(shell) {
   let down = null;
   bind(shell, shell.canvas, "pointerdown", (event) => {
     down = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    if (session && session.walk && session.walk.active) session.walk.drag = { x: event.clientX, y: event.clientY };
   });
   bind(shell, shell.canvas, "pointerup", (event) => {
     if (!down || down.id !== event.pointerId) return;
     const moved = Math.hypot(event.clientX - down.x, event.clientY - down.y);
     down = null;
+    if (session && session.walk) session.walk.drag = null;
     if (moved < 6) pickAt(event);
   });
+  bind(shell, shell.canvas, "pointercancel", () => {
+    down = null;
+    if (session && session.walk) session.walk.drag = null;
+  });
   bind(shell, shell.canvas, "pointermove", (event) => {
+    if (session && session.walk && session.walk.active && session.walk.drag && down && down.id === event.pointerId) {
+      const dx = event.clientX - session.walk.drag.x;
+      const dy = event.clientY - session.walk.drag.y;
+      session.walk.drag.x = event.clientX;
+      session.walk.drag.y = event.clientY;
+      if (dx || dy) {
+        applyWalkAction(session.walk, "look-right", dx * 0.005, () => false);
+        applyWalkAction(session.walk, "look-up", -dy * 0.004, () => false);
+        syncWalkCamera(session);
+      }
+    }
     if (!session || !session.camera || (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) >= 6)) return;
     const rect = session.canvas.getBoundingClientRect();
     const ndc = new THREE.Vector2(
@@ -1457,7 +1734,222 @@ export function debugSnapshot() {
       beacon: !!record.beacon,
     })),
     labelTexts: [...session.labelLayer.querySelectorAll(".map-pill")].map((node) => node.textContent),
+    viewMode: session.walk && session.walk.active ? "walk" : "orbit",
+    yaw: session.walk ? session.walk.yaw : 0,
+    focusId: session.walk ? session.walk.focusId : null,
+    camera: session.camera ? {
+      x: session.camera.position.x,
+      y: session.camera.position.y,
+      z: session.camera.position.z,
+    } : null,
+    target: session.controls ? {
+      x: session.controls.target.x,
+      y: session.controls.target.y,
+      z: session.controls.target.z,
+    } : null,
+    focusDistance: focusMetrics(session).distance,
+    eyeGap: focusMetrics(session).eyeGap,
+    facadeOpaque: session.buildings.every((record) => groupSolid(record.group)),
   };
+}
+
+function focusMetrics(shell) {
+  if (!shell || !shell.walk || !shell.walk.focusId || !shell.camera) return { distance: null, eyeGap: null };
+  const record = shell.buildings.find((item) => item.osmId === shell.walk.focusId);
+  if (!record) return { distance: null, eyeGap: null };
+  const distance = Math.hypot(shell.camera.position.x - record.centroid.x, shell.camera.position.z - record.centroid.z);
+  const ground = sampleTerrainY(shell.terrain, shell.camera.position.x, shell.camera.position.z);
+  return { distance, eyeGap: shell.camera.position.y - ground };
+}
+
+function groupSolid(group) {
+  let ok = true;
+  group.traverse((obj) => {
+    if (!obj.isMesh) return;
+    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+    for (const mat of mats) {
+      if (!mat || mat.transparent === true || mat.opacity < 1 || mat.depthWrite === false) ok = false;
+    }
+  });
+  return ok;
+}
+
+let probeMat = null;
+
+function getProbeMat() {
+  if (!probeMat) {
+    probeMat = new THREE.MeshBasicMaterial({
+      color: 0xff00ff,
+      toneMapped: false,
+      fog: false,
+      side: THREE.FrontSide,
+      depthTest: true,
+      depthWrite: true,
+      transparent: false,
+    });
+  }
+  return probeMat;
+}
+
+function swapProbe(records, on) {
+  for (const record of records) {
+    if (!record) continue;
+    if (on) {
+      const saved = [];
+      record.group.traverse((obj) => {
+        if (!obj.isMesh) return;
+        saved.push({ obj, material: obj.material });
+        obj.material = getProbeMat();
+      });
+      record._probeSaved = saved;
+    } else if (record._probeSaved) {
+      for (const item of record._probeSaved) item.obj.material = item.material;
+      record._probeSaved = null;
+    }
+  }
+}
+
+function segmentClear(shell, ax, ay, az, bx, by, bz, ignoreId) {
+  for (let s = 1; s < 10; s++) {
+    const t = s / 10;
+    const x = ax + (bx - ax) * t;
+    const y = ay + (by - ay) * t;
+    const z = az + (bz - az) * t;
+    if (sampleTerrainY(shell.terrain, x, z) > y - 0.35) return false;
+    for (const record of shell.buildings) {
+      if (record.osmId === ignoreId) continue;
+      if (pointInRing(x, z, record.building.footprintXZ)) return false;
+    }
+  }
+  return true;
+}
+
+function rayBlocked(shell, origin, point, ignoreGroup) {
+  const dir = point.clone().sub(origin);
+  const dist = dir.length();
+  if (dist < 0.8) return true;
+  dir.multiplyScalar(1 / dist);
+  const ray = new THREE.Raycaster(origin, dir, 0.15, Math.max(0.2, dist - 0.3));
+  const roots = [];
+  for (const child of shell.scene.children) {
+    if (child === ignoreGroup || child === shell.sky) continue;
+    roots.push(child);
+  }
+  return ray.intersectObjects(roots, true).length > 0;
+}
+
+function facadeSamples(record) {
+  const open = record.ring || record.building.footprintXZ;
+  const samples = [];
+  const midY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.45;
+  for (let i = 0; i < open.length; i++) {
+    const a = open[i];
+    const b = open[(i + 1) % open.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 6) continue;
+    const mx = (a[0] + b[0]) / 2;
+    const mz = (a[1] + b[1]) / 2;
+    const ox = (b[1] - a[1]) / len;
+    const oz = -(b[0] - a[0]) / len;
+    samples.push(new THREE.Vector3(mx + ox * 0.45, midY, mz + oz * 0.45));
+  }
+  samples.push(new THREE.Vector3(record.centroid.x, record.seat.baseY + SCHEMATIC_HEIGHT_M + 0.4, record.centroid.z));
+  return samples;
+}
+
+function placeFacadeView(shell, record, distance, eyeLift) {
+  const open = record.ring || record.building.footprintXZ;
+  let best = null;
+  for (let i = 0; i < open.length; i++) {
+    const a = open[i];
+    const b = open[(i + 1) % open.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 8) continue;
+    const mx = (a[0] + b[0]) / 2;
+    const mz = (a[1] + b[1]) / 2;
+    const ox = (b[1] - a[1]) / len;
+    const oz = -(b[0] - a[0]) / len;
+    const x = mx + ox * distance;
+    const z = mz + oz * distance;
+    const y = sampleTerrainY(shell.terrain, x, z) + eyeLift;
+    const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.5;
+    if (!segmentClear(shell, x, y, z, mx, aimY, mz, record.osmId)) continue;
+    if (!best || len > best.len) best = { x, y, z, mx, mz, aimY, len };
+  }
+  if (!best) return false;
+  shell.camera.position.set(best.x, best.y, best.z);
+  shell.camera.lookAt(best.mx, best.aimY, best.mz);
+  shell.camera.updateMatrixWorld(true);
+  return true;
+}
+
+function readPixel(shell, ndc) {
+  const gl = shell.renderer.getContext();
+  const bufW = shell.renderer.domElement.width;
+  const bufH = shell.renderer.domElement.height;
+  const x = Math.min(bufW - 1, Math.max(0, Math.floor((ndc.x * 0.5 + 0.5) * bufW)));
+  const y = Math.min(bufH - 1, Math.max(0, Math.floor((ndc.y * 0.5 + 0.5) * bufH)));
+  const px = new Uint8Array(4);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  return [px[0], px[1], px[2], px[3]];
+}
+
+export function debugOcclusion(osmId, mode) {
+  const shell = session;
+  if (!shell || !shell.camera || !shell.renderer) return { tested: 0, solid: 0, placed: false, mode: mode || "current" };
+  const modeName = mode || "current";
+  const pos = shell.camera.position.clone();
+  const quat = shell.camera.quaternion.clone();
+  const target = shell.controls.target.clone();
+  const involved = [];
+  try {
+    let placed = true;
+    if (modeName === "low" || modeName === "close") {
+      const record = shell.buildings.find((item) => item.osmId === osmId);
+      if (!record) return { tested: 0, solid: 0, placed: false, mode: modeName };
+      const distance = modeName === "low" ? 24 : 13;
+      const lift = modeName === "low" ? 2.6 : 4.2;
+      placed = placeFacadeView(shell, record, distance, lift) || placeFacadeView(shell, record, distance + 16, lift + 2);
+      if (!placed) return { tested: 0, solid: 0, placed: false, mode: modeName };
+    }
+    shell.camera.updateMatrixWorld(true);
+    const records = osmId ? shell.buildings.filter((item) => item.osmId === osmId) : shell.buildings;
+    const chosen = [];
+    for (const record of records) {
+      for (const point of facadeSamples(record)) {
+        if (chosen.length >= 8) break;
+        const roofY = record.seat.baseY + SCHEMATIC_HEIGHT_M;
+        if (point.y > roofY + 0.2 && shell.camera.position.y < roofY) continue;
+        const eye = point.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+        if (eye.z > -0.5) continue;
+        const ndc = point.clone().project(shell.camera);
+        if (Math.abs(ndc.x) > 0.92 || Math.abs(ndc.y) > 0.92) continue;
+        if (!segmentClear(shell, shell.camera.position.x, shell.camera.position.y, shell.camera.position.z, point.x, point.y, point.z, record.osmId)) continue;
+        if (rayBlocked(shell, shell.camera.position, point, record.group)) continue;
+        chosen.push({ record, ndc });
+      }
+    }
+    for (const item of chosen) {
+      if (!involved.includes(item.record)) involved.push(item.record);
+    }
+    swapProbe(involved, true);
+    shell.renderer.render(shell.scene, shell.camera);
+    let solid = 0;
+    const colors = [];
+    for (const item of chosen) {
+      const px = readPixel(shell, item.ndc);
+      colors.push(px);
+      if (px[0] > 180 && px[2] > 180 && px[1] < 110) solid += 1;
+    }
+    return { tested: chosen.length, solid, placed, mode: modeName, colors };
+  } finally {
+    swapProbe(involved, false);
+    shell.camera.position.copy(pos);
+    shell.camera.quaternion.copy(quat);
+    if (shell.controls) shell.controls.target.copy(target);
+    shell.renderer.render(shell.scene, shell.camera);
+  }
 }
 
 export function close() {
@@ -1489,6 +1981,7 @@ export async function open(opts) {
   document.body.appendChild(shell.root);
   lockPage(true);
   bind(shell, window, "keydown", (event) => {
+    if (session && session.root === shell.root) onWalkKey(event, true);
     if (event.key !== "Escape" || !session || session.root !== shell.root) return;
     event.preventDefault();
     event.stopPropagation();
@@ -1504,6 +1997,9 @@ export async function open(opts) {
       return;
     }
     close();
+  }, true);
+  bind(shell, window, "keyup", (event) => {
+    if (session && session.root === shell.root) onWalkKey(event, false);
   }, true);
   bind(shell, window, "resize", resize);
   bind(shell, document, "fullscreenchange", () => { if (session) paintChrome(session); });
