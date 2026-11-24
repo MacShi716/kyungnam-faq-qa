@@ -1,1 +1,4393 @@
-{"schemaVersion":2,"categoryVocabulary":["international","academic","dining","dorm","landmark","campus"],"entries":[{"faqId":"F41","nameKo":"학교 주소랑 대표 전화번호가 어떻게 돼요?","nameZh":"学校地址和总机电话是多少？","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://www.kyungnam.ac.kr/ko/4218/subview.do"],"sourceCheckedAt":"","textKo":"경남대학교 주소는 (51767) 경상남도 창원시 마산합포구 경남대학로 7(월영동)이고 대표전화는 055-245-5000입니다. ‘찾아오시는길’ 페이지의 담당은 홍보실(055-249-2049)입니다.","textZh":"庆南大学地址：(51767) 庆尚南道昌原市马山合浦区庆南大学路7（月影洞），总机 055-245-5000。“交通指南”页面的负责部门为宣传室（055-249-2049）。","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F42","nameKo":"정문","nameZh":"正门","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"정문은 경남대 캠퍼스맵 1번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"正门（정문）在庆南大学校园地图 1 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F43","nameKo":"정문게시판","nameZh":"正门布告栏","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"정문게시판은 경남대 캠퍼스맵 2번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"正门布告栏（정문게시판）在庆南大学校园地图 2 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F44","nameKo":"정문상황실","nameZh":"正门值班室","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"정문상황실은 경남대 캠퍼스맵 3번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"正门值班室（정문상황실）在庆南大学校园地图 3 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F45","nameKo":"월영지","nameZh":"月影池","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"월영지는 경남대 캠퍼스맵 4번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"月影池（월영지）在庆南大学校园地图 4 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F46","nameKo":"한마상","nameZh":"汉马像","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"","textKo":"한마상은 경남대 캠퍼스맵 5번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"한마상在庆南大学校园地图 5 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F47","nameKo":"10.18광장","nameZh":"10.18广场","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"10.18광장은 경남대 캠퍼스맵 6번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"10.18广场（10.18광장）在庆南大学校园地图 6 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F48","nameKo":"국제어학관","nameZh":"国际语学馆","category":"international","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"국제어학관은 경남대 캠퍼스맵 7번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"国际语学馆（국제어학관）在庆南大学校园地图 7 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F49","nameKo":"본관","nameZh":"本馆","category":"academic","osmBuildingIds":[1062064821],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"본관은 경남대 캠퍼스맵 8번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"本馆（본관）在庆南大学校园地图 8 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F50","nameKo":"대운동장","nameZh":"大运动场","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"대운동장은 경남대 캠퍼스맵 9번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"大运动场（대운동장）在庆南大学校园地图 9 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F51","nameKo":"고운관","nameZh":"孤云馆","category":"academic","osmBuildingIds":[1062064428],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"고운관은 경남대 캠퍼스맵 10번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"孤云馆（고운관）在庆南大学校园地图 10 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F52","nameKo":"팔각정","nameZh":"八角亭","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"팔각정은 경남대 캠퍼스맵 12번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"八角亭（팔각정）在庆南大学校园地图 12 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F53","nameKo":"제2공학관","nameZh":"第二工学馆","category":"academic","osmBuildingIds":[1062071979],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제2공학관은 경남대 캠퍼스맵 13번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第二工学馆（제2공학관）在庆南大学校园地图 13 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F54","nameKo":"혁신융합관","nameZh":"创新融合馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"혁신융합관은 경남대 캠퍼스맵 14번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"创新融合馆（혁신융합관）在庆南大学校园地图 14 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F55","nameKo":"성훈관","nameZh":"成训馆","category":"academic","osmBuildingIds":[1062071465],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"성훈관(제3공학관)은 경남대 캠퍼스맵 15번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"成训馆（第三工学馆，성훈관）在庆南大学校园地图 15 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F56","nameKo":"보건의료관","nameZh":"保健医疗馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"보건의료관은 경남대 캠퍼스맵 16번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"保健医疗馆（보건의료관）在庆南大学校园地图 16 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F57","nameKo":"건강과학관","nameZh":"健康科学馆","category":"academic","osmBuildingIds":[1062070428],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"건강과학관은 경남대 캠퍼스맵 17번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"健康科学馆（건강과학관）在庆南大学校园地图 17 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F58","nameKo":"제4공학관","nameZh":"第四工学馆","category":"academic","osmBuildingIds":[1062070303],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제4공학관은 경남대 캠퍼스맵 18번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第四工学馆（제4공학관）在庆南大学校园地图 18 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F59","nameKo":"제5공학관","nameZh":"第五工学馆","category":"academic","osmBuildingIds":[1062070057],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제5공학관은 경남대 캠퍼스맵 19번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第五工学馆（제5공학관）在庆南大学校园地图 19 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F60","nameKo":"교육관","nameZh":"教育馆","category":"academic","osmBuildingIds":[1062065692],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"교육관은 경남대 캠퍼스맵 20번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"教育馆（교육관）在庆南大学校园地图 20 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F61","nameKo":"제2경영관","nameZh":"第二经营馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제2경영관은 경남대 캠퍼스맵 21번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第二经营馆（제2경영관）在庆南大学校园地图 21 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F62","nameKo":"중앙도서관","nameZh":"中央图书馆","category":"academic","osmBuildingIds":[1061922793],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"중앙도서관은 경남대 캠퍼스맵 22번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"中央图书馆（중앙도서관）在庆南大学校园地图 22 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F63","nameKo":"법정관","nameZh":"法政馆","category":"academic","osmBuildingIds":[1061922762],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"법정관은 경남대 캠퍼스맵 23번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"法政馆（법정관）在庆南大学校园地图 23 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F64","nameKo":"테니스장","nameZh":"网球场","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"테니스장은 경남대 캠퍼스맵 24번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"网球场（테니스장）在庆南大学校园地图 24 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F65","nameKo":"제1경영관","nameZh":"第一经营馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제1경영관은 경남대 캠퍼스맵 25번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第一经营馆（제1경영관）在庆南大学校园地图 25 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F66","nameKo":"한마관","nameZh":"汉马馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"한마관은 경남대 캠퍼스맵 26번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"汉马馆（한마관，食堂）在庆南大学校园地图 26 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F67","nameKo":"산북도로 진입로","nameZh":"山北道路入口","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"산북도로 진입로는 경남대 캠퍼스맵 27번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"山北道路入口（산북도로 진입로）在庆南大学校园地图 27 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F68","nameKo":"서문(IC)","nameZh":"西门","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"서문(IC)은 경남대 캠퍼스맵 28번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"西门（서문）在庆南大学校园地图 28 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F69","nameKo":"한마미래관","nameZh":"汉马未来馆","category":"academic","osmBuildingIds":[1062065818],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"","textKo":"한마미래관은 경남대 캠퍼스맵 29번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"한마미래관在庆南大学校园地图 29 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F70","nameKo":"체육관","nameZh":"体育馆","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"체육관은 경남대 캠퍼스맵 30번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"体育馆（체육관）在庆南大学校园地图 30 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F71","nameKo":"제1한마생활관","nameZh":"第一汉马馆","category":"dorm","osmBuildingIds":[1061923876],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제1한마생활관은 경남대 캠퍼스맵 31번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第一汉马馆（宿舍，제1한마생활관）在庆南大学校园地图 31 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F72","nameKo":"제2한마생활관","nameZh":"第二汉马馆","category":"dorm","osmBuildingIds":[1061923944],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제2한마생활관은 경남대 캠퍼스맵 32번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第二汉马馆（宿舍，제2한마생활관）在庆南大学校园地图 32 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F73","nameKo":"제3한마생활관","nameZh":"第三汉马馆","category":"dorm","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"제3한마생활관은 경남대 캠퍼스맵 33번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"第三汉马馆（宿舍，제3한마생활관）在庆南大学校园地图 33 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F74","nameKo":"문무관","nameZh":"文武馆","category":"academic","osmBuildingIds":[1062066249],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"문무관은 경남대 캠퍼스맵 34번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"文武馆（문무관）在庆南大学校园地图 34 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F75","nameKo":"북문","nameZh":"北门","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"북문은 경남대 캠퍼스맵 35번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"北门（북문）在庆南大学校园地图 35 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F76","nameKo":"디자인관","nameZh":"设计馆","category":"academic","osmBuildingIds":[1062073167],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"디자인관은 경남대 캠퍼스맵 36번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"设计馆（디자인관）在庆南大学校园地图 36 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F77","nameKo":"화영운동장","nameZh":"运动场","category":"landmark","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"화영운동장은 경남대 캠퍼스맵 37번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"运动场（操场，화영운동장）在庆南大学校园地图 37 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F78","nameKo":"조소실A","nameZh":"雕塑室A","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"조소실A는 경남대 캠퍼스맵 38번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"雕塑室A（조소실A）在庆南大学校园地图 38 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F79","nameKo":"조소실B","nameZh":"雕塑室B","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"조소실B는 경남대 캠퍼스맵 39번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"雕塑室B（조소실B）在庆南大学校园地图 39 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F80","nameKo":"예술관","nameZh":"艺术馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"예술관은 경남대 캠퍼스맵 40번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"艺术馆（예술관）在庆南大学校园地图 40 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F81","nameKo":"고시원","nameZh":"考试院","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"고시원은 경남대 캠퍼스맵 41번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"考试院（고시원）在庆南大学校园地图 41 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F82","nameKo":"평생교육원","nameZh":"终身教育院","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"평생교육원은 경남대 캠퍼스맵 42번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"终身教育院（평생교육원）在庆南大学校园地图 42 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F83","nameKo":"창조관","nameZh":"创造馆","category":"academic","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"창조관은 경남대 캠퍼스맵 43번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"创造馆（창조관）在庆南大学校园地图 43 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F84","nameKo":"남문","nameZh":"南门","category":"campus","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"],"sourceCheckedAt":"2026-10-28","textKo":"남문은 경남대 캠퍼스맵 44번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","textZh":"南门（남문）在庆南大学校园地图 44 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching"},{"faqId":"F85","nameKo":"유학생서비스센터","nameZh":"留学生服务中心","category":"international","osmBuildingIds":[1062073167],"spatialStatus":"mapped","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","https://www.kyungnam.ac.kr/international/6906/subview.do"],"sourceCheckedAt":"2026-10-28","textKo":"유학생서비스센터는 디자인관(캠퍼스맵 36번) 7층에 있습니다. 전화: 055-249-2914 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 (팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요)","textZh":"留学生服务中心在设计馆（디자인관，校园地图 36 号）7 层。电话：055-249-2914。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 （团队确认，请以现场或官网指引为准）","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching","floorVerifiedByOfficialPage":false,"floorStatus":"teamConfirmed","claimedFloor":7,"claimedHostBuildingKo":"디자인관","officialCheck":"6906 page returned security-policy block; no floor confirmation","displayWarningZh":"（团队确认，请以现场或官网指引为准）","displayWarningKo":"(팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요)"},{"faqId":"F86","nameKo":"국제처","nameZh":"国际处","category":"international","osmBuildingIds":[],"spatialStatus":"unmapped-text-only","positionXZ":null,"sourceUrls":["https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517","https://www.kyungnam.ac.kr/international/14500/subview.do"],"sourceCheckedAt":"2026-10-28","textKo":"국제처는 창조관(캠퍼스맵 43번) 1층에 있습니다. 전화: 055-249-2299 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 (팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요)","textZh":"国际处在创造馆（창조관，校园地图 43 号）1 层。电话：055-249-2299。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 （团队确认，请以现场或官网指引为准）","provenance":"Existing FAQ; not independently verified except Korean name-to-OSM matching","floorVerifiedByOfficialPage":false,"floorStatus":"teamConfirmed","claimedFloor":1,"claimedHostBuildingKo":"창조관","officialCheck":"14500 page confirms institutional phone 055-249-2299 but no building or floor","displayWarningZh":"（团队确认，请以现场或官网指引为准）","displayWarningKo":"(팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요)"}],"generalMapFaqDraft":{"id":"PROPOSED_MAP_GENERAL","status":"draft-not-published","questionZh":"地图|校园地图|3D地图|学校地图","questionKo":"지도|캠퍼스맵|학교 지도|3D 지도","answerZh":"点击顶部「地图」打开可旋转的 3D 校园示意图，可缩放、选择已核实关联的楼栋并查看相关问答。不支持 3D 时可搜索地点列表。地势来自约 30 米卫星高程，楼高为示意，非实测或导航地图；未定位地点不会显示虚构标点。","answerKo":"상단 「지도」 버튼으로 회전 가능한 3D 캠퍼스 모형을 열고 확대·축소하거나 연결이 확인된 건물의 FAQ를 볼 수 있습니다. 3D 미지원 시 장소 목록을 검색하세요. 지형은 약 30m 위성 고도 자료이며 건물 높이는 예시입니다. 측량·길안내 지도가 아니며 미확인 위치는 임의 표시하지 않습니다."},"schematicBuildingDefaults":{"heightM":14,"isSchematicHeight":true,"skirtDepthM":3}}
+{
+  "schemaVersion": 2,
+  "categoryVocabulary": [
+    "international",
+    "academic",
+    "dining",
+    "dorm",
+    "landmark",
+    "campus"
+  ],
+  "entries": [
+    {
+      "faqId": "F41",
+      "nameKo": "학교 주소랑 대표 전화번호가 어떻게 돼요?",
+      "nameZh": "学校地址和总机电话是多少？",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://www.kyungnam.ac.kr/ko/4218/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "경남대학교 주소는 (51767) 경상남도 창원시 마산합포구 경남대학로 7(월영동)이고 대표전화는 055-245-5000입니다. ‘찾아오시는길’ 페이지의 담당은 홍보실(055-249-2049)입니다.",
+      "textZh": "庆南大学地址：(51767) 庆尚南道昌原市马山合浦区庆南大学路7（月影洞），总机 055-245-5000。“交通指南”页面的负责部门为宣传室（055-249-2049）。",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "summaryZh": "学校地址：庆尚南道昌原市马山合浦区庆南大学路7（月影洞），邮编51767。",
+      "summaryKo": "학교 주소는 경상남도 창원시 마산합포구 경남대학로 7(월영동), 우편번호 51767입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/4218/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F41",
+      "labelZh": "学校地址",
+      "labelKo": "학교 주소"
+    },
+    {
+      "faqId": "F42",
+      "nameKo": "정문",
+      "nameZh": "正门",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "정문은 경남대 캠퍼스맵 1번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "正门（정문）在庆南大学校园地图 1 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 1,
+      "summaryZh": "2026年官方校园地图中的正门，编号1。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 정문, 지도 번호 1번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F42",
+      "labelZh": "正门",
+      "labelKo": "정문"
+    },
+    {
+      "faqId": "F43",
+      "nameKo": "정문게시판",
+      "nameZh": "正门布告栏",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "정문게시판은 경남대 캠퍼스맵 2번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "正门布告栏（정문게시판）在庆南大学校园地图 2 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 2,
+      "summaryZh": "2026年官方校园地图中的正门布告栏，编号2。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 정문게시판, 지도 번호 2번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F43",
+      "labelZh": "正门布告栏",
+      "labelKo": "정문게시판"
+    },
+    {
+      "faqId": "F44",
+      "nameKo": "정문상황실",
+      "nameZh": "正门值班室",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "정문상황실은 경남대 캠퍼스맵 3번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "正门值班室（정문상황실）在庆南大学校园地图 3 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 3,
+      "summaryZh": "2026年官方校园地图中的正门值班室，编号3。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 정문상황실, 지도 번호 3번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F44",
+      "labelZh": "正门值班室",
+      "labelKo": "정문상황실"
+    },
+    {
+      "faqId": "F45",
+      "nameKo": "월영지",
+      "nameZh": "月影池",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "월영지는 경남대 캠퍼스맵 4번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "月影池（월영지）在庆南大学校园地图 4 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 4,
+      "summaryZh": "2026年官方校园地图中的月影池，编号4。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 월영지, 지도 번호 4번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F45",
+      "labelZh": "月影池",
+      "labelKo": "월영지"
+    },
+    {
+      "faqId": "F46",
+      "nameKo": "한마상",
+      "nameZh": "汉马像",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "한마상은 경남대 캠퍼스맵 5번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "한마상在庆南大学校园地图 5 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 5,
+      "summaryZh": "2026年官方校园地图中的汉马像，编号5。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 한마상, 지도 번호 5번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F46",
+      "labelZh": "汉马像",
+      "labelKo": "한마상"
+    },
+    {
+      "faqId": "F47",
+      "nameKo": "10.18광장",
+      "nameZh": "10.18广场",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "10.18광장은 경남대 캠퍼스맵 6번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "10.18广场（10.18광장）在庆南大学校园地图 6 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 6,
+      "summaryZh": "2026年官方校园地图中的10.18广场，编号6。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 10.18광장, 지도 번호 6번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F47",
+      "labelZh": "10.18广场",
+      "labelKo": "10.18광장"
+    },
+    {
+      "faqId": "F48",
+      "nameKo": "국제어학관",
+      "nameZh": "国际语学馆",
+      "category": "international",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/cge/6001/subview.do",
+        "https://www.kyungnam.ac.kr/ige/5829/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6373/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "국제어학관은 경남대 캠퍼스맵 7번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "国际语学馆（국제어학관）在庆南大学校园地图 7 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 7,
+      "summaryZh": "2026年官方校园地图中的国际语学馆，编号7。官网已核实的设施包括：创意融合学院、通识教育研究所、设施管理组、采购资产管理组。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 국제어학관, 지도 번호 7번입니다.공식 자료에서 확인한 시설: 창의융합대학, 교양교육연구소, 시설관리팀, 구매관재팀.",
+      "facilitiesZh": [
+        "创意融合学院",
+        "通识教育研究所",
+        "设施管理组|采购资产管理组"
+      ],
+      "facilitiesKo": [
+        "창의융합대학",
+        "교양교육연구소",
+        "시설관리팀|구매관재팀"
+      ],
+      "phones": [
+        {
+          "labelZh": "创意融合学院",
+          "labelKo": "창의융합대학",
+          "number": "055-249-2560",
+          "sourceUrl": "https://www.kyungnam.ac.kr/cge/6001/subview.do"
+        },
+        {
+          "labelZh": "通识教育研究所",
+          "labelKo": "교양교육연구소",
+          "number": "055-249-6377",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ige/5829/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/cge/6001/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ige/5829/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6373/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "创意融合学院",
+            "通识教育研究所",
+            "设施管理组",
+            "采购资产管理组"
+          ],
+          "roomsAndUsesKo": [
+            "창의융합대학",
+            "교양교육연구소",
+            "시설관리팀",
+            "구매관재팀"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/cge/6001/subview.do",
+            "https://www.kyungnam.ac.kr/ige/5829/subview.do",
+            "https://www.kyungnam.ac.kr/ko/6373/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F48",
+      "labelZh": "国际语学馆",
+      "labelKo": "국제어학관"
+    },
+    {
+      "faqId": "F49",
+      "nameKo": "본관",
+      "nameZh": "本馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062064821
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/ko/6362/subview.do",
+        "https://ipsi.kyungnam.ac.kr/sites/ipsi/index.do",
+        "https://www.kyungnam.ac.kr/ko/6373/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6338/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6398/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "본관은 경남대 캠퍼스맵 8번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "本馆（본관）在庆南大学校园地图 8 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 8,
+      "summaryZh": "2026年官方校园地图中的本馆，编号8。官网已核实的设施包括：学务管理组、招生处、总务人事组、教务处长室、教员人事组。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 본관, 지도 번호 8번입니다.공식 자료에서 확인한 시설: 학사관리팀, 입학처, 총무인사팀, 교무처장실, 교원인사팀.",
+      "facilitiesZh": [
+        "学务管理组",
+        "招生处",
+        "总务人事组",
+        "教务处长室|教员人事组",
+        "信息计算组",
+        "企划调整处"
+      ],
+      "facilitiesKo": [
+        "학사관리팀",
+        "입학처",
+        "총무인사팀",
+        "교무처장실|교원인사팀",
+        "정보전산팀",
+        "기획조정처"
+      ],
+      "phones": [
+        {
+          "labelZh": "招生处",
+          "labelKo": "입학처",
+          "number": "055-249-2000",
+          "sourceUrl": "https://ipsi.kyungnam.ac.kr/sites/ipsi/index.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6362/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://ipsi.kyungnam.ac.kr/sites/ipsi/index.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6373/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6338/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6398/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "学务管理组",
+            "招生处",
+            "总务人事组"
+          ],
+          "roomsAndUsesKo": [
+            "학사관리팀",
+            "입학처",
+            "총무인사팀"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6362/subview.do",
+            "https://ipsi.kyungnam.ac.kr/sites/ipsi/index.do",
+            "https://www.kyungnam.ac.kr/ko/6373/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "教务处长室",
+            "教员人事组",
+            "信息计算组"
+          ],
+          "roomsAndUsesKo": [
+            "교무처장실",
+            "교원인사팀",
+            "정보전산팀"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6362/subview.do",
+            "https://www.kyungnam.ac.kr/ko/6338/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "企划调整处"
+          ],
+          "roomsAndUsesKo": [
+            "기획조정처"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6398/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F49",
+      "labelZh": "本馆",
+      "labelKo": "본관"
+    },
+    {
+      "faqId": "F50",
+      "nameKo": "대운동장",
+      "nameZh": "大运动场",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "대운동장은 경남대 캠퍼스맵 9번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "大运动场（대운동장）在庆南大学校园地图 9 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 9,
+      "summaryZh": "2026年官方校园地图中的大运动场，编号9。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 대운동장, 지도 번호 9번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F50",
+      "labelZh": "大运动场",
+      "labelKo": "대운동장"
+    },
+    {
+      "faqId": "F51",
+      "nameKo": "고운관",
+      "nameZh": "孤云馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062064428
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/human/4805/subview.do",
+        "https://www.kyungnam.ac.kr/ics/4648/subview.do",
+        "https://www.kyungnam.ac.kr/china/3806/subview.do",
+        "https://www.kyungnam.ac.kr/lifelong-edu/11045/subview.do",
+        "https://www.kyungnam.ac.kr/leisurelife/11105/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "고운관은 경남대 캠퍼스맵 10번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "孤云馆（고운관）在庆南大学校园地图 10 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 10,
+      "summaryZh": "2026年官方校园地图中的孤云馆，编号10。官网已核实的设施包括：人文科学研究所、孤云学研究所（官网地址称人文馆）、中国学系、终身教育咨询保育学系。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 고운관, 지도 번호 10번입니다.공식 자료에서 확인한 시설: 인문과학연구소, 고운학연구소(공식 주소 표기는 인문관), 중국학과, 평생교육상담보육학과.",
+      "facilitiesZh": [
+        "人文科学研究所",
+        "孤云学研究所（官网地址称人文馆）",
+        "中国学系",
+        "终身教育咨询保育学系",
+        "休闲生活商务学系"
+      ],
+      "facilitiesKo": [
+        "인문과학연구소",
+        "고운학연구소(공식 주소 표기는 인문관)",
+        "중국학과",
+        "평생교육상담보육학과",
+        "여가라이프비즈니스학과"
+      ],
+      "phones": [
+        {
+          "labelZh": "人文科学研究所",
+          "labelKo": "인문과학연구소",
+          "number": "055-249-2985",
+          "sourceUrl": "https://www.kyungnam.ac.kr/human/4805/subview.do"
+        },
+        {
+          "labelZh": "孤云学研究所（官网地址称人文馆）",
+          "labelKo": "고운학연구소(공식 주소 표기는 인문관)",
+          "number": "055-249-2367",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ics/4648/subview.do"
+        },
+        {
+          "labelZh": "中国学系",
+          "labelKo": "중국학과",
+          "number": "055-249-2140",
+          "sourceUrl": "https://www.kyungnam.ac.kr/china/3806/subview.do"
+        },
+        {
+          "labelZh": "终身教育咨询保育学系",
+          "labelKo": "평생교육상담보육학과",
+          "number": "055-249-6321",
+          "sourceUrl": "https://www.kyungnam.ac.kr/lifelong-edu/11045/subview.do"
+        },
+        {
+          "labelZh": "休闲生活商务学系",
+          "labelKo": "여가라이프비즈니스학과",
+          "number": "055-249-6512",
+          "sourceUrl": "https://www.kyungnam.ac.kr/leisurelife/11105/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/human/4805/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ics/4648/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/china/3806/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/lifelong-edu/11045/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/leisurelife/11105/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "5F",
+          "labelZh": "5层",
+          "labelKo": "5층",
+          "roomsAndUsesZh": [
+            "人文科学研究所",
+            "孤云学研究所（官网地址称人文馆）"
+          ],
+          "roomsAndUsesKo": [
+            "인문과학연구소",
+            "고운학연구소(공식 주소 표기는 인문관)"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/human/4805/subview.do",
+            "https://www.kyungnam.ac.kr/ics/4648/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F51",
+      "labelZh": "孤云馆",
+      "labelKo": "고운관"
+    },
+    {
+      "faqId": "F13",
+      "entryId": "BUILDING-ENGINEERING-1",
+      "nameKo": "제1공학관",
+      "nameZh": "第一工学馆",
+      "labelKo": "제1공학관",
+      "labelZh": "第一工学馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062065374
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/isrc/5440/subview.do",
+        "https://www.kyungnam.ac.kr/arch/14251/subview.do",
+        "https://www.kyungnam.ac.kr/civ/5581/subview.do",
+        "https://www.kyungnam.ac.kr/eng/4490/subview.do",
+        "https://www.kyungnam.ac.kr/aisw/9007/subview.do",
+        "https://www.kyungnam.ac.kr/ce/3672/subview.do",
+        "https://www.kyungnam.ac.kr/ship/5900/subview.do",
+        "https://www.kyungnam.ac.kr/arch/6085/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "2026년 공식 캠퍼스맵의 제1공학관, 지도 번호 11번입니다.공식 자료에서 확인한 시설: 지능기계시스템연구소, 공동제도실1·2(2022학년도 1학기 표), 건설시스템공학과, 공과대학 교학행정실.",
+      "textZh": "2026年官方校园地图中的第一工学馆，编号11。官网已核实的设施包括：智能机械系统研究所、共同制图室1、2（2022年第一学期表）、建设系统工学系、工科学院教学行政室。",
+      "provenance": "Official public kyungnam.ac.kr pages; geometry attached only where the audited OSM name link already existed",
+      "mapNumber": 11,
+      "summaryZh": "2026年官方校园地图中的第一工学馆，编号11。官网已核实的设施包括：智能机械系统研究所、共同制图室1、2（2022年第一学期表）、建设系统工学系、工科学院教学行政室。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제1공학관, 지도 번호 11번입니다.공식 자료에서 확인한 시설: 지능기계시스템연구소, 공동제도실1·2(2022학년도 1학기 표), 건설시스템공학과, 공과대학 교학행정실.",
+      "facilitiesZh": [
+        "智能机械系统研究所",
+        "共同制图室1、2（2022年第一学期表）",
+        "建设系统工学系",
+        "工科学院教学行政室",
+        "AI·SW融合学院教学行政室",
+        "计算机工学部",
+        "造船海洋系统工学系",
+        "设计室11（2022年第一学期表）",
+        "建筑学部",
+        "设计室1至10（2022年第一学期表）|建筑CAD室|模型制作室及输出区|建筑展示室|建筑图书馆"
+      ],
+      "facilitiesKo": [
+        "지능기계시스템연구소",
+        "공동제도실1·2(2022학년도 1학기 표)",
+        "건설시스템공학과",
+        "공과대학 교학행정실",
+        "AI·SW융합대학 교학행정실",
+        "컴퓨터공학부",
+        "조선해양시스템공학과",
+        "설계실11(2022학년도 1학기 표)",
+        "건축학부",
+        "설계실1~10(2022학년도 1학기 표)|건축CAD실|모형제작실 및 출력 구역|건축전시실|건축도서관"
+      ],
+      "phones": [
+        {
+          "labelZh": "建设系统工学系",
+          "labelKo": "건설시스템공학과",
+          "number": "055-249-2664",
+          "sourceUrl": "https://www.kyungnam.ac.kr/civ/5581/subview.do"
+        },
+        {
+          "labelZh": "工科学院教学行政室",
+          "labelKo": "공과대학 교학행정실",
+          "number": "055-249-2847",
+          "sourceUrl": "https://www.kyungnam.ac.kr/eng/4490/subview.do"
+        },
+        {
+          "labelZh": "AI·SW融合学院教学行政室",
+          "labelKo": "AI·SW융합대학 교학행정실",
+          "number": "055-249-2132",
+          "sourceUrl": "https://www.kyungnam.ac.kr/aisw/9007/subview.do"
+        },
+        {
+          "labelZh": "计算机工学部",
+          "labelKo": "컴퓨터공학부",
+          "number": "055-249-2274",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ce/3672/subview.do"
+        },
+        {
+          "labelZh": "造船海洋系统工学系",
+          "labelKo": "조선해양시스템공학과",
+          "number": "055-249-2700",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ship/5900/subview.do"
+        },
+        {
+          "labelZh": "建筑学部",
+          "labelKo": "건축학부",
+          "number": "055-249-2674",
+          "sourceUrl": "https://www.kyungnam.ac.kr/arch/6085/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/isrc/5440/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/arch/14251/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/civ/5581/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/eng/4490/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/aisw/9007/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ce/3672/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ship/5900/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/arch/6085/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "智能机械系统研究所"
+          ],
+          "roomsAndUsesKo": [
+            "지능기계시스템연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/isrc/5440/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "5F",
+          "labelZh": "5层",
+          "labelKo": "5층",
+          "roomsAndUsesZh": [
+            "共同制图室1、2（2022年第一学期表）"
+          ],
+          "roomsAndUsesKo": [
+            "공동제도실1·2(2022학년도 1학기 표)"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/arch/14251/subview.do"
+          ],
+          "verifiedByOfficial": true,
+          "sourcePeriod": "2022학년도 1학기"
+        },
+        {
+          "floor": "6F",
+          "labelZh": "6层",
+          "labelKo": "6층",
+          "roomsAndUsesZh": [
+            "建设系统工学系"
+          ],
+          "roomsAndUsesKo": [
+            "건설시스템공학과"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/civ/5581/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "7F",
+          "labelZh": "7层",
+          "labelKo": "7층",
+          "roomsAndUsesZh": [
+            "工科学院教学行政室",
+            "AI·SW融合学院教学行政室"
+          ],
+          "roomsAndUsesKo": [
+            "공과대학 교학행정실",
+            "AI·SW융합대학 교학행정실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/eng/4490/subview.do",
+            "https://www.kyungnam.ac.kr/aisw/9007/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "8F",
+          "labelZh": "8层",
+          "labelKo": "8층",
+          "roomsAndUsesZh": [
+            "计算机工学部"
+          ],
+          "roomsAndUsesKo": [
+            "컴퓨터공학부"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ce/3672/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "9F",
+          "labelZh": "9层",
+          "labelKo": "9층",
+          "roomsAndUsesZh": [
+            "造船海洋系统工学系",
+            "设计室11（2022年第一学期表）"
+          ],
+          "roomsAndUsesKo": [
+            "조선해양시스템공학과",
+            "설계실11(2022학년도 1학기 표)"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ship/5900/subview.do",
+            "https://www.kyungnam.ac.kr/arch/14251/subview.do"
+          ],
+          "verifiedByOfficial": true,
+          "sourcePeriod": "2022학년도 1학기"
+        },
+        {
+          "floor": "10F",
+          "labelZh": "10层",
+          "labelKo": "10층",
+          "roomsAndUsesZh": [
+            "建筑学部",
+            "设计室1至10（2022年第一学期表）",
+            "建筑CAD室",
+            "模型制作室及输出区",
+            "建筑展示室",
+            "建筑图书馆"
+          ],
+          "roomsAndUsesKo": [
+            "건축학부",
+            "설계실1~10(2022학년도 1학기 표)",
+            "건축CAD실",
+            "모형제작실 및 출력 구역",
+            "건축전시실",
+            "건축도서관"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/arch/6085/subview.do",
+            "https://www.kyungnam.ac.kr/arch/14251/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "dataCautionsZh": [
+        "建筑设施页含2022年第一学期分配表，不能当作2026年课程表或实时教室安排。"
+      ]
+    },
+    {
+      "faqId": "F52",
+      "nameKo": "팔각정",
+      "nameZh": "八角亭",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "팔각정은 경남대 캠퍼스맵 12번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "八角亭（팔각정）在庆南大学校园地图 12 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 12,
+      "summaryZh": "2026年官方校园地图中的八角亭，编号12。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 팔각정, 지도 번호 12번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F52",
+      "labelZh": "八角亭",
+      "labelKo": "팔각정"
+    },
+    {
+      "faqId": "F53",
+      "nameKo": "제2공학관",
+      "nameZh": "第二工学馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062071979
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/fbi/5376/subview.do",
+        "https://www.kyungnam.ac.kr/rrc/5355/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제2공학관은 경남대 캠퍼스맵 13번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第二工学馆（제2공학관）在庆南大学校园地图 13 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 13,
+      "summaryZh": "2026年官方校园地图中的第二工学馆，编号13。官网已核实的设施包括：食品生命工学研究所、新材料研究所。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제2공학관, 지도 번호 13번입니다.공식 자료에서 확인한 시설: 식품생명공학연구소, 신소재연구소.",
+      "facilitiesZh": [
+        "食品生命工学研究所",
+        "新材料研究所"
+      ],
+      "facilitiesKo": [
+        "식품생명공학연구소",
+        "신소재연구소"
+      ],
+      "phones": [
+        {
+          "labelZh": "食品生命工学研究所",
+          "labelKo": "식품생명공학연구소",
+          "number": "055-249-2995",
+          "sourceUrl": "https://www.kyungnam.ac.kr/fbi/5376/subview.do"
+        },
+        {
+          "labelZh": "新材料研究所",
+          "labelKo": "신소재연구소",
+          "number": "055-249-2692",
+          "sourceUrl": "https://www.kyungnam.ac.kr/rrc/5355/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/fbi/5376/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/rrc/5355/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "食品生命工学研究所"
+          ],
+          "roomsAndUsesKo": [
+            "식품생명공학연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/fbi/5376/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "新材料研究所"
+          ],
+          "roomsAndUsesKo": [
+            "신소재연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/rrc/5355/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F53",
+      "labelZh": "第二工学馆",
+      "labelKo": "제2공학관"
+    },
+    {
+      "faqId": "F54",
+      "nameKo": "혁신융합관",
+      "nameZh": "创新融合馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "혁신융합관은 경남대 캠퍼스맵 14번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "创新融合馆（혁신융합관）在庆南大学校园地图 14 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 14,
+      "summaryZh": "2026年官方校园地图中的创新融合馆，编号14。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 혁신융합관, 지도 번호 14번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F54",
+      "labelZh": "创新融合馆",
+      "labelKo": "혁신융합관"
+    },
+    {
+      "faqId": "F55",
+      "nameKo": "성훈관",
+      "nameZh": "成训馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062071465
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/eei/5547/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "성훈관(제3공학관)은 경남대 캠퍼스맵 15번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "成训馆（第三工学馆，성훈관）在庆南大学校园地图 15 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 15,
+      "summaryZh": "2026年官方校园地图中的成训馆（第三工学馆），编号15。官网已核实的设施包括：电气能源研究所。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 성훈관(제3공학관), 지도 번호 15번입니다.공식 자료에서 확인한 시설: 전기에너지연구소.",
+      "facilitiesZh": [
+        "电气能源研究所"
+      ],
+      "facilitiesKo": [
+        "전기에너지연구소"
+      ],
+      "phones": [
+        {
+          "labelZh": "电气能源研究所",
+          "labelKo": "전기에너지연구소",
+          "number": "055-249-2839",
+          "sourceUrl": "https://www.kyungnam.ac.kr/eei/5547/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/eei/5547/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "电气能源研究所"
+          ],
+          "roomsAndUsesKo": [
+            "전기에너지연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/eei/5547/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F55",
+      "labelZh": "成训馆（第三工学馆）",
+      "labelKo": "성훈관(제3공학관)"
+    },
+    {
+      "faqId": "F56",
+      "nameKo": "보건의료관",
+      "nameZh": "保健医疗馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/natcol/5025/subview.do",
+        "https://www.kyungnam.ac.kr/nur/6452/subview.do",
+        "https://www.kyungnam.ac.kr/ot/10516/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "보건의료관은 경남대 캠퍼스맵 16번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "保健医疗馆（보건의료관）在庆南大学校园地图 16 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 16,
+      "summaryZh": "2026年官方校园地图中的保健医疗馆，编号16。官网已核实的设施包括：健康保健学院教学行政室、303教室（官网仅给出房间号，未明确楼层；不据此推断3层）、702、703教室（官网仅给出房间号，未明确楼层；不据此推断7层）。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 보건의료관, 지도 번호 16번입니다.공식 자료에서 확인한 시설: 건강보건대학 교학행정실, 303강의실(공식 자료에 호실만 표기되어 층수는 추정하지 않음), 702·703강의실(호실만 표기되어 층수는 추정하지 않음).",
+      "facilitiesZh": [
+        "健康保健学院教学行政室",
+        "303教室（官网仅给出房间号，未明确楼层；不据此推断3层）",
+        "702、703教室（官网仅给出房间号，未明确楼层；不据此推断7层）"
+      ],
+      "facilitiesKo": [
+        "건강보건대학 교학행정실",
+        "303강의실(공식 자료에 호실만 표기되어 층수는 추정하지 않음)",
+        "702·703강의실(호실만 표기되어 층수는 추정하지 않음)"
+      ],
+      "phones": [
+        {
+          "labelZh": "健康保健学院教学行政室",
+          "labelKo": "건강보건대학 교학행정실",
+          "number": "055-249-2205",
+          "sourceUrl": "https://www.kyungnam.ac.kr/natcol/5025/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/natcol/5025/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/nur/6452/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ot/10516/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "健康保健学院教学行政室"
+          ],
+          "roomsAndUsesKo": [
+            "건강보건대학 교학행정실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/natcol/5025/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F56",
+      "labelZh": "保健医疗馆",
+      "labelKo": "보건의료관"
+    },
+    {
+      "faqId": "F57",
+      "nameKo": "건강과학관",
+      "nameZh": "健康科学馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062070428
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/fobu/5284/subview.do",
+        "https://www.kyungnam.ac.kr/health/9426/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "건강과학관은 경남대 캠퍼스맵 17번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "健康科学馆（건강과학관）在庆南大学校园地图 17 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 17,
+      "summaryZh": "2026年官方校园地图中的健康科学馆，编号17。官网已核实的设施包括：外食烹饪学系办公室、烹饪实习室、烘焙实习室、保健医疗信息学系办公室。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 건강과학관, 지도 번호 17번입니다.공식 자료에서 확인한 시설: 외식조리학과 사무실, 조리실습실, 베이킹 실습실, 보건의료정보학과 사무실.",
+      "facilitiesZh": [
+        "外食烹饪学系办公室|烹饪实习室",
+        "烘焙实习室",
+        "保健医疗信息学系办公室"
+      ],
+      "facilitiesKo": [
+        "외식조리학과 사무실|조리실습실",
+        "베이킹 실습실",
+        "보건의료정보학과 사무실"
+      ],
+      "phones": [
+        {
+          "labelZh": "外食烹饪学系办公室|烹饪实习室",
+          "labelKo": "외식조리학과 사무실|조리실습실",
+          "number": "055-249-2588",
+          "sourceUrl": "https://www.kyungnam.ac.kr/fobu/5284/subview.do"
+        },
+        {
+          "labelZh": "保健医疗信息学系办公室",
+          "labelKo": "보건의료정보학과 사무실",
+          "number": "055-249-6498",
+          "sourceUrl": "https://www.kyungnam.ac.kr/health/9426/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/fobu/5284/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/health/9426/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "外食烹饪学系办公室",
+            "烹饪实习室"
+          ],
+          "roomsAndUsesKo": [
+            "외식조리학과 사무실",
+            "조리실습실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/fobu/5284/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "5F",
+          "labelZh": "5层",
+          "labelKo": "5층",
+          "roomsAndUsesZh": [
+            "烘焙实习室",
+            "保健医疗信息学系办公室"
+          ],
+          "roomsAndUsesKo": [
+            "베이킹 실습실",
+            "보건의료정보학과 사무실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/fobu/5284/subview.do",
+            "https://www.kyungnam.ac.kr/health/9426/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F57",
+      "labelZh": "健康科学馆",
+      "labelKo": "건강과학관"
+    },
+    {
+      "faqId": "F58",
+      "nameKo": "제4공학관",
+      "nameZh": "第四工学馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062070303
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/icmc/4693/subview.do",
+        "https://www.kyungnam.ac.kr/rach/13387/subview.do",
+        "https://www.kyungnam.ac.kr/environment/6197/subview.do",
+        "https://www.kyungnam.ac.kr/auto/10694/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제4공학관은 경남대 캠퍼스맵 18번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第四工学馆（제4공학관）在庆南大学校园地图 18 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 18,
+      "summaryZh": "2026年官方校园地图中的第四工学馆，编号18。官网已核实的设施包括：环境问题研究所、文化遗产修复艺术学系、环境能源工学系、未来汽车学系。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제4공학관, 지도 번호 18번입니다.공식 자료에서 확인한 시설: 환경문제연구소, 문화유산복원예술학과, 환경에너지공학과, 미래자동차학과.",
+      "facilitiesZh": [
+        "环境问题研究所",
+        "文化遗产修复艺术学系",
+        "环境能源工学系",
+        "未来汽车学系"
+      ],
+      "facilitiesKo": [
+        "환경문제연구소",
+        "문화유산복원예술학과",
+        "환경에너지공학과",
+        "미래자동차학과"
+      ],
+      "phones": [
+        {
+          "labelZh": "文化遗产修复艺术学系",
+          "labelKo": "문화유산복원예술학과",
+          "number": "055-249-6494",
+          "sourceUrl": "https://www.kyungnam.ac.kr/rach/13387/subview.do"
+        },
+        {
+          "labelZh": "环境能源工学系",
+          "labelKo": "환경에너지공학과",
+          "number": "055-249-2954",
+          "sourceUrl": "https://www.kyungnam.ac.kr/environment/6197/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/icmc/4693/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/rach/13387/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/environment/6197/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/auto/10694/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "环境问题研究所"
+          ],
+          "roomsAndUsesKo": [
+            "환경문제연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/icmc/4693/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F58",
+      "labelZh": "第四工学馆",
+      "labelKo": "제4공학관"
+    },
+    {
+      "faqId": "F59",
+      "nameKo": "제5공학관",
+      "nameZh": "第五工学馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062070057
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제5공학관은 경남대 캠퍼스맵 19번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第五工学馆（제5공학관）在庆南大学校园地图 19 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 19,
+      "summaryZh": "2026年官方校园地图中的第五工学馆，编号19。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제5공학관, 지도 번호 19번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F59",
+      "labelZh": "第五工学馆",
+      "labelKo": "제5공학관"
+    },
+    {
+      "faqId": "F60",
+      "nameKo": "교육관",
+      "nameZh": "教育馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062065692
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/nobel/2916/subview.do",
+        "https://www.kyungnam.ac.kr/mathedu/5308/subview.do",
+        "https://www.kyungnam.ac.kr/koredu/3439/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "교육관은 경남대 캠퍼스맵 20번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "教育馆（교육관）在庆南大学校园地图 20 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 20,
+      "summaryZh": "2026年官方校园地图中的教育馆，编号20。官网已核实的设施包括：科学英才教育院、数学教育系办公室、国语教育系。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 교육관, 지도 번호 20번입니다.공식 자료에서 확인한 시설: 과학영재교육원, 수학교육과 사무실, 국어교육과.",
+      "facilitiesZh": [
+        "科学英才教育院",
+        "数学教育系办公室",
+        "国语教育系"
+      ],
+      "facilitiesKo": [
+        "과학영재교육원",
+        "수학교육과 사무실",
+        "국어교육과"
+      ],
+      "phones": [
+        {
+          "labelZh": "科学英才教育院",
+          "labelKo": "과학영재교육원",
+          "number": "055-249-2796",
+          "sourceUrl": "https://www.kyungnam.ac.kr/nobel/2916/subview.do"
+        },
+        {
+          "labelZh": "数学教育系办公室",
+          "labelKo": "수학교육과 사무실",
+          "number": "055-249-2356",
+          "sourceUrl": "https://www.kyungnam.ac.kr/mathedu/5308/subview.do"
+        },
+        {
+          "labelZh": "国语教育系",
+          "labelKo": "국어교육과",
+          "number": "055-249-2324",
+          "sourceUrl": "https://www.kyungnam.ac.kr/koredu/3439/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/nobel/2916/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/mathedu/5308/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/koredu/3439/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "科学英才教育院"
+          ],
+          "roomsAndUsesKo": [
+            "과학영재교육원"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/nobel/2916/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "数学教育系办公室"
+          ],
+          "roomsAndUsesKo": [
+            "수학교육과 사무실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/mathedu/5308/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F60",
+      "labelZh": "教育馆",
+      "labelKo": "교육관"
+    },
+    {
+      "faqId": "F61",
+      "nameKo": "제2경영관",
+      "nameZh": "第二经营馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제2경영관은 경남대 캠퍼스맵 21번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第二经营馆（제2경영관）在庆南大学校园地图 21 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 21,
+      "summaryZh": "2026年官方校园地图中的第二经营馆，编号21。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제2경영관, 지도 번호 21번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F61",
+      "labelZh": "第二经营馆",
+      "labelKo": "제2경영관"
+    },
+    {
+      "faqId": "F62",
+      "nameKo": "중앙도서관",
+      "nameZh": "中央图书馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1061922793
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://library.kyungnam.ac.kr/webcontent/info/48",
+        "https://library.kyungnam.ac.kr/webcontent/info/49",
+        "https://www.kyungnam.ac.kr/ko/6388/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6392/subview.do",
+        "https://library.kyungnam.ac.kr/webcontent/info/47"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "중앙도서관은 경남대 캠퍼스맵 22번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "中央图书馆（중앙도서관）在庆南大学校园地图 22 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 22,
+      "summaryZh": "2026年官方校园地图中的中央图书馆，编号22。官网已核实的设施包括：研究振兴组、产学合作团、借还书服务、借还书咨询。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 중앙도서관, 지도 번호 22번입니다.공식 자료에서 확인한 시설: 연구진흥팀, 산학협력단, 대출·반납, 대출·반납 문의.",
+      "facilitiesZh": [
+        "研究振兴组",
+        "产学合作团",
+        "借还书服务",
+        "借还书咨询"
+      ],
+      "facilitiesKo": [
+        "연구진흥팀",
+        "산학협력단",
+        "대출·반납",
+        "대출·반납 문의"
+      ],
+      "phones": [
+        {
+          "labelZh": "借还书服务",
+          "labelKo": "대출·반납",
+          "number": "055-249-2920",
+          "sourceUrl": "https://library.kyungnam.ac.kr/webcontent/info/49"
+        },
+        {
+          "labelZh": "借还书咨询",
+          "labelKo": "대출·반납 문의",
+          "number": "055-249-2918",
+          "sourceUrl": "https://library.kyungnam.ac.kr/webcontent/info/49"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：1层借还书处及休憩区、3层资料室、4层资料室：周一至周五08:00–17:00，周末闭馆；2层普通阅览室05:00–23:00。资料室关门前10分钟起限制进入；假期及临时调整以图书馆通知为准。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 1층 대출반납실·휴 플레이스, 3·4층 자료실은 월~금 08:00–17:00, 주말 휴관. 2층 일반열람실은 05:00–23:00. 자료실 마감 10분 전 입장 제한, 방학·임시 변경은 공지 확인.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://library.kyungnam.ac.kr/webcontent/info/48"
+        },
+        {
+          "labelZh": "图书馆分室说明",
+          "labelKo": "도서관 실별안내",
+          "url": "https://library.kyungnam.ac.kr/webcontent/info/49"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6388/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6392/subview.do"
+        },
+        {
+          "labelZh": "图书馆开放时间",
+          "labelKo": "도서관 이용시간",
+          "url": "https://library.kyungnam.ac.kr/webcontent/info/47"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "B1F",
+          "labelZh": "地下1层",
+          "labelKo": "지하1층",
+          "roomsAndUsesZh": [
+            "保存书库（闭架）",
+            "便利店"
+          ],
+          "roomsAndUsesKo": [
+            "보존서고(폐가제)",
+            "편의점"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "借还书处及第一书库",
+            "休憩及自习区",
+            "小组学习室5、6",
+            "AI·SW创业就业咖啡区及计算机实习室",
+            "复印室"
+          ],
+          "roomsAndUsesKo": [
+            "대출반납실 및 제1서고",
+            "휴 플레이스",
+            "그룹스터디룸5·6",
+            "AI·SW취창업카페 및 컴퓨터실습실",
+            "복사실"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "第一至第四阅览室",
+            "第二、第三书库",
+            "随书资料保管室"
+          ],
+          "roomsAndUsesKo": [
+            "제1~4열람실",
+            "제2·3서고",
+            "딸림자료보관실"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "连续出版物室及保管室",
+            "考试资料室",
+            "学位论文室",
+            "名人书房专题馆藏",
+            "休息区及便当区"
+          ],
+          "roomsAndUsesKo": [
+            "연속간행물실 및 보관실",
+            "수험자료실",
+            "학위논문실",
+            "명사의 서재",
+            "휴게실 및 도시락코너"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "新书借阅室",
+            "参考资料室",
+            "古典资料室",
+            "古籍室",
+            "个人视频创作室",
+            "朝鲜特殊资料室"
+          ],
+          "roomsAndUsesKo": [
+            "신간대출실",
+            "참고자료실",
+            "고전자료실",
+            "한적실",
+            "1인 크리에이터실",
+            "북한특수자료실"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "5F",
+          "labelZh": "5层",
+          "labelKo": "5층",
+          "roomsAndUsesZh": [
+            "图书馆长室",
+            "学术文献组"
+          ],
+          "roomsAndUsesKo": [
+            "중앙도서관장실",
+            "학술문헌팀"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "6F",
+          "labelZh": "6层",
+          "labelKo": "6층",
+          "roomsAndUsesZh": [
+            "研究振兴组",
+            "产学合作团"
+          ],
+          "roomsAndUsesKo": [
+            "연구진흥팀",
+            "산학협력단"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6388/subview.do",
+            "https://www.kyungnam.ac.kr/ko/6392/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "7F",
+          "labelZh": "7层",
+          "labelKo": "7층",
+          "roomsAndUsesZh": [
+            "多功能室2（授课、研讨空间）"
+          ],
+          "roomsAndUsesKo": [
+            "다목적실2(강의·세미나 공간)"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "8F",
+          "labelZh": "8层",
+          "labelKo": "8층",
+          "roomsAndUsesZh": [
+            "创意融合学习室1、2、3",
+            "多功能学习室1、2（分室说明页标注筹备中）",
+            "教师研究室"
+          ],
+          "roomsAndUsesKo": [
+            "창의융합스터디룸1·2·3",
+            "다목적스터디룸1·2(실별안내에는 준비중으로 표기)",
+            "교수연구실"
+          ],
+          "sourceUrls": [
+            "https://library.kyungnam.ac.kr/webcontent/info/48"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "dataCautionsZh": [
+        "8层多功能学习室1、2在分层图中出现，但分室说明仍标注“筹备中”，不承诺已开放。"
+      ],
+      "entryId": "F62",
+      "labelZh": "中央图书馆",
+      "labelKo": "중앙도서관"
+    },
+    {
+      "faqId": "F63",
+      "nameKo": "법정관",
+      "nameZh": "法政馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1061922762
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/cla/3131/subview.do",
+        "https://www.kyungnam.ac.kr/law/4154/subview.do",
+        "https://www.kyungnam.ac.kr/cop/4871/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "법정관은 경남대 캠퍼스맵 23번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "法政馆（법정관）在庆南大学校园地图 23 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 23,
+      "summaryZh": "2026年官方校园地图中的法政馆，编号23。官网已核实的设施包括：地方自治研究所、法学系、警察学系。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 법정관, 지도 번호 23번입니다.공식 자료에서 확인한 시설: 지방자치연구소, 법학과, 경찰학과.",
+      "facilitiesZh": [
+        "地方自治研究所",
+        "法学系",
+        "警察学系"
+      ],
+      "facilitiesKo": [
+        "지방자치연구소",
+        "법학과",
+        "경찰학과"
+      ],
+      "phones": [
+        {
+          "labelZh": "地方自治研究所",
+          "labelKo": "지방자치연구소",
+          "number": "055-249-2519",
+          "sourceUrl": "https://www.kyungnam.ac.kr/cla/3131/subview.do"
+        },
+        {
+          "labelZh": "法学系",
+          "labelKo": "법학과",
+          "number": "055-249-2516",
+          "sourceUrl": "https://www.kyungnam.ac.kr/law/4154/subview.do"
+        },
+        {
+          "labelZh": "警察学系",
+          "labelKo": "경찰학과",
+          "number": "055-249-2904",
+          "sourceUrl": "https://www.kyungnam.ac.kr/cop/4871/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/cla/3131/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/law/4154/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/cop/4871/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "地方自治研究所"
+          ],
+          "roomsAndUsesKo": [
+            "지방자치연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/cla/3131/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F63",
+      "labelZh": "法政馆",
+      "labelKo": "법정관"
+    },
+    {
+      "faqId": "F64",
+      "nameKo": "테니스장",
+      "nameZh": "网球场",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "테니스장은 경남대 캠퍼스맵 24번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "网球场（테니스장）在庆南大学校园地图 24 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 24,
+      "summaryZh": "2026年官方校园地图中的网球场，编号24。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 테니스장, 지도 번호 24번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F64",
+      "labelZh": "网球场",
+      "labelKo": "테니스장"
+    },
+    {
+      "faqId": "F65",
+      "nameKo": "제1경영관",
+      "nameZh": "第一经营馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/management/3539/subview.do",
+        "https://www.kyungnam.ac.kr/kuit/3930/subview.do",
+        "https://www.kyungnam.ac.kr/riim/5335/subview.do",
+        "https://www.kyungnam.ac.kr/eco/3872/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제1경영관은 경남대 캠퍼스맵 25번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第一经营馆（제1경영관）在庆南大学校园地图 25 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 25,
+      "summaryZh": "2026年官方校园地图中的第一经营馆，编号25。官网已核实的设施包括：经营学系、贸易物流学系办公室、产业经营研究所、经营学院。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제1경영관, 지도 번호 25번입니다.공식 자료에서 확인한 시설: 경영학과, 무역물류학과 사무실, 산업경영연구소, 경영대학.",
+      "facilitiesZh": [
+        "经营学系",
+        "贸易物流学系办公室",
+        "产业经营研究所",
+        "经营学院"
+      ],
+      "facilitiesKo": [
+        "경영학과",
+        "무역물류학과 사무실",
+        "산업경영연구소",
+        "경영대학"
+      ],
+      "phones": [
+        {
+          "labelZh": "经营学系",
+          "labelKo": "경영학과",
+          "number": "055-249-2567",
+          "sourceUrl": "https://www.kyungnam.ac.kr/management/3539/subview.do"
+        },
+        {
+          "labelZh": "贸易物流学系办公室",
+          "labelKo": "무역물류학과 사무실",
+          "number": "055-249-2406",
+          "sourceUrl": "https://www.kyungnam.ac.kr/kuit/3930/subview.do"
+        },
+        {
+          "labelZh": "产业经营研究所",
+          "labelKo": "산업경영연구소",
+          "number": "055-249-2322",
+          "sourceUrl": "https://www.kyungnam.ac.kr/riim/5335/subview.do"
+        },
+        {
+          "labelZh": "经营学院",
+          "labelKo": "경영대학",
+          "number": "055-249-2786",
+          "sourceUrl": "https://www.kyungnam.ac.kr/eco/3872/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/management/3539/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/kuit/3930/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/riim/5335/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/eco/3872/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "经营学系",
+            "贸易物流学系办公室",
+            "产业经营研究所"
+          ],
+          "roomsAndUsesKo": [
+            "경영학과",
+            "무역물류학과 사무실",
+            "산업경영연구소"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/management/3539/subview.do",
+            "https://www.kyungnam.ac.kr/kuit/3930/subview.do",
+            "https://www.kyungnam.ac.kr/riim/5335/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F65",
+      "labelZh": "第一经营馆",
+      "labelKo": "제1경영관"
+    },
+    {
+      "faqId": "F66",
+      "nameKo": "한마관",
+      "nameZh": "汉马馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/dorm/3162/subview.do",
+        "https://www.kyungnam.ac.kr/ko/4424/subview.do",
+        "https://www.kyungnam.ac.kr/ko/4311/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "한마관은 경남대 캠퍼스맵 26번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "汉马馆（한마관，食堂）在庆南大学校园地图 26 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 26,
+      "summaryZh": "2026年官方校园地图中的汉马馆，编号26。官网已核实的设施包括：学生食堂、奖学福利组、社会服务中心。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 한마관, 지도 번호 26번입니다.공식 자료에서 확인한 시설: 학생식당, 장학복지팀, 사회봉사센터.",
+      "facilitiesZh": [
+        "学生食堂",
+        "奖学福利组",
+        "社会服务中心"
+      ],
+      "facilitiesKo": [
+        "학생식당",
+        "장학복지팀",
+        "사회봉사센터"
+      ],
+      "phones": [
+        {
+          "labelZh": "社会服务中心",
+          "labelKo": "사회봉사센터",
+          "number": "055-249-2950",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/4311/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：官网生活馆设施页所列食堂工作日供餐：早餐07:00–08:30，午餐10:00–13:00，晚餐16:30–18:00；周末、节假日不适用。以最新食堂通知为准。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 생활관 시설안내 기준 평일 식당 배식: 조식 07:00–08:30, 중식 10:00–13:00, 석식 16:30–18:00. 주말·공휴일 제외, 최신 공지 확인 필요.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/4424/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/4311/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "学生食堂"
+          ],
+          "roomsAndUsesKo": [
+            "학생식당"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "5F",
+          "labelZh": "5层",
+          "labelKo": "5층",
+          "roomsAndUsesZh": [
+            "奖学福利组",
+            "社会服务中心"
+          ],
+          "roomsAndUsesKo": [
+            "장학복지팀",
+            "사회봉사센터"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/4424/subview.do",
+            "https://www.kyungnam.ac.kr/ko/4311/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F66",
+      "labelZh": "汉马馆",
+      "labelKo": "한마관"
+    },
+    {
+      "faqId": "F67",
+      "nameKo": "산북도로 진입로",
+      "nameZh": "山北道路入口",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "산북도로 진입로는 경남대 캠퍼스맵 27번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "山北道路入口（산북도로 진입로）在庆南大学校园地图 27 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 27,
+      "summaryZh": "2026年官方校园地图中的山腹道路入口，编号27。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 산복도로 진입로, 지도 번호 27번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F67",
+      "labelZh": "山腹道路入口",
+      "labelKo": "산복도로 진입로"
+    },
+    {
+      "faqId": "F68",
+      "nameKo": "서문(IC)",
+      "nameZh": "西门",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "서문(IC)은 경남대 캠퍼스맵 28번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "西门（서문）在庆南大学校园地图 28 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 28,
+      "summaryZh": "2026年官方校园地图中的西门（IC），编号28。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 서문(IC), 지도 번호 28번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F68",
+      "labelZh": "西门（IC）",
+      "labelKo": "서문(IC)"
+    },
+    {
+      "faqId": "F69",
+      "nameKo": "한마미래관",
+      "nameZh": "汉马未来馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062065818
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/museum/4187/subview.do",
+        "https://www.kyungnam.ac.kr/museum/4178/subview.do",
+        "https://www.kyungnam.ac.kr/museum/1638/subview.do",
+        "https://www.kyungnam.ac.kr/museum/1624/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "한마미래관은 경남대 캠퍼스맵 29번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "한마미래관在庆南大学校园地图 29 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 29,
+      "summaryZh": "2026年官方校园地图中的汉马未来馆，编号29。官网已核实的设施包括：大学博物馆展览。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 한마미래관, 지도 번호 29번입니다.공식 자료에서 확인한 시설: 대학교 박물관 전시.",
+      "facilitiesZh": [
+        "大学博物馆展览"
+      ],
+      "facilitiesKo": [
+        "대학교 박물관 전시"
+      ],
+      "phones": [
+        {
+          "labelZh": "大学博物馆展览",
+          "labelKo": "대학교 박물관 전시",
+          "number": "055-249-2924",
+          "sourceUrl": "https://www.kyungnam.ac.kr/museum/4178/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：博物馆：学期中周一至周五09:00–16:00；假期周一至周五09:00–14:00；周末及节假日休馆，团体例外须预约确认。免费参观。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 박물관은 학기 중 월~금 09:00–16:00, 방학 중 월~금 09:00–14:00. 토·일·공휴일 휴관, 단체 예외는 사전 확인. 관람료 무료.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/museum/4178/subview.do"
+        },
+        {
+          "labelZh": "博物馆迁馆说明",
+          "labelKo": "박물관 이전 안내",
+          "url": "https://www.kyungnam.ac.kr/museum/1638/subview.do"
+        },
+        {
+          "labelZh": "博物馆参观时间",
+          "labelKo": "박물관 관람안내",
+          "url": "https://www.kyungnam.ac.kr/museum/1624/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "B1F",
+          "labelZh": "地下1层",
+          "labelKo": "지하1층",
+          "roomsAndUsesZh": [
+            "博物馆办公室",
+            "藏品库"
+          ],
+          "roomsAndUsesKo": [
+            "박물관 사무실",
+            "수장고"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "校史展厅"
+          ],
+          "roomsAndUsesKo": [
+            "학교사전시실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "常设展厅",
+            "文库展厅",
+            "特别展厅"
+          ],
+          "roomsAndUsesKo": [
+            "상설전시실",
+            "데라우치문고전시실",
+            "특별전시실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F69",
+      "labelZh": "汉马未来馆",
+      "labelKo": "한마미래관"
+    },
+    {
+      "faqId": "",
+      "entryId": "POI-MUSEUM",
+      "nameKo": "경남대학교박물관",
+      "nameZh": "庆南大学博物馆",
+      "labelKo": "경남대학교박물관",
+      "labelZh": "庆南大学博物馆",
+      "category": "landmark",
+      "osmBuildingIds": [
+        1062065818
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/museum/4187/subview.do",
+        "https://www.kyungnam.ac.kr/museum/4178/subview.do",
+        "https://www.kyungnam.ac.kr/museum/1638/subview.do",
+        "https://www.kyungnam.ac.kr/museum/1624/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "박물관 공식 안내에 따라 2008년 한마미래관으로 이전했습니다. 전시는 1·2층이며 찾아오시는길 주소는 2층입니다. 다른 OSM 박물관 표기 건물에 이 정보를 연결하지 않습니다.",
+      "textZh": "博物馆官网明确记载2008年迁入汉马未来馆；展厅位于1、2层，参观入口地址为2层。不能把此信息附到另一处仅被OSM标为博物馆的楼栋。",
+      "provenance": "Official public kyungnam.ac.kr pages; geometry attached only where the audited OSM name link already existed",
+      "mapNumber": 29,
+      "summaryZh": "博物馆官网明确记载2008年迁入汉马未来馆；展厅位于1、2层，参观入口地址为2层。不能把此信息附到另一处仅被OSM标为博物馆的楼栋。",
+      "summaryKo": "박물관 공식 안내에 따라 2008년 한마미래관으로 이전했습니다. 전시는 1·2층이며 찾아오시는길 주소는 2층입니다. 다른 OSM 박물관 표기 건물에 이 정보를 연결하지 않습니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [
+        {
+          "labelZh": "大学博物馆展览",
+          "labelKo": "대학교 박물관 전시",
+          "number": "055-249-2924",
+          "sourceUrl": "https://www.kyungnam.ac.kr/museum/4178/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：博物馆：学期中周一至周五09:00–16:00；假期周一至周五09:00–14:00；周末及节假日休馆，团体例外须预约确认。免费参观。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 박물관은 학기 중 월~금 09:00–16:00, 방학 중 월~금 09:00–14:00. 토·일·공휴일 휴관, 단체 예외는 사전 확인. 관람료 무료.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/museum/4178/subview.do"
+        },
+        {
+          "labelZh": "博物馆迁馆说明",
+          "labelKo": "박물관 이전 안내",
+          "url": "https://www.kyungnam.ac.kr/museum/1638/subview.do"
+        },
+        {
+          "labelZh": "博物馆参观时间",
+          "labelKo": "박물관 관람안내",
+          "url": "https://www.kyungnam.ac.kr/museum/1624/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "B1F",
+          "labelZh": "地下1层",
+          "labelKo": "지하1층",
+          "roomsAndUsesZh": [
+            "博物馆办公室",
+            "藏品库"
+          ],
+          "roomsAndUsesKo": [
+            "박물관 사무실",
+            "수장고"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "校史展厅"
+          ],
+          "roomsAndUsesKo": [
+            "학교사전시실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "常设展厅",
+            "文库展厅",
+            "特别展厅"
+          ],
+          "roomsAndUsesKo": [
+            "상설전시실",
+            "데라우치문고전시실",
+            "특별전시실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/museum/4187/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "hostBuildingZh": "汉马未来馆",
+      "hostBuildingKo": "한마미래관",
+      "mapNumberRefersTo": "host-building"
+    },
+    {
+      "faqId": "F70",
+      "nameKo": "체육관",
+      "nameZh": "体育馆",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/ko/4331/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "체육관은 경남대 캠퍼스맵 30번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "体育馆（체육관）在庆南大学校园地图 30 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 30,
+      "summaryZh": "2026年官方校园地图中的体育馆，编号30。官网已核实的设施包括：体育指导员研修院行政组。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 체육관, 지도 번호 30번입니다.공식 자료에서 확인한 시설: 스포츠지도사연수원 행정팀.",
+      "facilitiesZh": [
+        "体育指导员研修院行政组"
+      ],
+      "facilitiesKo": [
+        "스포츠지도사연수원 행정팀"
+      ],
+      "phones": [
+        {
+          "labelZh": "体育指导员研修院行政组",
+          "labelKo": "스포츠지도사연수원 행정팀",
+          "number": "055-249-6380",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/4331/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/4331/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "体育指导员研修院行政组"
+          ],
+          "roomsAndUsesKo": [
+            "스포츠지도사연수원 행정팀"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/4331/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F70",
+      "labelZh": "体育馆",
+      "labelKo": "체육관"
+    },
+    {
+      "faqId": "F71",
+      "nameKo": "제1한마생활관",
+      "nameZh": "第一汉马馆",
+      "category": "dorm",
+      "osmBuildingIds": [
+        1061923876
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/dorm/3162/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제1한마생활관은 경남대 캠퍼스맵 31번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第一汉马馆（宿舍，제1한마생활관）在庆南大学校园地图 31 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 31,
+      "summaryZh": "2026年官方校园地图中的第一汉马生活馆，编号31。官网已核实的设施包括：生活馆公共设施、生活馆行政咨询。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제1한마생활관, 지도 번호 31번입니다.공식 자료에서 확인한 시설: 생활관 공용시설, 생활관 행정 문의.",
+      "facilitiesZh": [
+        "生活馆公共设施",
+        "生活馆行政咨询"
+      ],
+      "facilitiesKo": [
+        "생활관 공용시설",
+        "생활관 행정 문의"
+      ],
+      "phones": [
+        {
+          "labelZh": "生活馆行政咨询",
+          "labelKo": "생활관 행정 문의",
+          "number": "055-249-2261",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：官网公共设施说明：自习室24小时开放；学习咖啡区、休息室、熨烫室04:00–22:40。仅为生活馆设施使用规则，不代表对校外访客开放。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 공식 공용시설 안내: 독서실 24시간, 스터디 카페·휴게실·다림방 04:00–22:40. 생활관 이용규칙이며 외부 방문자 개방을 뜻하지 않음.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "各栋自习室",
+            "B、C栋休息室"
+          ],
+          "roomsAndUsesKo": [
+            "각 동 독서실",
+            "B·C동 휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "各栋学习咖啡区",
+            "A栋休息室"
+          ],
+          "roomsAndUsesKo": [
+            "각 동 스터디 카페",
+            "A동 휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F71",
+      "labelZh": "第一汉马生活馆",
+      "labelKo": "제1한마생활관"
+    },
+    {
+      "faqId": "F72",
+      "nameKo": "제2한마생활관",
+      "nameZh": "第二汉马馆",
+      "category": "dorm",
+      "osmBuildingIds": [
+        1061923944
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/dorm/3162/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제2한마생활관은 경남대 캠퍼스맵 32번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第二汉马馆（宿舍，제2한마생활관）在庆南大学校园地图 32 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 32,
+      "summaryZh": "2026年官方校园地图中的第二汉马生活馆，编号32。官网已核实的设施包括：生活馆公共设施、生活馆行政咨询。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제2한마생활관, 지도 번호 32번입니다.공식 자료에서 확인한 시설: 생활관 공용시설, 생활관 행정 문의.",
+      "facilitiesZh": [
+        "生活馆公共设施",
+        "生活馆行政咨询"
+      ],
+      "facilitiesKo": [
+        "생활관 공용시설",
+        "생활관 행정 문의"
+      ],
+      "phones": [
+        {
+          "labelZh": "生活馆行政咨询",
+          "labelKo": "생활관 행정 문의",
+          "number": "055-249-2261",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：官网公共设施说明：自习室24小时开放；学习咖啡区、休息室、熨烫室04:00–22:40。仅为生活馆设施使用规则，不代表对校外访客开放。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 공식 공용시설 안내: 독서실 24시간, 스터디 카페·휴게실·다림방 04:00–22:40. 생활관 이용규칙이며 외부 방문자 개방을 뜻하지 않음.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "GS便利店"
+          ],
+          "roomsAndUsesKo": [
+            "GS편의점"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "学习咖啡区",
+            "自习室"
+          ],
+          "roomsAndUsesKo": [
+            "스터디 카페",
+            "독서실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "休息室"
+          ],
+          "roomsAndUsesKo": [
+            "휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "6F",
+          "labelZh": "6层",
+          "labelKo": "6층",
+          "roomsAndUsesZh": [
+            "休息室"
+          ],
+          "roomsAndUsesKo": [
+            "휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "9F",
+          "labelZh": "9层",
+          "labelKo": "9층",
+          "roomsAndUsesZh": [
+            "休息室"
+          ],
+          "roomsAndUsesKo": [
+            "휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "12F",
+          "labelZh": "12层",
+          "labelKo": "12층",
+          "roomsAndUsesZh": [
+            "洗衣室",
+            "熨烫室"
+          ],
+          "roomsAndUsesKo": [
+            "세탁실",
+            "다림방"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F72",
+      "labelZh": "第二汉马生活馆",
+      "labelKo": "제2한마생활관"
+    },
+    {
+      "faqId": "F73",
+      "nameKo": "제3한마생활관",
+      "nameZh": "第三汉马馆",
+      "category": "dorm",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/dorm/3162/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "제3한마생활관은 경남대 캠퍼스맵 33번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "第三汉马馆（宿舍，제3한마생활관）在庆南大学校园地图 33 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 33,
+      "summaryZh": "2026年官方校园地图中的第三汉马生活馆，编号33。官网已核实的设施包括：生活馆公共设施、生活馆行政咨询。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 제3한마생활관, 지도 번호 33번입니다.공식 자료에서 확인한 시설: 생활관 공용시설, 생활관 행정 문의.",
+      "facilitiesZh": [
+        "生活馆公共设施",
+        "生活馆行政咨询"
+      ],
+      "facilitiesKo": [
+        "생활관 공용시설",
+        "생활관 행정 문의"
+      ],
+      "phones": [
+        {
+          "labelZh": "生活馆行政咨询",
+          "labelKo": "생활관 행정 문의",
+          "number": "055-249-2261",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：官网公共设施说明：自习室24小时开放；学习咖啡区、休息室、熨烫室04:00–22:40。仅为生活馆设施使用规则，不代表对校外访客开放。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 공식 공용시설 안내: 독서실 24시간, 스터디 카페·휴게실·다림방 04:00–22:40. 생활관 이용규칙이며 외부 방문자 개방을 뜻하지 않음.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6347/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "学习咖啡区",
+            "自习室"
+          ],
+          "roomsAndUsesKo": [
+            "스터디 카페",
+            "독서실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "休息室"
+          ],
+          "roomsAndUsesKo": [
+            "휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "5F",
+          "labelZh": "5层",
+          "labelKo": "5층",
+          "roomsAndUsesZh": [
+            "休息室"
+          ],
+          "roomsAndUsesKo": [
+            "휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "7F",
+          "labelZh": "7层",
+          "labelKo": "7층",
+          "roomsAndUsesZh": [
+            "休息室"
+          ],
+          "roomsAndUsesKo": [
+            "휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "9F",
+          "labelZh": "9层",
+          "labelKo": "9층",
+          "roomsAndUsesZh": [
+            "洗衣室",
+            "熨烫室"
+          ],
+          "roomsAndUsesKo": [
+            "세탁실",
+            "다림방"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F73",
+      "labelZh": "第三汉马生活馆",
+      "labelKo": "제3한마생활관"
+    },
+    {
+      "faqId": "F74",
+      "nameKo": "문무관",
+      "nameZh": "文武馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062066249
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/spo/5560/subview.do",
+        "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "문무관은 경남대 캠퍼스맵 34번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "文武馆（문무관）在庆南大学校园地图 34 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 34,
+      "summaryZh": "2026年官方校园地图中的文武馆，编号34。官网已核实的设施包括：体育科学学部办公室、生活馆健身设施（须携带馆生证）。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 문무관, 지도 번호 34번입니다.공식 자료에서 확인한 시설: 스포츠과학부 사무실, 생활관 헬스장(관생증 지참).",
+      "facilitiesZh": [
+        "体育科学学部办公室",
+        "生活馆健身设施（须携带馆生证）"
+      ],
+      "facilitiesKo": [
+        "스포츠과학부 사무실",
+        "생활관 헬스장(관생증 지참)"
+      ],
+      "phones": [
+        {
+          "labelZh": "体育科学学部办公室",
+          "labelKo": "스포츠과학부 사무실",
+          "number": "055-249-2204",
+          "sourceUrl": "https://www.kyungnam.ac.kr/spo/5560/subview.do"
+        }
+      ],
+      "hoursZh": "上海时间（UTC+8；已由韩国当地时间减1小时）：生活馆官网所列文武馆健身设施：工作日07:00–21:00，须携带馆生证；不代表整栋开放时间。",
+      "hoursKo": "상하이 시간(UTC+8, 한국 현지 시각보다 1시간 이전): 생활관 안내의 문무관 헬스장: 평일 07:00–21:00, 관생증 지참. 건물 전체 운영시간 아님.",
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/spo/5560/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/dorm/3162/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "体育科学学部办公室"
+          ],
+          "roomsAndUsesKo": [
+            "스포츠과학부 사무실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/spo/5560/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F74",
+      "labelZh": "文武馆",
+      "labelKo": "문무관"
+    },
+    {
+      "faqId": "F75",
+      "nameKo": "북문",
+      "nameZh": "北门",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "북문은 경남대 캠퍼스맵 35번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "北门（북문）在庆南大学校园地图 35 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 35,
+      "summaryZh": "2026年官方校园地图中的北门，编号35。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 북문, 지도 번호 35번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F75",
+      "labelZh": "北门",
+      "labelKo": "북문"
+    },
+    {
+      "faqId": "F76",
+      "nameKo": "디자인관",
+      "nameZh": "设计馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062073167
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/ko/6382/subview.do",
+        "https://www.kyungnam.ac.kr/indesign/5950/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "디자인관은 경남대 캠퍼스맵 36번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "设计馆（디자인관）在庆南大学校园地图 36 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 36,
+      "summaryZh": "2026年官方校园地图中的设计馆，编号36。官网已核实的设施包括：留学生服务中心、网络漫画·设计学系。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 디자인관, 지도 번호 36번입니다.공식 자료에서 확인한 시설: 유학생서비스센터, 웹툰·디자인학과.",
+      "facilitiesZh": [
+        "留学生服务中心",
+        "网络漫画·设计学系"
+      ],
+      "facilitiesKo": [
+        "유학생서비스센터",
+        "웹툰·디자인학과"
+      ],
+      "phones": [
+        {
+          "labelZh": "留学生服务中心",
+          "labelKo": "유학생서비스센터",
+          "number": "055-249-2914",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        },
+        {
+          "labelZh": "网络漫画·设计学系",
+          "labelKo": "웹툰·디자인학과",
+          "number": "055-249-2930",
+          "sourceUrl": "https://www.kyungnam.ac.kr/indesign/5950/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/indesign/5950/subview.do"
+        }
+      ],
+      "highlightRole": "international-red",
+      "floors": [
+        {
+          "floor": "7F",
+          "labelZh": "7层",
+          "labelKo": "7층",
+          "roomsAndUsesZh": [
+            "留学生服务中心"
+          ],
+          "roomsAndUsesKo": [
+            "유학생서비스센터"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "floorVerifiedByOfficialPage": true,
+      "entryId": "F76",
+      "labelZh": "设计馆",
+      "labelKo": "디자인관"
+    },
+    {
+      "faqId": "F77",
+      "nameKo": "화영운동장",
+      "nameZh": "运动场",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "화영운동장은 경남대 캠퍼스맵 37번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "运动场（操场，화영운동장）在庆南大学校园地图 37 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 37,
+      "summaryZh": "2026年官方校园地图中的花影运动场，编号37。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 화영운동장, 지도 번호 37번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F77",
+      "labelZh": "花影运动场",
+      "labelKo": "화영운동장"
+    },
+    {
+      "faqId": "F78",
+      "nameKo": "조소실A",
+      "nameZh": "雕塑室A",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "조소실A는 경남대 캠퍼스맵 38번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "雕塑室A（조소실A）在庆南大学校园地图 38 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 38,
+      "summaryZh": "2026年官方校园地图中的雕塑室A，编号38。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 조소실A, 지도 번호 38번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F78",
+      "labelZh": "雕塑室A",
+      "labelKo": "조소실A"
+    },
+    {
+      "faqId": "F79",
+      "nameKo": "조소실B",
+      "nameZh": "雕塑室B",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "조소실B는 경남대 캠퍼스맵 39번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "雕塑室B（조소실B）在庆南大学校园地图 39 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 39,
+      "summaryZh": "2026年官方校园地图中的雕塑室B，编号39。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 조소실B, 지도 번호 39번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F79",
+      "labelZh": "雕塑室B",
+      "labelKo": "조소실B"
+    },
+    {
+      "faqId": "F80",
+      "nameKo": "예술관",
+      "nameZh": "艺术馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "예술관은 경남대 캠퍼스맵 40번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "艺术馆（예술관）在庆南大学校园地图 40 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 40,
+      "summaryZh": "2026年官方校园地图中的艺术馆，编号40。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 예술관, 지도 번호 40번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F80",
+      "labelZh": "艺术馆",
+      "labelKo": "예술관"
+    },
+    {
+      "faqId": "F81",
+      "nameKo": "고시원",
+      "nameZh": "考试院",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "고시원은 경남대 캠퍼스맵 41번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "考试院（고시원）在庆南大学校园地图 41 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 41,
+      "summaryZh": "2026年官方校园地图中的考试院，编号41。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 고시원, 지도 번호 41번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F81",
+      "labelZh": "考试院",
+      "labelKo": "고시원"
+    },
+    {
+      "faqId": "F82",
+      "nameKo": "평생교육원",
+      "nameZh": "终身教育院",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/cce/3466/subview.do",
+        "https://www.kyungnam.ac.kr/cce/2463/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "평생교육원은 경남대 캠퍼스맵 42번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "终身教育院（평생교육원）在庆南大学校园地图 42 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 42,
+      "summaryZh": "2026年官方校园地图中的终身教育馆，编号42。官网已核实的设施包括：终身教育院。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 평생교육관, 지도 번호 42번입니다.공식 자료에서 확인한 시설: 평생교육원.",
+      "facilitiesZh": [
+        "终身教育院"
+      ],
+      "facilitiesKo": [
+        "평생교육원"
+      ],
+      "phones": [
+        {
+          "labelZh": "终身教育院",
+          "labelKo": "평생교육원",
+          "number": "055-249-2720",
+          "sourceUrl": "https://www.kyungnam.ac.kr/cce/2463/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/cce/3466/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/cce/2463/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "B1F",
+          "labelZh": "地下1层",
+          "labelKo": "지하1층",
+          "roomsAndUsesZh": [
+            "001、002教室",
+            "音乐室1、2",
+            "体育教室1",
+            "男女淋浴室"
+          ],
+          "roomsAndUsesKo": [
+            "001·002강의실",
+            "음악실1·2",
+            "스포츠강의실1",
+            "남녀 샤워실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/cce/3466/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "101教室",
+            "韩国画室",
+            "终身教育行政室",
+            "咨询室",
+            "休息室",
+            "学分银行制学习室",
+            "美术室"
+          ],
+          "roomsAndUsesKo": [
+            "101강의실",
+            "한국화실",
+            "평생교육행정실",
+            "상담실",
+            "휴게실",
+            "학점은행제 학습실",
+            "미술실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/cce/3466/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "202至207教室",
+            "讲师休息室"
+          ],
+          "roomsAndUsesKo": [
+            "202~207강의실",
+            "교강사 휴게실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/cce/3466/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "301至305教室",
+            "AMP Lyceum讲堂",
+            "美术室"
+          ],
+          "roomsAndUsesKo": [
+            "301~305강의실",
+            "AMP Lyceum",
+            "미술실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/cce/3466/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-complete",
+      "floorCoverageNoteZh": "已逐层读取官网公布的地下1层至3层平面图；仅覆盖图中标出的用途，不是实时课程表。",
+      "floorCoverageNoteKo": "공식 B1~3층 평면도에 표시된 용도를 층별 확인했으며 실시간 강의시간표는 아닙니다.",
+      "verificationLevel": "official-detailed",
+      "entryId": "F82",
+      "labelZh": "终身教育馆",
+      "labelKo": "평생교육관"
+    },
+    {
+      "faqId": "F83",
+      "nameKo": "창조관",
+      "nameZh": "创造馆",
+      "category": "academic",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/gse/3382/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6382/subview.do",
+        "https://www.kyungnam.ac.kr/ad/3619/subview.do",
+        "https://www.kyungnam.ac.kr/indbiz/1101/subview.do",
+        "https://www.kyungnam.ac.kr/scc/13250/subview.do",
+        "https://www.kyungnam.ac.kr/grad/10667/subview.do",
+        "https://www.kyungnam.ac.kr/econ/3893/subview.do",
+        "https://www.kyungnam.ac.kr/comm/5099/subview.do",
+        "https://www.kyungnam.ac.kr/sols/5153/subview.do",
+        "https://www.kyungnam.ac.kr/aig/13860/subview.do",
+        "https://www.kyungnam.ac.kr/law_pol_col/5131/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6365/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "창조관은 경남대 캠퍼스맵 43번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "创造馆（창조관）在庆南大学校园地图 43 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 43,
+      "summaryZh": "2026年官方校园地图中的创造馆，编号43。官网已核实的设施包括：教育研究生院教学行政室、国际处国际交流组、韩国语教育中心、行政研究生院教学行政室、产业经营研究生院教学支持室。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 창조관, 지도 번호 43번입니다.공식 자료에서 확인한 시설: 교육대학원 교학행정실, 국제처 국제교류팀, 한국어교육센터, 행정대학원 교학행정실, 산업경영대학원 교학지원실.",
+      "facilitiesZh": [
+        "教育研究生院教学行政室",
+        "国际处国际交流组|韩国语教育中心",
+        "行政研究生院教学行政室",
+        "产业经营研究生院教学支持室",
+        "大学生活文化院（咨询服务）",
+        "研究生院教学行政室",
+        "房地产经济金融学系办公室",
+        "媒体影像学系",
+        "自由专业学部",
+        "AI·SW融合专业研究生院教学行政室",
+        "公共人才学院教学行政室",
+        "教育革新本部及教学学习、比较科、远程教育等支援中心"
+      ],
+      "facilitiesKo": [
+        "교육대학원 교학행정실",
+        "국제처 국제교류팀|한국어교육센터",
+        "행정대학원 교학행정실",
+        "산업경영대학원 교학지원실",
+        "대학생활문화원(상담)",
+        "대학원 교학행정실",
+        "부동산경제금융학과 사무실",
+        "미디어영상학과",
+        "자유전공학부",
+        "AI·SW융합전문대학원 교학행정실",
+        "공공인재대학 교학행정실",
+        "교육혁신본부 및 교수학습·비교과·원격교육 등 지원센터"
+      ],
+      "phones": [
+        {
+          "labelZh": "教育研究生院教学行政室",
+          "labelKo": "교육대학원 교학행정실",
+          "number": "055-249-2811",
+          "sourceUrl": "https://www.kyungnam.ac.kr/gse/3382/subview.do"
+        },
+        {
+          "labelZh": "国际处国际交流组|韩国语教育中心",
+          "labelKo": "국제처 국제교류팀|한국어교육센터",
+          "number": "055-249-2299",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        },
+        {
+          "labelZh": "行政研究生院教学行政室",
+          "labelKo": "행정대학원 교학행정실",
+          "number": "055-249-2595",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ad/3619/subview.do"
+        },
+        {
+          "labelZh": "产业经营研究生院教学支持室",
+          "labelKo": "산업경영대학원 교학지원실",
+          "number": "055-249-2587",
+          "sourceUrl": "https://www.kyungnam.ac.kr/indbiz/1101/subview.do"
+        },
+        {
+          "labelZh": "大学生活文化院（咨询服务）",
+          "labelKo": "대학생활문화원(상담)",
+          "number": "055-249-2722",
+          "sourceUrl": "https://www.kyungnam.ac.kr/scc/13250/subview.do"
+        },
+        {
+          "labelZh": "研究生院教学行政室",
+          "labelKo": "대학원 교학행정실",
+          "number": "055-249-2807",
+          "sourceUrl": "https://www.kyungnam.ac.kr/grad/10667/subview.do"
+        },
+        {
+          "labelZh": "房地产经济金融学系办公室",
+          "labelKo": "부동산경제금융학과 사무실",
+          "number": "055-249-2407",
+          "sourceUrl": "https://www.kyungnam.ac.kr/econ/3893/subview.do"
+        },
+        {
+          "labelZh": "媒体影像学系",
+          "labelKo": "미디어영상학과",
+          "number": "055-249-2545",
+          "sourceUrl": "https://www.kyungnam.ac.kr/comm/5099/subview.do"
+        },
+        {
+          "labelZh": "自由专业学部",
+          "labelKo": "자유전공학부",
+          "number": "055-249-2155",
+          "sourceUrl": "https://www.kyungnam.ac.kr/sols/5153/subview.do"
+        },
+        {
+          "labelZh": "AI·SW融合专业研究生院教学行政室",
+          "labelKo": "AI·SW융합전문대학원 교학행정실",
+          "number": "055-249-2438",
+          "sourceUrl": "https://www.kyungnam.ac.kr/aig/13860/subview.do"
+        },
+        {
+          "labelZh": "公共人才学院教学行政室",
+          "labelKo": "공공인재대학 교학행정실",
+          "number": "055-249-2502",
+          "sourceUrl": "https://www.kyungnam.ac.kr/law_pol_col/5131/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/gse/3382/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ad/3619/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/indbiz/1101/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/scc/13250/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/grad/10667/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/econ/3893/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/comm/5099/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/sols/5153/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/aig/13860/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/law_pol_col/5131/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6365/subview.do"
+        }
+      ],
+      "highlightRole": "international-red",
+      "floors": [
+        {
+          "floor": "B1F",
+          "labelZh": "地下1层",
+          "labelKo": "지하1층",
+          "roomsAndUsesZh": [
+            "教育研究生院教学行政室"
+          ],
+          "roomsAndUsesKo": [
+            "교육대학원 교학행정실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/gse/3382/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "国际处国际交流组",
+            "韩国语教育中心",
+            "行政研究生院教学行政室",
+            "产业经营研究生院教学支持室",
+            "大学生活文化院（咨询服务）"
+          ],
+          "roomsAndUsesKo": [
+            "국제처 국제교류팀",
+            "한국어교육센터",
+            "행정대학원 교학행정실",
+            "산업경영대학원 교학지원실",
+            "대학생활문화원(상담)"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6382/subview.do",
+            "https://www.kyungnam.ac.kr/ad/3619/subview.do",
+            "https://www.kyungnam.ac.kr/indbiz/1101/subview.do",
+            "https://www.kyungnam.ac.kr/scc/13250/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "2F",
+          "labelZh": "2层",
+          "labelKo": "2층",
+          "roomsAndUsesZh": [
+            "研究生院教学行政室",
+            "房地产经济金融学系办公室",
+            "媒体影像学系",
+            "自由专业学部"
+          ],
+          "roomsAndUsesKo": [
+            "대학원 교학행정실",
+            "부동산경제금융학과 사무실",
+            "미디어영상학과",
+            "자유전공학부"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/grad/10667/subview.do",
+            "https://www.kyungnam.ac.kr/econ/3893/subview.do",
+            "https://www.kyungnam.ac.kr/comm/5099/subview.do",
+            "https://www.kyungnam.ac.kr/sols/5153/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "3F",
+          "labelZh": "3层",
+          "labelKo": "3층",
+          "roomsAndUsesZh": [
+            "AI·SW融合专业研究生院教学行政室",
+            "公共人才学院教学行政室",
+            "教育革新本部及教学学习、比较科、远程教育等支援中心"
+          ],
+          "roomsAndUsesKo": [
+            "AI·SW융합전문대학원 교학행정실",
+            "공공인재대학 교학행정실",
+            "교육혁신본부 및 교수학습·비교과·원격교육 등 지원센터"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/aig/13860/subview.do",
+            "https://www.kyungnam.ac.kr/law_pol_col/5131/subview.do",
+            "https://www.kyungnam.ac.kr/ko/6365/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "floorVerifiedByOfficialPage": true,
+      "entryId": "F83",
+      "labelZh": "创造馆",
+      "labelKo": "창조관"
+    },
+    {
+      "faqId": "F84",
+      "nameKo": "남문",
+      "nameZh": "南门",
+      "category": "campus",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "남문은 경남대 캠퍼스맵 44번에 있습니다. (지도에는 건물 내 층·호실 정보가 없으니 구체적인 호실은 학과/건물 안내에서 확인하세요.) 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "textZh": "南门（남문）在庆南大学校园地图 44 号（地图上没有楼内楼层和房间号，具体位置请向系办公室或楼内指引确认）。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "mapNumber": 44,
+      "summaryZh": "2026年官方校园地图中的南门，编号44。",
+      "summaryKo": "2026년 공식 캠퍼스맵의 남문, 지도 번호 44번입니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-map-only",
+      "entryId": "F84",
+      "labelZh": "南门",
+      "labelKo": "남문"
+    },
+    {
+      "faqId": "F85",
+      "nameKo": "유학생서비스센터",
+      "nameZh": "留学生服务中心",
+      "category": "international",
+      "osmBuildingIds": [
+        1062073167
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/international/6906/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "유학생서비스센터는 디자인관(캠퍼스맵 36번) 7층에 있습니다. 전화: 055-249-2914 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 (팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요)",
+      "textZh": "留学生服务中心在设计馆（디자인관，校园地图 36 号）7 层。电话：055-249-2914。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 （团队确认，请以现场或官网指引为准）",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "floorVerifiedByOfficialPage": true,
+      "floorStatus": "officialVerified",
+      "claimedFloor": 7,
+      "claimedHostBuildingKo": "디자인관",
+      "officialCheck": "6906 page returned security-policy block; no floor confirmation",
+      "displayWarningZh": "请以现场或官网最新指引为准（官网 ko/6382 页面日期 2021-08-30）。",
+      "displayWarningKo": "현장 또는 학교 공식 최신 안내 기준 확인 필요 (공식 ko/6382 페이지 날짜 2021-08-30).",
+      "mapNumber": 36,
+      "summaryZh": "设于设计馆7层，提供外国人登记、签证延期与变更、学业及在韩生活咨询，并提供自助烹饪环境。",
+      "summaryKo": "디자인관 7층에서 외국인등록·체류기간 연장 및 변경, 학사·생활 상담과 취사 환경을 지원합니다.",
+      "facilitiesZh": [
+        "留学生服务中心"
+      ],
+      "facilitiesKo": [
+        "유학생서비스센터"
+      ],
+      "phones": [
+        {
+          "labelZh": "留学生服务中心",
+          "labelKo": "유학생서비스센터",
+          "number": "055-249-2914",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/international/6906/subview.do"
+        }
+      ],
+      "highlightRole": "international-red",
+      "floors": [
+        {
+          "floor": "7F",
+          "labelZh": "7层",
+          "labelKo": "7층",
+          "roomsAndUsesZh": [
+            "留学生服务中心"
+          ],
+          "roomsAndUsesKo": [
+            "유학생서비스센터"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "hostBuildingZh": "设计馆",
+      "hostBuildingKo": "디자인관",
+      "officialFloorSourcePageLastModified": "2021-08-30",
+      "dataCautionsZh": [
+        "官网页面最后修改日期为2021-08-30；本次已访问确认页面仍公开显示该楼层，但不应宣称为2026年新发布。"
+      ],
+      "mapNumberRefersTo": "host-building",
+      "floorVerificationUrl": "https://www.kyungnam.ac.kr/ko/6382/subview.do",
+      "entryId": "F85",
+      "labelZh": "留学生服务中心",
+      "labelKo": "유학생서비스센터"
+    },
+    {
+      "faqId": "F86",
+      "nameKo": "국제처",
+      "nameZh": "国际处",
+      "category": "international",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517",
+        "https://www.kyungnam.ac.kr/international/14500/subview.do",
+        "https://www.kyungnam.ac.kr/ko/6382/subview.do",
+        "https://www.kyungnam.ac.kr/international/6892/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "국제처는 창조관(캠퍼스맵 43번) 1층에 있습니다. 전화: 055-249-2299 캠퍼스맵: https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 (팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요)",
+      "textZh": "国际处在创造馆（창조관，校园地图 43 号）1 层。电话：055-249-2299。校园地图：https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517 （团队确认，请以现场或官网指引为准）",
+      "provenance": "Existing FAQ; not independently verified except Korean name-to-OSM matching",
+      "floorVerifiedByOfficialPage": true,
+      "floorStatus": "officialVerified",
+      "claimedFloor": 1,
+      "claimedHostBuildingKo": "창조관",
+      "officialCheck": "14500 page confirms institutional phone 055-249-2299 but no building or floor",
+      "displayWarningZh": "请以现场或官网最新指引为准（官网 ko/6382 页面日期 2021-08-30）。",
+      "displayWarningKo": "현장 또는 학교 공식 최신 안내 기준 확인 필요 (공식 ko/6382 페이지 날짜 2021-08-30).",
+      "mapNumber": 43,
+      "summaryZh": "设于创造馆1层，办理国际交流项目及留学生适应支援；同处设韩国语教育中心。",
+      "summaryKo": "창조관 1층에서 국제교류 프로그램과 유학생 적응 지원을 담당하며 한국어교육센터도 안내합니다.",
+      "facilitiesZh": [
+        "国际处"
+      ],
+      "facilitiesKo": [
+        "국제처"
+      ],
+      "phones": [
+        {
+          "labelZh": "国际处",
+          "labelKo": "국제처",
+          "number": "055-249-2299",
+          "sourceUrl": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "2026年官方校园地图",
+          "labelKo": "2026 공식 캠퍼스맵",
+          "url": "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/international/6892/subview.do"
+        }
+      ],
+      "highlightRole": "international-red",
+      "floors": [
+        {
+          "floor": "1F",
+          "labelZh": "1层",
+          "labelKo": "1층",
+          "roomsAndUsesZh": [
+            "国际处"
+          ],
+          "roomsAndUsesKo": [
+            "국제처"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/ko/6382/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "hostBuildingZh": "创造馆",
+      "hostBuildingKo": "창조관",
+      "officialFloorSourcePageLastModified": "2021-08-30",
+      "dataCautionsZh": [
+        "官网页面最后修改日期为2021-08-30；本次已访问确认页面仍公开显示该楼层，但不应宣称为2026年新发布。"
+      ],
+      "mapNumberRefersTo": "host-building",
+      "floorVerificationUrl": "https://www.kyungnam.ac.kr/ko/6382/subview.do",
+      "entryId": "F86",
+      "labelZh": "国际处",
+      "labelKo": "국제처"
+    },
+    {
+      "faqId": "",
+      "entryId": "BUILDING-INDUSTRY-ACADEMY",
+      "nameKo": "산학협력관",
+      "nameZh": "产学合作馆",
+      "labelKo": "산학협력관",
+      "labelZh": "产学合作馆",
+      "category": "academic",
+      "osmBuildingIds": [
+        1062070770
+      ],
+      "spatialStatus": "mapped",
+      "positionXZ": null,
+      "sourceUrls": [
+        "https://www.kyungnam.ac.kr/pt/4770/subview.do",
+        "https://www.kyungnam.ac.kr/bsri/4900/subview.do"
+      ],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "물리치료학과 공식 안내의 사무실 주소는 산학협력관 6층입니다. 2026 지도에서의 개명·번호 관계는 추정하지 않습니다.공식 자료에서 확인한 시설: 물리치료학과 사무실, 건강보건연구소.",
+      "textZh": "物理治疗学系官网将系办公室地址列为产学合作馆6层；不据此推断该楼在2026地图上的改名或编号。官网已核实的设施包括：物理治疗学系办公室、健康保健研究所。",
+      "provenance": "Official public kyungnam.ac.kr pages; geometry attached only where the audited OSM name link already existed",
+      "summaryZh": "物理治疗学系官网将系办公室地址列为产学合作馆6层；不据此推断该楼在2026地图上的改名或编号。官网已核实的设施包括：物理治疗学系办公室、健康保健研究所。",
+      "summaryKo": "물리치료학과 공식 안내의 사무실 주소는 산학협력관 6층입니다. 2026 지도에서의 개명·번호 관계는 추정하지 않습니다.공식 자료에서 확인한 시설: 물리치료학과 사무실, 건강보건연구소.",
+      "facilitiesZh": [
+        "物理治疗学系办公室",
+        "健康保健研究所"
+      ],
+      "facilitiesKo": [
+        "물리치료학과 사무실",
+        "건강보건연구소"
+      ],
+      "phones": [
+        {
+          "labelZh": "物理治疗学系办公室",
+          "labelKo": "물리치료학과 사무실",
+          "number": "055-249-2830",
+          "sourceUrl": "https://www.kyungnam.ac.kr/pt/4770/subview.do"
+        }
+      ],
+      "officialUrls": [
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/pt/4770/subview.do"
+        },
+        {
+          "labelZh": "官方说明",
+          "labelKo": "공식 안내",
+          "url": "https://www.kyungnam.ac.kr/bsri/4900/subview.do"
+        }
+      ],
+      "highlightRole": "normal",
+      "floors": [
+        {
+          "floor": "4F",
+          "labelZh": "4层",
+          "labelKo": "4층",
+          "roomsAndUsesZh": [
+            "健康保健研究所（研究所地址页所列）"
+          ],
+          "roomsAndUsesKo": [
+            "건강보건연구소(연구소 주소 안내 기준)"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/bsri/4900/subview.do"
+          ],
+          "verifiedByOfficial": true
+        },
+        {
+          "floor": "6F",
+          "labelZh": "6层",
+          "labelKo": "6층",
+          "roomsAndUsesZh": [
+            "物理治疗学系办公室"
+          ],
+          "roomsAndUsesKo": [
+            "물리치료학과 사무실"
+          ],
+          "sourceUrls": [
+            "https://www.kyungnam.ac.kr/pt/4770/subview.do"
+          ],
+          "verifiedByOfficial": true
+        }
+      ],
+      "floorGuideStatus": "official-partial",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "official-detailed",
+      "dataCautionsZh": [
+        "研究所页面同时沿用健康保健学院行政室旧地址表述；学院自己的现行位置页另列保健医疗馆4层。本条不声称学院行政室仍在产学合作馆。"
+      ]
+    },
+    {
+      "faqId": "",
+      "entryId": "OSM-1062071802",
+      "nameKo": "생활과학관",
+      "nameZh": "生活科学馆",
+      "labelKo": "생활과학관",
+      "labelZh": "生活科学馆",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "OSM의 건물명이며 이번에 확인한 공식 자료로 현행 명칭·지도 번호·층별 용도를 확정하지 못했습니다. 유사 명칭 건물과 합치지 않습니다.",
+      "textZh": "这是OSM中的楼栋名称；本轮查阅的官方资料未证实其现行名称、地图编号及楼层用途，暂不与相似名称楼栋合并。",
+      "provenance": "Official public kyungnam.ac.kr pages; geometry attached only where the audited OSM name link already existed",
+      "summaryZh": "这是OSM中的楼栋名称；本轮查阅的官方资料未证实其现行名称、地图编号及楼层用途，暂不与相似名称楼栋合并。",
+      "summaryKo": "OSM의 건물명이며 이번에 확인한 공식 자료로 현행 명칭·지도 번호·층별 용도를 확정하지 못했습니다. 유사 명칭 건물과 합치지 않습니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "unresolved-osm-name"
+    },
+    {
+      "faqId": "",
+      "entryId": "OSM-1062063659",
+      "nameKo": "제2경상관",
+      "nameZh": "第二经商馆",
+      "labelKo": "제2경상관",
+      "labelZh": "第二经商馆",
+      "category": "landmark",
+      "osmBuildingIds": [],
+      "spatialStatus": "unmapped-text-only",
+      "positionXZ": null,
+      "sourceUrls": [],
+      "sourceCheckedAt": "2026-11-24",
+      "textKo": "OSM의 건물명이며 이번에 확인한 공식 자료로 현행 명칭·지도 번호·층별 용도를 확정하지 못했습니다. 유사 명칭 건물과 합치지 않습니다.",
+      "textZh": "这是OSM中的楼栋名称；本轮查阅的官方资料未证实其现行名称、地图编号及楼层用途，暂不与相似名称楼栋合并。",
+      "provenance": "Official public kyungnam.ac.kr pages; geometry attached only where the audited OSM name link already existed",
+      "summaryZh": "这是OSM中的楼栋名称；本轮查阅的官方资料未证实其现行名称、地图编号及楼层用途，暂不与相似名称楼栋合并。",
+      "summaryKo": "OSM의 건물명이며 이번에 확인한 공식 자료로 현행 명칭·지도 번호·층별 용도를 확정하지 못했습니다. 유사 명칭 건물과 합치지 않습니다.",
+      "facilitiesZh": [],
+      "facilitiesKo": [],
+      "phones": [],
+      "officialUrls": [],
+      "highlightRole": "normal",
+      "floors": [],
+      "floorGuideStatus": "not-published-online",
+      "floorCoverageNoteZh": "仅收录查阅到的官方公开资料；未列出的楼层、教室及用途尚未核实，不能理解为空置。",
+      "floorCoverageNoteKo": "확인한 공식 공개 자료만 수록했습니다. 미기재 층·강의실·용도는 미확인이며 빈 공간을 뜻하지 않습니다.",
+      "verificationLevel": "unresolved-osm-name"
+    }
+  ],
+  "generalMapFaqDraft": {
+    "id": "PROPOSED_MAP_GENERAL",
+    "status": "draft-not-published",
+    "questionZh": "地图|校园地图|3D地图|学校地图",
+    "questionKo": "지도|캠퍼스맵|학교 지도|3D 지도",
+    "answerZh": "点击顶部「地图」打开可旋转的 3D 校园示意图，可缩放、选择已核实关联的楼栋并查看相关问答。不支持 3D 时可搜索地点列表。地势来自约 30 米卫星高程，楼高为示意，非实测或导航地图；未定位地点不会显示虚构标点。",
+    "answerKo": "상단 「지도」 버튼으로 회전 가능한 3D 캠퍼스 모형을 열고 확대·축소하거나 연결이 확인된 건물의 FAQ를 볼 수 있습니다. 3D 미지원 시 장소 목록을 검색하세요. 지형은 약 30m 위성 고도 자료이며 건물 높이는 예시입니다. 측량·길안내 지도가 아니며 미확인 위치는 임의 표시하지 않습니다."
+  },
+  "schematicBuildingDefaults": {
+    "heightM": 14,
+    "isSchematicHeight": true,
+    "skirtDepthM": 3
+  }
+}

@@ -97,10 +97,17 @@ test("general map wording selects the campus map FAQ and buildings stay specific
   expectId("国际处", "zh", "F86");
   const f85 = api.FAQ_DATA.find((f) => f.id === "F85");
   const f86 = api.FAQ_DATA.find((f) => f.id === "F86");
-  assert.match(f85.answer_zh, /（团队确认，请以现场或官网指引为准）/);
-  assert.match(f85.answer, /팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요/);
-  assert.match(f86.answer_zh, /（团队确认，请以现场或官网指引为准）/);
-  assert.match(f86.answer, /팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요/);
+  assert.match(f85.answer_zh, /请以现场或官网最新指引为准/);
+  assert.match(f85.answer_zh, /https:\/\/www\.kyungnam\.ac\.kr\/ko\/6382\/subview\.do/);
+  assert.match(f85.answer_zh, /2021-08-30/);
+  assert.match(f85.answer, /현장 또는 학교 공식 최신 안내 기준 확인 필요/);
+  assert.match(f85.answer, /https:\/\/www\.kyungnam\.ac\.kr\/ko\/6382\/subview\.do/);
+  assert.match(f86.answer_zh, /请以现场或官网最新指引为准/);
+  assert.match(f86.answer_zh, /https:\/\/www\.kyungnam\.ac\.kr\/ko\/6382\/subview\.do/);
+  assert.match(f86.answer_zh, /2021-08-30/);
+  assert.match(f86.answer, /현장 또는 학교 공식 최신 안내 기준 확인 필요/);
+  assert.match(f86.source, /ko\/6382/);
+  assert.match(f85.source, /ko\/6382/);
 });
 
 test("school questions and paraphrases still select the same FAQ", () => {
