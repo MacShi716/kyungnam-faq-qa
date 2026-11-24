@@ -2,22 +2,23 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   RED_OSM_ID,
-  buildingKind,
   lightRig,
-  paintTokens,
-  skyColor,
-  terrainColor,
 } from "./colors.mjs";
 import { layoutLabelBoxes, measureLabel } from "./labels.mjs";
+import { displayTitle, directoryRank, faqButtonLabel, officialLinkLabel } from "./present.mjs";
 import { blobMatchesQuery, entrySearchBlob } from "./search.mjs";
 import {
+  applyAtmosphereTheme,
+  buildCampusLayers,
+  buildRealisticBuildings,
+  buildRealisticTerrain,
+  installAtmosphere,
+  paintRealisticBuildings,
+  repaintTerrainColors,
+} from "./scene-dress.mjs";
+import {
   SCHEMATIC_HEIGHT_M,
-  measureFootprint,
-  openRing,
-  ringCentroid,
   sampleTerrainY,
-  terrainCellIndices,
-  triangulateXZ,
 } from "./placement.mjs";
 
 const FAV_KEY = "campus_map_favorites";
@@ -36,7 +37,7 @@ const TEXT = {
     privacy: "请勿输入学号、手机号等个人信息", clearFav: "清空收藏",
     storage: "仅保存在本机浏览器，公用设备请清空", fav: "收藏", favOn: "已收藏",
     viewFaq: "查看相关 FAQ", noFaq: "暂无对应 FAQ", textOnly: "文字地点",
-    notice: "数据来源与许可", licenseTitle: "数据来源与许可", loading: "正在加载校园地图…",
+    notice: "Copernicus · 数据来源与许可", licenseTitle: "数据来源与许可", loading: "正在加载校园地图…",
     fallback: "当前环境无法显示 3D 模型。可以搜索地点列表，或打开官方校园地图。",
     schematic: "本图为示意图：地势来自约 30 米卫星地表模型（DSM），建筑平面来自 OpenStreetMap 轮廓，楼高为统一示意高度，不是实测地形、实测楼高，也不是导航路线。",
     summary: "地形高程使用 Copernicus WorldDEM-30 公开数据，只用于这张校园示意图。欧盟、ESA、DLR 与 Airbus 不对使用该数据承担责任，也不表示认可本页面。",
@@ -58,7 +59,7 @@ const TEXT = {
     privacy: "학번·전화번호 등 개인정보는 입력하지 마세요", clearFav: "즐겨찾기 비우기",
     storage: "이 브라우저에만 저장됩니다. 공용 기기에서는 비워 주세요", fav: "즐겨찾기", favOn: "즐겨찾기됨",
     viewFaq: "관련 FAQ 보기", noFaq: "연결된 FAQ 없음", textOnly: "텍스트 안내",
-    notice: "출처·라이선스", licenseTitle: "데이터 출처 및 라이선스", loading: "캠퍼스맵을 불러오는 중…",
+    notice: "Copernicus · 출처·라이선스", licenseTitle: "데이터 출처 및 라이선스", loading: "캠퍼스맵을 불러오는 중…",
     fallback: "이 환경에서는 3D 모형을 표시할 수 없습니다. 장소 목록을 검색하거나 공식 캠퍼스맵을 여세요.",
     schematic: "이 화면은 모식도입니다. 지형은 약 30m 위성 표면모델(DSM)이고 건물 평면은 OpenStreetMap 윤곽이며 건물 높이는 동일한 예시 높이입니다. 측량 지형·높이 또는 길안내 경로가 아닙니다.",
     summary: "지형 고도는 Copernicus WorldDEM-30 공개 자료를 사용하며 이 캠퍼스 모식도에만 씁니다. EU, ESA, DLR, Airbus는 이 자료의 사용에 책임을 지지 않으며 이 페이지를 보증하거나 승인하지 않습니다.",
@@ -78,15 +79,16 @@ const TEXT = {
 
 const CAT_ORDER = ["all", "international", "academic", "dining", "dorm", "other", "fav"];
 const MAP_CSS = `
-.map-modal{position:fixed;inset:0;z-index:40;width:100%;height:100dvh;max-width:100vw;box-sizing:border-box;overflow:hidden;background:var(--bg);color:var(--ink);font:inherit;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.map-modal{--map-panel:rgba(255,252,247,.9);--map-line:rgba(28,32,38,.16);position:fixed;inset:0;z-index:40;width:100%;height:100dvh;max-width:100vw;box-sizing:border-box;overflow:hidden;background:var(--bg);color:var(--ink);font:inherit;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.map-modal[data-theme="dark"]{--map-panel:rgba(14,16,20,.82);--map-line:rgba(255,255,255,.14)}
 .map-stage{position:relative;width:100%;height:100%;overflow:hidden}
 .map-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .map-fallback,.map-status{position:absolute;z-index:4;left:12px;right:12px;top:64px;margin:0;padding:12px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(16px)}
 .map-toolbar,.map-directory,.map-info{position:absolute;z-index:8}
 .map-labels{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
 .map-toolbar{top:8px;left:8px;right:8px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 16px)}
-.map-btn{min-height:44px;padding:0 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--rim) 42%,var(--line));background:var(--glass);color:var(--ink);font:inherit;font-weight:650;font-size:.86rem;cursor:pointer;backdrop-filter:blur(16px) saturate(1.3)}
-.map-btn[aria-pressed="true"]{background:var(--pressed-bg);box-shadow:inset 0 0 0 1px var(--rim)}
+.map-btn{min-height:44px;padding:0 11px;border-radius:8px;border:1px solid var(--map-line);background:var(--map-panel);color:var(--ink);font:inherit;font-weight:600;font-size:.82rem;letter-spacing:.01em;cursor:pointer;backdrop-filter:blur(18px) saturate(1.2);box-shadow:none}
+.map-btn[aria-pressed="true"]{background:var(--pressed-bg);box-shadow:inset 0 0 0 1px var(--map-line)}
 .map-btn:focus-visible,.map-search:focus-visible,.map-ext-link:focus-visible,.map-osm-link:focus-visible,.map-pill:focus-visible,.map-odbl-link:focus-visible{outline:2px solid var(--rim);outline-offset:2px}
 .map-directory{top:0;right:0;bottom:0;width:min(320px,100%);display:flex;flex-direction:column;gap:8px;padding:64px 10px 12px;background:color-mix(in srgb,var(--bg) 88%,transparent);border-left:1px solid var(--line);backdrop-filter:blur(18px);box-sizing:border-box}
 .map-modal.dir-collapsed:not(.is-narrow) .map-directory{transform:translateX(105%)}
@@ -98,14 +100,14 @@ const MAP_CSS = `
 .map-list button small{display:block;color:var(--muted);font-size:.75rem}
 .map-badge{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border-radius:999px;background:var(--badge-warn-bg);color:var(--warn);font-size:.75rem}
 .map-num-pill{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:.75rem}
-.map-role-badge{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border-radius:999px;background:#e03131;color:#fff;font-size:.75rem;font-weight:750}
-.map-info{z-index:14;top:64px;right:332px;left:auto;bottom:auto;width:min(400px,calc(100% - 360px));max-height:calc(100% - 84px);overflow:auto;padding:14px 14px 16px;border-radius:18px;background:var(--card-bg);border:1px solid var(--line);backdrop-filter:blur(18px);box-sizing:border-box;box-shadow:var(--shadow)}
+.map-role-badge{display:inline-block;margin:0 6px 6px 0;padding:2px 7px;border-radius:3px;background:transparent;color:#b91c1c;border:1px solid #c92a2a;font-size:.75rem;font-weight:650}
+.map-info{z-index:14;top:64px;right:332px;left:auto;bottom:auto;width:min(400px,calc(100% - 360px));max-height:calc(100% - 132px);overflow:auto;padding:14px 14px 18px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);backdrop-filter:blur(18px);box-sizing:border-box;box-shadow:0 16px 40px rgba(16,18,22,.12)}
 .map-modal.dir-collapsed:not(.is-narrow) .map-info{right:12px;width:min(420px,calc(100% - 24px))}
 .map-info-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .map-info h3{margin:0 0 4px;font-size:1.05rem;line-height:1.3}
 .map-info h4{margin:10px 0 6px;font-size:.86rem}
 .map-info p{margin:0 0 8px;line-height:1.45}
-.map-detail-close{width:36px;min-height:36px;padding:0;border-radius:999px;flex:0 0 auto}
+.map-detail-close{width:36px;min-height:36px;padding:0;border-radius:8px;flex:0 0 auto}
 .map-overview{margin:0 0 8px;line-height:1.5}
 .map-warning{color:var(--warn);font-weight:650}
 .map-floors,.map-facilities{list-style:none;margin:0 0 8px;padding:0}
@@ -115,27 +117,35 @@ const MAP_CSS = `
 .map-facilities{display:flex;flex-wrap:wrap;gap:6px}
 .map-facilities li{padding:3px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);font-size:.78rem}
 .map-floor-note,.map-floor-note-alt,.map-floor-freshness{font-size:.78rem;color:var(--muted);line-height:1.45}
-.map-pill{position:absolute;pointer-events:auto;border:1px solid var(--line);border-radius:999px;padding:3px 8px;background:color-mix(in srgb,var(--card) 90%,transparent);color:var(--ink);font:inherit;font-size:12px;font-weight:750;line-height:1.35;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer}
-.map-pill.is-red{background:#e03131;color:#fff;border-color:#c92a2a}
-.map-pill.is-active{box-shadow:0 0 0 2px var(--rim),0 2px 8px rgba(0,0,0,.18)}
-.map-intl-pill,.map-intl-banner{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;line-height:1.15;background:#e03131;color:#fff;border-color:#c92a2a;text-align:left}
-.map-intl-pill small,.map-intl-banner small{color:#fff;font-size:.68rem;font-weight:650;opacity:.95}
-.map-intl-banner{width:100%;min-height:52px;border-radius:14px;padding:8px 12px}
+.map-pill{position:absolute;pointer-events:auto;border:1px solid var(--map-line);border-radius:3px;padding:2px 6px 3px;background:rgba(255,252,247,.92);color:#1c2430;font:inherit;font-size:11px;font-weight:600;letter-spacing:.01em;line-height:1.3;white-space:nowrap;box-shadow:none;cursor:pointer}
+.map-pill::before{content:"";position:absolute;left:50%;top:100%;width:1px;height:9px;background:currentColor;opacity:.7}
+.map-pill::after{content:"";position:absolute;left:50%;top:calc(100% + 8px);width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
+.map-pill.is-red{background:rgba(255,252,247,.94);color:#b91c1c;border-color:#c92a2a}
+.map-modal[data-theme="dark"] .map-pill{background:rgba(16,18,22,.82);color:#f4f7fb;border-color:rgba(255,255,255,.16)}
+.map-modal[data-theme="dark"] .map-pill.is-red{color:#c92a2a;border-color:#c92a2a;background:rgba(22,14,14,.88)}
+.map-pill.is-active{box-shadow:inset 0 0 0 1px currentColor}
+.map-intl-pill,.map-intl-banner{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;line-height:1.15;background:rgba(201,42,42,.06);color:#b91c1c;border:1px solid #c92a2a;text-align:left;box-shadow:none}
+.map-modal[data-theme="dark"] .map-intl-pill,.map-modal[data-theme="dark"] .map-intl-banner{background:rgba(201,42,42,.16);color:#f3d0d0;border-color:#c92a2a}
+.map-intl-pill small,.map-intl-banner small{color:currentColor;font-size:.68rem;font-weight:600;opacity:.9}
+.map-intl-banner{width:100%;min-height:48px;border-radius:8px;padding:7px 10px}
 .map-attrib{position:absolute;left:10px;bottom:10px;z-index:16;max-width:calc(100% - 20px)}
-.map-attrib-bar{display:flex;align-items:center;gap:8px;height:32px;max-width:100%;padding:0 8px 0 10px;border-radius:999px;background:color-mix(in srgb,var(--bg) 72%,transparent);border:1px solid var(--line);backdrop-filter:blur(14px);box-sizing:border-box;overflow:hidden;white-space:nowrap}
-.map-attrib-bar .map-osm-link{font-size:11px;line-height:1;font-weight:700}
-.map-notice-btn{min-height:24px;height:24px;padding:0 8px;font-size:11px;line-height:1}
-.map-license{position:absolute;left:0;bottom:42px;width:min(440px,calc(100vw - 24px));max-height:min(52vh,calc(100dvh - 96px));overflow:auto;padding:12px 12px 10px;border-radius:16px;background:var(--card-bg);border:1px solid var(--line);backdrop-filter:blur(16px);box-sizing:border-box;box-shadow:var(--shadow)}
+.map-attrib-bar{display:flex;align-items:center;gap:8px;height:32px;max-width:100%;padding:0 8px 0 10px;border-radius:8px;background:var(--map-panel);border:1px solid var(--map-line);backdrop-filter:blur(14px);box-sizing:border-box;overflow:hidden;white-space:nowrap}
+.map-attrib-bar .map-osm-link{font-size:11px;line-height:1;font-weight:650;overflow:hidden;text-overflow:ellipsis}
+.map-notice-btn{min-height:24px;height:24px;padding:0 8px;font-size:11px;line-height:1;border-radius:6px;flex:0 0 auto}
+.map-modal.is-narrow .map-attrib-bar{gap:6px;padding:0 6px 0 8px}
+.map-modal.is-narrow .map-attrib-bar .map-osm-link,.map-modal.is-narrow .map-notice-btn{font-size:10px}
+.map-modal.is-narrow .map-notice-btn{padding:0 6px}
+.map-license{position:absolute;left:0;bottom:42px;width:min(440px,calc(100vw - 24px));max-height:min(52vh,calc(100dvh - 96px));overflow:auto;padding:16px 16px 44px;scroll-padding-bottom:28px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);backdrop-filter:blur(16px);box-sizing:border-box;box-shadow:inset 0 -18px 16px -14px rgba(16,18,22,.28),0 16px 40px rgba(16,18,22,.16)}
 .map-license h2{margin:0 0 8px;font-size:.92rem}
 .map-legal{margin:4px 0;font-size:11px;line-height:1.45}
 .map-osm-link,.map-odbl-link,.map-ext-link{color:var(--ink);font-weight:700}
 .map-license .map-osm-link,.map-license .map-odbl-link{display:inline-block;margin:0 0 6px;font-size:12px}
 .map-ext-tag{margin-left:6px;color:var(--muted);font-size:.75rem;font-weight:500}
-.map-modal.is-narrow .map-directory{top:auto;left:0;right:0;width:100%;max-height:48%;border-left:0;border-top:1px solid var(--line);padding:10px;transform:none}
+.map-modal.is-narrow .map-directory{top:auto;left:0;right:0;width:100%;max-height:48%;border-left:0;border-top:1px solid var(--map-line);padding:10px;transform:none}
 .map-modal.is-narrow.dir-collapsed .map-directory{display:none}
-.map-modal.is-narrow .map-info{left:0;right:0;top:auto;bottom:0;width:100%;max-height:min(62vh,560px);border-radius:18px 18px 0 0}
+.map-modal.is-narrow .map-info{z-index:18;left:0;right:0;top:auto;bottom:0;width:100%;max-height:min(62vh,560px);border-radius:12px 12px 0 0}
 .map-modal.is-narrow:not(.dir-collapsed) .map-attrib{bottom:calc(48% + 10px)}
-.map-modal.is-narrow.info-open.dir-collapsed .map-attrib{bottom:calc(min(62vh,560px) + 8px)}
+.map-modal.is-narrow.info-open .map-attrib{bottom:calc(min(62vh, 560px) + 12px);z-index:12}
 html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 `;
 
@@ -537,7 +547,10 @@ function renderDirectory() {
   if (!shell || !shell.list || !shell.poi) return;
   const copy = TEXT[shell.lang];
   shell.list.replaceChildren();
-  const rows = shell.poi.entries.filter((entry) => entryMatches(shell, entry));
+  const rows = shell.poi.entries.filter((entry) => entryMatches(shell, entry))
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => directoryRank(a.entry) - directoryRank(b.entry) || a.index - b.index)
+    .map((item) => item.entry);
   if (!rows.length) {
     const empty = document.createElement("li");
     empty.className = "map-meta";
@@ -552,7 +565,7 @@ function renderDirectory() {
     node.dataset.faqId = entry.faqId || "";
     node.dataset.spatial = entry.spatialStatus;
     const name = document.createElement("strong");
-    name.textContent = shell.lang === "ko" ? entry.nameKo : entry.nameZh;
+    name.textContent = displayTitle(entry, shell.lang);
     const meta = document.createElement("small");
     const badge = entry.spatialStatus === "mapped" ? "3D" : copy.textOnly;
     meta.textContent = `${badge} · ${catOf(entry, shell.lang)} · ${shell.lang === "ko" ? entry.nameZh : entry.nameKo}`;
@@ -647,6 +660,12 @@ function hideDetail() {
   layoutLabels();
 }
 
+function revealDetail(shell) {
+  shell.info.hidden = false;
+  shell.root.classList.add("info-open");
+  if (shell.root.classList.contains("is-narrow")) shell.root.classList.add("dir-collapsed");
+}
+
 function detailHeader(title, sub) {
   const head = document.createElement("div");
   head.className = "map-info-head";
@@ -674,8 +693,7 @@ function showUnlinked(building) {
   shell.detailEntries = null;
   shell.detailFocus = null;
   shell.detailBuilding = building;
-  shell.info.hidden = false;
-  shell.root.classList.add("info-open");
+  revealDetail(shell);
   shell.info.replaceChildren();
   const name = (building.tags && (building.tags.name || building.tags["name:ko"])) || ("OSM " + building.osmId);
   shell.info.appendChild(detailHeader(name, "OSM " + building.osmId));
@@ -710,8 +728,7 @@ function showDetail(entries, focus, building) {
   shell.detailEntries = list;
   shell.detailFocus = focus || list[0];
   shell.detailBuilding = building || null;
-  shell.info.hidden = false;
-  shell.root.classList.add("info-open");
+  revealDetail(shell);
   shell.info.replaceChildren();
   const focusEntry = shell.detailFocus;
   const design = isDesign(list);
@@ -855,8 +872,7 @@ function showDetail(entries, focus, building) {
     for (const link of entry.officialUrls || []) {
       if (!link || !link.url || seenUrl.has(link.url)) continue;
       seenUrl.add(link.url);
-      const label = lang === "ko" ? (link.labelKo || link.url) : (link.labelZh || link.url);
-      shell.info.appendChild(extLink(link.url, label, lang));
+      shell.info.appendChild(extLink(link.url, officialLinkLabel(link, entry, lang), lang));
     }
   }
   const faqIds = [];
@@ -864,7 +880,8 @@ function showDetail(entries, focus, building) {
     if (entry.faqId && /^F\d+$/.test(entry.faqId) && !faqIds.includes(entry.faqId)) faqIds.push(entry.faqId);
   }
   for (const id of faqIds) {
-    const faq = button(copy.viewFaq, "map-btn");
+    const faqEntry = list.find((entry) => entry.faqId === id) || { faqId: id };
+    const faq = button(faqButtonLabel(faqEntry, lang), "map-btn");
     faq.dataset.faqId = id;
     faq.addEventListener("click", () => openFaq(id));
     shell.info.appendChild(faq);
@@ -945,6 +962,13 @@ function disposeGL(shell, lost) {
       }
     });
   }
+  const seenTex = new Set();
+  for (const tex of shell.ownedTextures || []) {
+    if (tex && !seenTex.has(tex.uuid)) {
+      seenTex.add(tex.uuid);
+      tex.dispose();
+    }
+  }
   if (shell.renderer) {
     if (!lost) {
       try { shell.renderer.forceContextLoss(); } catch (e) { /* already lost */ }
@@ -955,222 +979,22 @@ function disposeGL(shell, lost) {
   shell.controls = null;
 }
 
-function extrudeGeometry(open, tris, y0, y1) {
-  const positions = [];
-  const push = (p, y) => positions.push(p[0], y, p[1]);
-  for (let t = 0; t < tris.length; t += 3) {
-    push(open[tris[t]], y1);
-    push(open[tris[t + 1]], y1);
-    push(open[tris[t + 2]], y1);
-  }
-  for (let t = 0; t < tris.length; t += 3) {
-    push(open[tris[t]], y0);
-    push(open[tris[t + 2]], y0);
-    push(open[tris[t + 1]], y0);
-  }
-  for (let i = 0; i < open.length; i++) {
-    const a = open[i];
-    const b = open[(i + 1) % open.length];
-    positions.push(a[0], y0, a[1], b[0], y0, b[1], b[0], y1, b[1]);
-    positions.push(a[0], y0, a[1], b[0], y1, b[1], a[0], y1, a[1]);
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geo.computeVertexNormals();
-  return geo;
-}
-
-function roofGeometry(open, tris, y) {
-  const thick = 0.7;
-  const positions = [];
-  const push = (p, yy) => positions.push(p[0], yy, p[1]);
-  for (let t = 0; t < tris.length; t += 3) {
-    push(open[tris[t]], y + thick);
-    push(open[tris[t + 1]], y + thick);
-    push(open[tris[t + 2]], y + thick);
-  }
-  for (let t = 0; t < tris.length; t += 3) {
-    push(open[tris[t]], y);
-    push(open[tris[t + 2]], y);
-    push(open[tris[t + 1]], y);
-  }
-  for (let i = 0; i < open.length; i++) {
-    const a = open[i];
-    const b = open[(i + 1) % open.length];
-    positions.push(a[0], y, a[1], b[0], y, b[1], b[0], y + thick, b[1]);
-    positions.push(a[0], y, a[1], b[0], y + thick, b[1], a[0], y + thick, a[1]);
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geo.computeVertexNormals();
-  return geo;
-}
-
-function trianglesOf(ring) {
-  const open = openRing(ring);
-  let tris = triangulateXZ(open);
-  if (tris.length < 3 && open.length >= 3) {
-    tris = [];
-    for (let i = 1; i < open.length - 1; i++) tris.push(0, i, i + 1);
-  }
-  return { open, tris };
-}
-
 function buildTerrain(shell) {
-  const terrain = shell.terrain;
-  const width = terrain.xM.length;
-  const height = terrain.zM.length;
-  const positions = new Float32Array(width * height * 3);
-  const heights = new Float32Array(width * height);
-  let p = 0;
-  let minY = Infinity;
-  let maxY = -Infinity;
-  for (let j = 0; j < height; j++) {
-    for (let i = 0; i < width; i++) {
-      const y = terrain.elevationsAboveMinM[j][i];
-      positions[p++] = terrain.xM[i];
-      positions[p++] = y;
-      positions[p++] = terrain.zM[j];
-      heights[j * width + i] = y;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
-    }
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geo.setIndex(terrainCellIndices(width, height));
-  geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(width * height * 3), 3));
-  geo.computeVertexNormals();
-  const mat = new THREE.MeshLambertMaterial({ vertexColors: true });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.receiveShadow = true;
-  shell.scene.add(mesh);
-  shell.terrainMesh = mesh;
-  shell.terrainRange = { minY, maxY, heights, width };
-  paintTerrain(shell);
-  const boundary = drapeBoundary(shell, shell.osm.campusBoundaryXZ);
-  if (boundary) shell.scene.add(boundary);
+  buildRealisticTerrain(shell);
 }
 
 function paintTerrain(shell) {
-  if (!shell.terrainMesh) return;
-  const { minY, maxY, heights } = shell.terrainRange;
-  const span = Math.max(1, maxY - minY);
-  const colors = shell.terrainMesh.geometry.attributes.color.array;
-  for (let i = 0; i < heights.length; i++) {
-    const tone = terrainColor((heights[i] - minY) / span, shell.theme);
-    colors[i * 3] = tone[0];
-    colors[i * 3 + 1] = tone[1];
-    colors[i * 3 + 2] = tone[2];
-  }
-  shell.terrainMesh.geometry.attributes.color.needsUpdate = true;
-  if (shell.boundary) shell.boundary.material.color.setHex(lightRig(shell.theme).boundary);
-}
-
-function drapeBoundary(shell, ring) {
-  if (!ring || ring.length < 2) return null;
-  const samples = [];
-  const pts = ring.map((p) => [p[0], p[1]]);
-  for (let i = 0; i < pts.length - 1; i++) {
-    const a = pts[i];
-    const b = pts[i + 1];
-    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    const steps = Math.max(1, Math.ceil(len / 2));
-    for (let s = 0; s < steps; s++) {
-      const u = s / steps;
-      const x = a[0] + (b[0] - a[0]) * u;
-      const z = a[1] + (b[1] - a[1]) * u;
-      samples.push(new THREE.Vector3(x, sampleTerrainY(shell.terrain, x, z) + 0.55, z));
-    }
-  }
-  if (samples.length < 2) return null;
-  const half = 0.85;
-  const positions = [];
-  for (let i = 0; i < samples.length; i++) {
-    const prev = samples[Math.max(0, i - 1)];
-    const next = samples[Math.min(samples.length - 1, i + 1)];
-    const tx = next.x - prev.x;
-    const tz = next.z - prev.z;
-    const mag = Math.hypot(tx, tz) || 1;
-    const px = (-tz / mag) * half;
-    const pz = (tx / mag) * half;
-    const point = samples[i];
-    positions.push(point.x - px, point.y, point.z - pz, point.x + px, point.y, point.z + pz);
-  }
-  const indices = [];
-  for (let i = 0; i < samples.length - 1; i++) {
-    const a = i * 2;
-    indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geo.setIndex(indices);
-  geo.computeVertexNormals();
-  const mat = new THREE.MeshBasicMaterial({ color: lightRig(shell.theme).boundary, side: THREE.DoubleSide });
-  const mesh = new THREE.Mesh(geo, mat);
-  shell.boundary = mesh;
-  return mesh;
+  repaintTerrainColors(shell);
+  applyAtmosphereTheme(shell);
 }
 
 function buildBuildings(shell) {
-  for (const building of shell.osm.buildings) {
-    const seat = measureFootprint(building.footprintXZ, shell.terrain);
-    const { open, tris } = trianglesOf(building.footprintXZ);
-    if (!open.length || tris.length < 3) continue;
-    const roofY = seat.baseY + SCHEMATIC_HEIGHT_M;
-    const skirtGeo = extrudeGeometry(open, tris, seat.skirtBottomY, seat.baseY);
-    const massGeo = extrudeGeometry(open, tris, seat.baseY, roofY - 0.05);
-    const capGeo = roofGeometry(open, tris, roofY - 0.05);
-    const entries = shell.byOsm.get(building.osmId) || [];
-    const kind = buildingKind(building.osmId, entries.length > 0);
-    const skirt = new THREE.Mesh(skirtGeo, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, flatShading: true }));
-    const mass = new THREE.Mesh(massGeo, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, flatShading: true }));
-    const roof = new THREE.Mesh(capGeo, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, flatShading: true }));
-    skirt.castShadow = true;
-    skirt.receiveShadow = true;
-    mass.castShadow = true;
-    mass.receiveShadow = true;
-    roof.castShadow = true;
-    roof.receiveShadow = true;
-    mass.userData.osmId = building.osmId;
-    roof.userData.osmId = building.osmId;
-    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(massGeo, 20), new THREE.LineBasicMaterial());
-    const group = new THREE.Group();
-    group.add(skirt, mass, roof, edges);
-    let beacon = null;
-    if (kind === "red") {
-      const pts = open.map((point) => new THREE.Vector3(point[0], roofY + 1.35, point[1]));
-      beacon = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xe03131 }));
-      group.add(beacon);
-    }
-    shell.scene.add(group);
-    const centroid = ringCentroid(open);
-    const record = {
-      osmId: building.osmId, building, entries, mapped: entries.length > 0, kind,
-      skirt, mass, roof, edge: edges, beacon, group, seat, centroid,
-    };
-    shell.buildings.push(record);
-    shell.pickables.push(mass, roof);
-  }
-  paintBuildings();
+  buildRealisticBuildings(shell);
 }
 
 function paintBuildings() {
-  const shell = session;
-  if (!shell) return;
-  for (const record of shell.buildings) {
-    const mode = record.osmId === shell.selectedId ? "selected" : record.osmId === shell.hoverId ? "hover" : "idle";
-    const tokens = paintTokens(record.kind, record.osmId, shell.theme, mode);
-    record.mass.material.color.setHex(tokens.mass);
-    record.mass.material.emissive.setHex(tokens.emissive);
-    record.mass.material.emissiveIntensity = tokens.emissiveIntensity;
-    record.roof.material.color.setHex(tokens.roof);
-    record.roof.material.emissive.setHex(tokens.emissive);
-    record.roof.material.emissiveIntensity = tokens.emissiveIntensity;
-    record.skirt.material.color.setHex(tokens.skirt);
-    record.edge.material.color.setHex(tokens.edge);
-    if (record.beacon) record.beacon.material.color.setHex(0xe03131);
-  }
+  if (!session) return;
+  paintRealisticBuildings(session);
 }
 
 function labelText(record, lang) {
@@ -1250,9 +1074,9 @@ function frameCampus() {
   for (const record of shell.buildings) box.expandByObject(record.group);
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
-  const radius = Math.max(size.x, size.z, 120) * 0.68;
-  shell.controls.target.copy(center);
-  shell.camera.position.set(center.x + radius * 0.08, center.y + radius * 0.62, center.z + radius);
+  const radius = Math.max(size.x, size.z, 180);
+  shell.controls.target.set(center.x - 8, center.y + 10, center.z - 16);
+  shell.camera.position.set(center.x + radius * 0.46, center.y + radius * 0.42, center.z + radius * 0.74);
   if (shell.sun) shell.sun.target.position.copy(center);
   shell.tween = null;
   poke();
@@ -1339,7 +1163,7 @@ function layoutLabels() {
   for (const record of shell.buildings) {
     const text = labelText(record, shell.lang);
     if (!text) continue;
-    const point = new THREE.Vector3(record.centroid.x, record.seat.baseY + SCHEMATIC_HEIGHT_M + 1.6, record.centroid.z);
+    const point = new THREE.Vector3(record.centroid.x, record.seat.baseY + SCHEMATIC_HEIGHT_M + 4.2, record.centroid.z);
     point.project(shell.camera);
     if (point.z > 1) continue;
     const size = measureLabel(text);
@@ -1464,16 +1288,17 @@ function applyThemeMaterials() {
   const shell = session;
   if (!shell || !shell.renderer) return;
   const rig = lightRig(shell.theme);
-  shell.renderer.setClearColor(skyColor(shell.theme), 1);
+  const dark = shell.theme === "dark";
   if (shell.hemi) {
-    shell.hemi.color.setHex(rig.hemi);
-    shell.hemi.groundColor.setHex(rig.hemiGround);
-    shell.hemi.intensity = rig.hemiIntensity;
+    shell.hemi.color.setHex(dark ? 0x9eb0c4 : 0xf4f7fb);
+    shell.hemi.groundColor.setHex(dark ? 0x1a201c : 0xa39880);
+    shell.hemi.intensity = dark ? 0.38 : 0.46;
   }
   if (shell.sun) {
     shell.sun.color.setHex(rig.sun);
-    shell.sun.intensity = rig.sunIntensity;
+    shell.sun.intensity = dark ? 0.95 : 1.7;
   }
+  applyAtmosphereTheme(shell);
   paintTerrain(shell);
   paintBuildings();
   poke();
@@ -1491,6 +1316,8 @@ function buildScene(shell) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, 1, 0.5, 5000);
   const controls = new OrbitControls(camera, shell.canvas);
@@ -1502,9 +1329,9 @@ function buildScene(shell) {
   controls.maxDistance = 1200;
   controls.target.set(0, 40, 0);
   const rig = lightRig(shell.theme);
-  const hemi = new THREE.HemisphereLight(rig.hemi, rig.hemiGround, rig.hemiIntensity);
-  const sun = new THREE.DirectionalLight(rig.sun, rig.sunIntensity);
-  sun.position.set(-180, 380, 140);
+  const hemi = new THREE.HemisphereLight(0xf4f7fb, 0xa39880, 0.55);
+  const sun = new THREE.DirectionalLight(rig.sun, 1.7);
+  sun.position.set(-260, 540, 280);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
   sun.shadow.camera.left = -520;
@@ -1525,8 +1352,14 @@ function buildScene(shell) {
   shell.canvas.hidden = false;
   shell.status.hidden = true;
   shell.fallback.hidden = true;
+  shell.ownedTextures = [];
+  shell.facadeMaterials = [];
+  shell.surfaceMaterials = [];
+  installAtmosphere(shell);
   buildTerrain(shell);
+  buildCampusLayers(shell);
   buildBuildings(shell);
+  applyThemeMaterials();
   bind(shell, controls, "start", () => { if (session) session.interacting = true; poke(); });
   bind(shell, controls, "end", () => { if (session) session.interacting = false; poke(); });
   bind(shell, controls, "change", poke);
@@ -1609,7 +1442,12 @@ export function debugSnapshot() {
     lowColor: at(lowI),
     highColor: at(highI),
     clear: session.renderer ? session.renderer.getClearColor(new THREE.Color()).getHexString() : "",
+    toneMapping: session.renderer && session.renderer.toneMapping === THREE.ACESFilmicToneMapping ? "ACESFilmic" : "",
+    trees: session.treeCount || 0,
+    roads: session.layerStats ? session.layerStats.roads : 0,
+    pbr: !!(session.terrainMesh && session.terrainMesh.material && session.terrainMesh.material.map),
     buildings: session.buildings.map((record) => ({
+      archetype: record.archetype || "",
       osmId: record.osmId,
       kind: record.kind,
       mass: record.mass.material.color.getHexString(),
@@ -1651,25 +1489,37 @@ export async function open(opts) {
   document.body.appendChild(shell.root);
   lockPage(true);
   bind(shell, window, "keydown", (event) => {
-    if (event.key === "Escape" && session && session.root === shell.root) {
-      event.preventDefault();
-      event.stopPropagation();
-      close();
+    if (event.key !== "Escape" || !session || session.root !== shell.root) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (session.license && !session.license.hidden) {
+      session.license.hidden = true;
+      const notice = session.attribBar && session.attribBar.querySelector(".map-notice-btn");
+      if (notice) notice.setAttribute("aria-expanded", "false");
+      layoutLabels();
+      return;
     }
+    if (session.info && !session.info.hidden) {
+      hideDetail();
+      return;
+    }
+    close();
   }, true);
   bind(shell, window, "resize", resize);
   bind(shell, document, "fullscreenchange", () => { if (session) paintChrome(session); });
   mountDirectory(shell);
   try {
-    const [osm, terrain, poi] = await Promise.all([
+    const [osm, terrain, poi, layers] = await Promise.all([
       fetchJson("osm-buildings.json"),
       fetchJson("campus-terrain.json"),
       fetchJson("campus-poi-directory.json"),
+      fetchJson("osm-campus-layers.json"),
     ]);
     if (gen !== bootGen || session !== shell) return;
     shell.osm = osm;
     shell.terrain = terrain;
     shell.poi = poi;
+    shell.layers = layers;
     shell.byOsm = indexEntries(poi);
     renderDirectory();
     if (!probeWebGL2()) {

@@ -1472,8 +1472,8 @@ function suggestedFaqs(query, lang, limit) {
   }
   function linkify(s) {
     const escaped = escapeHtml(s);
-    return escaped.replace(/https?:\/\/[^\s<]+/g, (url) => {
-      const clean = url.replace(/[),.，。]+$/, "");
+    return escaped.replace(/https?:\/\/[A-Za-z0-9][A-Za-z0-9\-._~:/?#\[\]@!$&'*+,;=%]*/g, (url) => {
+      const clean = url.replace(/[),.;:!?]+$/, "");
       const trail = url.slice(clean.length);
       const href = escapeHtml(clean);
       const icon = '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M4.2 2.1H2.3a1.1 1.1 0 0 0-1.1 1.1v6.4a1.1 1.1 0 0 0 1.1 1.1h6.4a1.1 1.1 0 0 0 1.1-1.1V7.7M6.5 1.3h4.2V5.5M10.5 1.5 5.2 6.8"/></svg>';
@@ -1486,10 +1486,10 @@ function suggestedFaqs(query, lang, limit) {
     const parts = String(source).split(/\s*;\s*/).map(s => s.trim()).filter(Boolean);
     const links = [];
     for (const part of parts) {
-      const m = part.match(/^(.*?)(https?:\/\/\S+)\s*$/);
+      const m = part.match(/^(.*?)(https?:\/\/[A-Za-z0-9][A-Za-z0-9\-._~:/?#\[\]@!$&'*+,;=%]*)/);
       if (m) {
         let title = m[1].trim().replace(/[：:]\s*$/, "");
-        const url = m[2].replace(/[),.，。]+$/, "");
+        const url = m[2].replace(/[),.;:!?]+$/, "");
         if (!title) title = url.replace(/^https?:\/\//, "").split("/")[0];
         links.push(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a><span class="ext-official">${escapeHtml(t("ext_official"))}</span>`);
       } else {

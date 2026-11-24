@@ -43,6 +43,7 @@ test("initial load stays local and does not fetch the map bundle", async ({ page
   expect(seen.urls.some((url) => url.includes("osm-buildings.json"))).toBe(false);
   expect(seen.urls.some((url) => url.includes("campus-terrain.json"))).toBe(false);
   expect(seen.urls.some((url) => url.includes("campus-poi-directory.json"))).toBe(false);
+  expect(seen.urls.some((url) => url.includes("osm-campus-layers.json"))).toBe(false);
   expect(seen.urls.filter((url) => EXTERNAL.test(url))).toEqual([]);
   expect(seen.errors).toEqual([]);
 });
@@ -170,6 +171,7 @@ for (const viewport of [
       expect(await page.locator(".map-modal img").count()).toBe(0);
       await page.locator(".map-notice-btn").click();
       await expect(page.locator(".map-license")).toBeHidden();
+      expect(seen.urls.some((url) => url.includes("osm-campus-layers.json"))).toBe(true);
       expect(seen.errors).toEqual([]);
       await page.locator(".map-toolbar [data-map-action='close']").click();
       await expect(modal).toHaveCount(0);
@@ -188,7 +190,7 @@ test("building, FAQ, directory, favorites, theme, and language stay in sync", as
   await page.locator(".map-faq-btn").click();
   await expect(page.locator(".map-modal")).toBeVisible();
   await expect(page.locator(".map-info")).toContainText("本馆", { timeout: 20000 });
-  await page.locator(".map-info").getByRole("button", { name: "查看相关 FAQ" }).click();
+  await page.locator(".map-info").getByRole("button", { name: "FAQ：本馆" }).click();
   await expect(page.locator(".map-modal")).toHaveCount(0);
   await expect(page.locator("#thread .card").last()).toContainText("本馆");
 
@@ -203,7 +205,7 @@ test("building, FAQ, directory, favorites, theme, and language stay in sync", as
 
   await page.locator(".map-search").fill("");
   await page.locator(".map-filters").getByRole("button", { name: "宿舍" }).click();
-  await expect(page.locator(".map-list")).toContainText("第一汉马馆");
+  await expect(page.locator(".map-list")).toContainText("第一汉马生活馆");
   await expect(page.locator(".map-list")).not.toContainText("本馆");
   await page.locator(".map-filters").getByRole("button", { name: "全部" }).click();
   await page.locator(".map-search").fill("");
@@ -317,10 +319,16 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[2]);
   const red = snap.buildings.find((item) => item.osmId === 1062073167);
   expect(red.kind).toBe("red");
-  expect(red.roof).toBe("ef4444");
+  expect(red.archetype).toBe("crimson");
+  expect(red.roof).toBe("3a1818");
   expect(red.mass).toBe("c92a2a");
-  expect(red.edge).toBe("e03131");
+  expect(red.edge).toBe("c92a2a");
   expect(red.beacon).toBe(true);
+  expect(snap.pbr).toBe(true);
+  expect(snap.toneMapping).toBe("ACESFilmic");
+  expect(snap.roads).toBe(81);
+  expect(snap.trees).toBeGreaterThanOrEqual(350);
+  expect(snap.trees).toBeLessThanOrEqual(550);
   const oldMuseum = snap.buildings.find((item) => item.osmId === 1061923278);
   expect(oldMuseum.kind).toBe("neutral");
   expect(oldMuseum.roof).not.toBe("ef4444");
@@ -379,7 +387,106 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   expect(dark.chroma).toBeGreaterThan(0.08);
   const redDark = dark.buildings.find((item) => item.osmId === 1062073167);
   expect(redDark.mass).toBe("c92a2a");
-  expect(redDark.roof === "ef4444" || redDark.roof === "ff5c5c").toBe(true);
+  expect(redDark.roof).toBe("3a1818");
+  expect(redDark.edge).toBe("c92a2a");
   expect(seen.errors).toEqual([]);
   expect(seen.urls.filter((url) => EXTERNAL.test(url))).toEqual([]);
+});
+
+function boxGap(a, b) {
+  if (!a || !b) return 0;
+  const dx = Math.max(0, Math.max(b.x - (a.x + a.width), a.x - (b.x + b.width)));
+  const dy = Math.max(0, Math.max(b.y - (a.y + a.height), a.y - (b.y + b.height)));
+  if (dx === 0 && dy === 0) return 0;
+  if (dx === 0) return dy;
+  if (dy === 0) return dx;
+  return Math.hypot(dx, dy);
+}
+
+test("mobile detail drawer does not cover the attribution bar", async ({ page }) => {
+  test.setTimeout(90000);
+  const seen = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await expect(page.locator(".map-modal")).not.toHaveClass(/dir-collapsed/);
+  await page.locator(".map-intl-banner").click();
+  await expect(page.locator(".map-modal")).toHaveClass(/dir-collapsed/);
+  await expect(page.locator(".map-info")).toBeVisible();
+  const openGap = boxGap(await page.locator(".map-attrib").boundingBox(), await page.locator(".map-info").boundingBox());
+  expect(openGap).toBeGreaterThan(0);
+  await page.locator(".map-detail-close").click();
+  await expect(page.locator(".map-info")).toBeHidden();
+  await page.locator(".map-pill.is-red").click();
+  await expect(page.locator(".map-info")).toContainText("设计馆");
+  const again = boxGap(await page.locator(".map-attrib").boundingBox(), await page.locator(".map-info").boundingBox());
+  expect(again).toBeGreaterThan(0);
+  expect(seen.errors).toEqual([]);
+});
+
+test("iPad detail card keeps clearance from the attribution bar", async ({ page }) => {
+  test.setTimeout(90000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-list button[data-faq-id='F49']").click();
+  await expect(page.locator(".map-info")).toBeVisible();
+  const gap = boxGap(await page.locator(".map-attrib").boundingBox(), await page.locator(".map-info").boundingBox());
+  expect(gap).toBeGreaterThanOrEqual(10);
+});
+
+test("escape closes the license, then the detail, then the map", async ({ page }) => {
+  test.setTimeout(90000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-notice-btn").click();
+  await expect(page.locator(".map-license")).toBeVisible();
+  const pad = await page.locator(".map-license").evaluate((el) => parseFloat(getComputedStyle(el).paddingBottom));
+  expect(pad).toBeGreaterThanOrEqual(24);
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".map-license")).toBeHidden();
+  await expect(page.locator(".map-modal")).toBeVisible();
+  await page.locator(".map-pill.is-red").click();
+  await expect(page.locator(".map-info")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".map-info")).toBeHidden();
+  await expect(page.locator(".map-modal")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".map-modal")).toHaveCount(0);
+});
+
+test("directory leads with a place name and detail actions stay distinct", async ({ page }) => {
+  test.setTimeout(90000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await openMap(page);
+  await expect(page.locator(".map-notice-btn")).toHaveText("Copernicus · 数据来源与许可");
+  const first = page.locator(".map-list button").first();
+  await expect(first).toContainText("本馆");
+  await expect(first).not.toContainText("学校地址和总机电话是多少");
+  await page.locator(".map-search").fill("总机");
+  await expect(page.locator(".map-list")).toContainText("庆南大学（地址与总机）");
+  await page.locator(".map-search").fill("");
+  await page.locator(".map-pill.is-red").click();
+  await expect(page.locator(".map-info").getByRole("button", { name: "FAQ：设计馆" })).toBeVisible();
+  await expect(page.locator(".map-info").getByRole("button", { name: "FAQ：留学生服务中心" })).toBeVisible();
+  const labels = await page.locator(".map-info .map-ext-link").allTextContents();
+  expect(labels.length).toBeGreaterThan(0);
+  expect(labels.every((label) => label === "官方说明")).toBe(false);
+});
+
+test("student system answer keeps a clean sugang host", async ({ page }) => {
+  await silenceAi(page);
+  await page.goto("/");
+  await ask(page, "怎么登录学生信息系统？");
+  const link = page.locator("#thread .card").last().locator("a[href*='sugang.kyungnam.ac.kr']");
+  await expect(link).toHaveAttribute("href", "https://sugang.kyungnam.ac.kr");
+  const href = await link.getAttribute("href");
+  expect(href).not.toContain("xn--");
 });
