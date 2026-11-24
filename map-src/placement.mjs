@@ -131,6 +131,11 @@ function barycentric(ax, az, bx, bz, cx, cz, px, pz) {
   return { u, v, w: 1 - u - v };
 }
 
+/** Height in metres on the Copernicus grid. Alias used by draped campus layers. */
+export function getElevationAt(terrain, x, z) {
+  return sampleTerrainY(terrain, x, z);
+}
+
 /**
  * Piecewise-linear height on the fixed NW-SE mesh.
  * Cell (j, i): a=(j,i), b=(j,i+1), c=(j+1,i), d=(j+1,i+1).
