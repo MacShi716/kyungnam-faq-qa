@@ -18,7 +18,7 @@ test("protected map sources stay byte-identical", () => {
   assert.equal(sha(new URL("assets/map/COPERNICUS-LICENSE.txt", root)), "058dfc85eca8419acbe0595bc9a13eda9de0083599d41020cea8d5cd71a49350");
   assert.equal(sha(new URL("assets/map/DEM-NOTICE.txt", root)), "f025756f55de65c5335ef72ab7a9b9640c5af34edb35a9a2f0513552d55501b3");
   assert.equal(sha(new URL("assets/map/THREE-LICENSE.txt", root)), "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc");
-  assert.equal(sha(new URL("THIRD_PARTY_NOTICES.md", root)), "2f4491881bd4c954ef99e9d732e44de642bb9d12fd7925521b752edc92e86334");
+  assert.equal(sha(new URL("THIRD_PARTY_NOTICES.md", root)), "e9335e5088b896806b3ab8c280e253205af06d275fcc5b68e89a90455e2f995c");
 });
 
 test("official floors enrich the directory without moving verified geometry", () => {

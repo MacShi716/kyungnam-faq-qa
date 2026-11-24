@@ -299,6 +299,11 @@ function stdMat(shell, params) {
     metalness: 0.02,
     envMapIntensity: 0.42,
     ...params,
+    transparent: false,
+    opacity: 1,
+    depthWrite: true,
+    depthTest: true,
+    side: THREE.FrontSide,
   });
   shell.facadeMaterials.push(mat);
   return mat;
@@ -414,25 +419,40 @@ function pushTri(buf, ax, ay, az, bx, by, bz, cx, cy, cz, au, av, bu, bv, cu, cv
   buf.uv.push(au, av, bu, bv, cu, cv);
 }
 
-function addWall(buf, a, b, y0, y1, inwardX, inwardZ) {
+function emptyBuf() {
+  return { pos: [], nrm: [], uv: [] };
+}
+
+function orientCCW(open) {
+  if (signedArea(open) < 0) return open.slice().reverse();
+  return open.slice();
+}
+
+/**
+ * Face the wall along (faceX, faceZ).
+ * A single vertex-to-centroid "inward" vector points the wrong way on later
+ * edges of the same ring, and FrontSide culling then drops those façades.
+ */
+function addWall(buf, a, b, y0, y1, faceX, faceZ) {
   const dx = b[0] - a[0];
   const dz = b[1] - a[1];
   const len = Math.hypot(dx, dz);
+  if (len < 1e-4 || !(y1 > y0)) return;
+  const yH = y1 - y0;
   const leftX = -dz;
   const leftZ = dx;
-  const leftIsOutward = leftX * inwardX + leftZ * inwardZ < 0;
-  const yH = y1 - y0;
-  const a0 = [a[0], y0, a[1]];
-  const b0 = [b[0], y0, b[1]];
-  const b1 = [b[0], y1, b[1]];
-  const a1 = [a[0], y1, a[1]];
-  if (leftIsOutward) {
-    pushTri(buf, a0[0], a0[1], a0[2], b0[0], b0[1], b0[2], b1[0], b1[1], b1[2], 0, 0, len, 0, len, yH);
-    pushTri(buf, a0[0], a0[1], a0[2], b1[0], b1[1], b1[2], a1[0], a1[1], a1[2], 0, 0, len, yH, 0, yH);
+  const useLeft = leftX * faceX + leftZ * faceZ > 0;
+  if (useLeft) {
+    pushTri(buf, a[0], y0, a[1], b[0], y0, b[1], b[0], y1, b[1], 0, 0, len, 0, len, yH);
+    pushTri(buf, a[0], y0, a[1], b[0], y1, b[1], a[0], y1, a[1], 0, 0, len, yH, 0, yH);
   } else {
-    pushTri(buf, a0[0], a0[1], a0[2], b1[0], b1[1], b1[2], b0[0], b0[1], b0[2], 0, 0, len, yH, len, 0);
-    pushTri(buf, a0[0], a0[1], a0[2], a1[0], a1[1], a1[2], b1[0], b1[1], b1[2], 0, 0, 0, yH, len, yH);
+    pushTri(buf, a[0], y0, a[1], b[0], y1, b[1], b[0], y0, b[1], 0, 0, len, yH, len, 0);
+    pushTri(buf, a[0], y0, a[1], a[0], y1, a[1], b[0], y1, b[1], 0, 0, 0, yH, len, yH);
   }
+}
+
+function horizontalNy(a, b, c) {
+  return (b[1] - a[1]) * (c[0] - a[0]) - (b[0] - a[0]) * (c[1] - a[1]);
 }
 
 function addCap(buf, open, tris, y, insetUV) {
@@ -440,8 +460,74 @@ function addCap(buf, open, tris, y, insetUV) {
     const a = open[tris[t]];
     const b = open[tris[t + 1]];
     const c = open[tris[t + 2]];
-    pushTri(buf, a[0], y, a[1], c[0], y, c[1], b[0], y, b[1], a[0] * insetUV, a[1] * insetUV, c[0] * insetUV, c[1] * insetUV, b[0] * insetUV, b[1] * insetUV);
+    const up = horizontalNy(a, b, c) >= 0;
+    const u = insetUV;
+    if (up) {
+      pushTri(buf, a[0], y, a[1], b[0], y, b[1], c[0], y, c[1], a[0] * u, a[1] * u, b[0] * u, b[1] * u, c[0] * u, c[1] * u);
+    } else {
+      pushTri(buf, a[0], y, a[1], c[0], y, c[1], b[0], y, b[1], a[0] * u, a[1] * u, c[0] * u, c[1] * u, b[0] * u, b[1] * u);
+    }
   }
+}
+
+function addUpQuad(buf, a, b, c, d, y) {
+  const up = horizontalNy(a, b, c) >= 0;
+  const u = 0.2;
+  if (up) {
+    pushTri(buf, a[0], y, a[1], b[0], y, b[1], c[0], y, c[1], a[0] * u, a[1] * u, b[0] * u, b[1] * u, c[0] * u, c[1] * u);
+    pushTri(buf, a[0], y, a[1], c[0], y, c[1], d[0], y, d[1], a[0] * u, a[1] * u, c[0] * u, c[1] * u, d[0] * u, d[1] * u);
+  } else {
+    pushTri(buf, a[0], y, a[1], c[0], y, c[1], b[0], y, b[1], a[0] * u, a[1] * u, c[0] * u, c[1] * u, b[0] * u, b[1] * u);
+    pushTri(buf, a[0], y, a[1], d[0], y, d[1], c[0], y, c[1], a[0] * u, a[1] * u, d[0] * u, d[1] * u, c[0] * u, c[1] * u);
+  }
+}
+
+export function footprintShell(ring, levels) {
+  const open = orientCCW(openRing(ring));
+  const baseY = levels.baseY;
+  const roofY = levels.roofY;
+  const skirtBottomY = levels.skirtBottomY;
+  const walls = emptyBuf();
+  const skirt = emptyBuf();
+  const parapetOuter = emptyBuf();
+  const parapetInner = emptyBuf();
+  const parapetTop = emptyBuf();
+  const gravel = emptyBuf();
+  for (let i = 0; i < open.length; i++) {
+    const a = open[i];
+    const b = open[(i + 1) % open.length];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const outX = dz;
+    const outZ = -dx;
+    addWall(walls, a, b, baseY, roofY, outX, outZ);
+    addWall(skirt, a, b, skirtBottomY, baseY + 0.05, outX, outZ);
+    addWall(parapetOuter, a, b, roofY, roofY + 0.9, outX, outZ);
+  }
+  const inner = insetRing(open, 0.75);
+  const innerTris = triangulateXZ(inner);
+  for (let i = 0; i < inner.length; i++) {
+    const a = inner[i];
+    const b = inner[(i + 1) % inner.length];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    addWall(parapetInner, a, b, roofY, roofY + 0.9, -dz, dx);
+    addUpQuad(parapetTop, open[i], open[(i + 1) % open.length], b, a, roofY + 0.9);
+  }
+  const tris = triangulateXZ(open);
+  if (innerTris.length >= 3) addCap(gravel, inner, innerTris, roofY + 0.08, 0.2);
+  else if (tris.length >= 3) addCap(gravel, open, tris, roofY + 0.08, 0.2);
+  return { open, inner, walls, skirt, parapetOuter, parapetInner, parapetTop, gravel };
+}
+
+function concatBufs(parts) {
+  const out = emptyBuf();
+  for (const part of parts) {
+    for (let i = 0; i < part.pos.length; i++) out.pos.push(part.pos[i]);
+    for (let i = 0; i < part.nrm.length; i++) out.nrm.push(part.nrm[i]);
+    for (let i = 0; i < part.uv.length; i++) out.uv.push(part.uv[i]);
+  }
+  return out;
 }
 
 function geoFrom(buf) {
@@ -836,44 +922,19 @@ export function buildRealisticBuildings(shell) {
   const gravelTex = trackOwned(shell, canvasTexture(paintGravel(), THREE.SRGBColorSpace, 0.25, 0.25));
   for (const building of shell.osm.buildings) {
     const seat = measureFootprint(building.footprintXZ, shell.terrain);
-    const open = openRing(building.footprintXZ);
-    const tris = triangulateXZ(open);
-    if (open.length < 3 || tris.length < 3) continue;
+    const roofY = seat.baseY + SCHEMATIC_HEIGHT_M;
+    const built = footprintShell(building.footprintXZ, {
+      baseY: seat.baseY,
+      roofY,
+      skirtBottomY: seat.skirtBottomY,
+    });
+    const open = built.open;
+    if (open.length < 3 || built.walls.pos.length < 9) continue;
     const entries = shell.byOsm.get(building.osmId) || [];
     const kind = buildingKind(building.osmId, entries.length > 0);
     const archetype = archetypeFor(building.osmId, kind);
     const spec = ARCHETYPE_COLOR[archetype];
-    const roofY = seat.baseY + SCHEMATIC_HEIGHT_M;
     const centroid = ringCentroid(open);
-    const inwardX = centroid.x - open[0][0];
-    const inwardZ = centroid.z - open[0][1];
-    const walls = { pos: [], nrm: [], uv: [] };
-    const skirt = { pos: [], nrm: [], uv: [] };
-    const parapet = { pos: [], nrm: [], uv: [] };
-    for (let i = 0; i < open.length; i++) {
-      const a = open[i];
-      const b = open[(i + 1) % open.length];
-      addWall(walls, a, b, seat.baseY, roofY, inwardX, inwardZ);
-      addWall(skirt, a, b, seat.skirtBottomY, seat.baseY + 0.05, inwardX, inwardZ);
-      addWall(parapet, a, b, roofY, roofY + 0.9, inwardX, inwardZ);
-    }
-    const inner = insetRing(open, 0.75);
-    const innerTris = triangulateXZ(inner);
-    for (let i = 0; i < inner.length; i++) {
-      const a = inner[i];
-      const b = inner[(i + 1) % inner.length];
-      addWall(parapet, a, b, roofY, roofY + 0.9, centroid.x - a[0], centroid.z - a[1]);
-      const dx = b[0] - a[0];
-      const dz = b[1] - a[1];
-      const len = Math.hypot(dx, dz);
-      const ox = open[i];
-      const oy = open[(i + 1) % open.length];
-      pushTri(parapet, ox[0], roofY + 0.9, ox[1], oy[0], roofY + 0.9, oy[1], b[0], roofY + 0.9, b[1], 0, 0, len, 0, len, 0.75);
-      pushTri(parapet, ox[0], roofY + 0.9, ox[1], b[0], roofY + 0.9, b[1], a[0], roofY + 0.9, a[1], 0, 0, len, 0.75, 0, 0.75);
-    }
-    const gravel = { pos: [], nrm: [], uv: [] };
-    if (innerTris.length >= 3) addCap(gravel, inner, innerTris, roofY + 0.08, 0.2);
-    else addCap(gravel, open, tris, roofY + 0.08, 0.2);
     const facade = makeFacadeMaterial(shell, archetype);
     const skirtMat = stdMat(shell, { color: spec.skirt, roughness: 0.96, metalness: 0 });
     const parapetMat = stdMat(shell, { color: spec.roof, roughness: 0.78, metalness: 0.05 });
@@ -883,23 +944,26 @@ export function buildRealisticBuildings(shell) {
       roughness: 0.92,
       metalness: 0.02,
     });
-    const mass = new THREE.Mesh(geoFrom(walls), facade);
-    const skirtMesh = new THREE.Mesh(geoFrom(skirt), skirtMat);
+    const parapet = concatBufs([built.parapetOuter, built.parapetInner, built.parapetTop]);
+    const mass = new THREE.Mesh(geoFrom(built.walls), facade);
+    const skirtMesh = new THREE.Mesh(geoFrom(built.skirt), skirtMat);
     const roof = new THREE.Mesh(geoFrom(parapet), parapetMat);
-    const gravelMesh = new THREE.Mesh(geoFrom(gravel), gravelMat);
+    const gravelMesh = built.gravel.pos.length >= 9 ? new THREE.Mesh(geoFrom(built.gravel), gravelMat) : null;
     const edges = new THREE.LineSegments(
       new THREE.EdgesGeometry(mass.geometry, 28),
       new THREE.LineBasicMaterial({ color: spec.edge, transparent: true, opacity: archetype === "crimson" ? 0.55 : 0.16 }),
     );
     for (const mesh of [mass, skirtMesh, roof, gravelMesh]) {
+      if (!mesh) continue;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
     }
     mass.userData.osmId = building.osmId;
     roof.userData.osmId = building.osmId;
-    gravelMesh.userData.osmId = building.osmId;
+    if (gravelMesh) gravelMesh.userData.osmId = building.osmId;
     const group = new THREE.Group();
-    group.add(skirtMesh, mass, gravelMesh, roof, edges);
+    group.add(skirtMesh, mass, roof, edges);
+    if (gravelMesh) group.add(gravelMesh);
     const area = Math.abs(signedArea(open));
     if (area > 220) {
       const mech = stdMat(shell, { color: 0x6d6962, roughness: 0.7, metalness: 0.22 });
@@ -962,10 +1026,12 @@ export function buildRealisticBuildings(shell) {
       group,
       seat,
       centroid,
+      ring: open,
       facades: [facade],
     };
     shell.buildings.push(record);
-    shell.pickables.push(mass, roof, gravelMesh);
+    shell.pickables.push(mass, roof);
+    if (gravelMesh) shell.pickables.push(gravelMesh);
   }
   paintRealisticBuildings(shell);
 }
