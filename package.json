@@ -1,11 +1,14 @@
 {
   "private": true,
   "scripts": {
-    "test": "node --test tests/retrieve.test.mjs",
+    "build:map": "node scripts/build-map.mjs",
+    "test": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs",
     "test:browser": "playwright test",
-    "test:all": "node --test tests/retrieve.test.mjs && playwright test"
+    "test:all": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs && playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "1.49.1"
+    "@playwright/test": "1.49.1",
+    "esbuild": "0.25.0",
+    "three": "0.187.0"
   }
 }
