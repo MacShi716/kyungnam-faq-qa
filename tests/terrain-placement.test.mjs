@@ -27,8 +27,8 @@ test("source files stay isolated", () => {
   assert.equal(osm.buildings.length, 25);
   assert.equal(terrain.width, 32);
   assert.equal(terrain.height, 36);
-  assert.equal(poi.entries.length, 46);
-  assert.equal(poi.entries.filter((e) => e.osmBuildingIds.length).length, 16);
+  assert.equal(poi.entries.length, 51);
+  assert.equal(poi.entries.filter((e) => e.osmBuildingIds.length).length, 19);
 });
 
 test("terrain mesh uses NW-SE triangles and relative elevations", () => {

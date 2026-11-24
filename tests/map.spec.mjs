@@ -71,8 +71,8 @@ test("map questions stay on the local FAQ and buildings stay specific", async ({
     ["正门", "正门"],
     ["本馆", "本馆"],
     ["图书馆", "图书馆"],
-    ["留学生服务中心", "团队确认，请以现场或官网指引为准"],
-    ["国际处", "团队确认，请以现场或官网指引为准"],
+    ["留学生服务中心", "请以现场或官网最新指引为准"],
+    ["国际处", "请以现场或官网最新指引为准"],
   ];
   for (const [query, snippet] of exact) {
     await ask(page, query);
@@ -83,15 +83,18 @@ test("map questions stay on the local FAQ and buildings stay specific", async ({
   }
   await page.locator("#btn-ko").click();
   await ask(page, "유학생서비스센터");
-  await expect(page.locator("#thread .card").last()).toContainText("팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요");
+  await expect(page.locator("#thread .card").last()).toContainText("현장 또는 학교 공식 최신 안내 기준 확인 필요");
+  await expect(page.locator("#thread .card").last()).toContainText("ko/6382");
   await page.locator("#btn-clear").click();
   await ask(page, "국제처 어디예요?");
-  await expect(page.locator("#thread .card").last()).toContainText("팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요");
+  await expect(page.locator("#thread .card").last()).toContainText("현장 또는 학교 공식 최신 안내 기준 확인 필요");
+  await expect(page.locator("#thread .card").last()).toContainText("ko/6382");
   expect(posts).toEqual([]);
 });
 
 for (const viewport of [
   { name: "desktop", width: 1280, height: 800 },
+  { name: "ipad", width: 1024, height: 768 },
   { name: "mobile", width: 390, height: 844 },
 ]) {
   test.describe(`map viewport ${viewport.name}`, () => {
@@ -124,13 +127,49 @@ for (const viewport of [
         return buf.reduce((sum, value) => sum + value, 0);
       });
       expect(pixels).toBeGreaterThan(0);
-      await expect(page.locator(".map-osm-link")).toBeVisible();
-      await expect(page.locator(".map-osm-link")).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
-      await expect(page.locator(".map-osm-link")).toHaveAttribute("target", "_blank");
-      await expect(page.locator(".map-osm-link")).toHaveAttribute("rel", /noopener/);
-      await expect(page.locator(".map-attrib")).toContainText(LEGAL);
-      await expect(page.locator(".map-attrib")).toContainText(LIABILITY);
+      await expect(page.locator(".map-attrib-bar .map-osm-link")).toBeVisible();
+      await expect(page.locator(".map-attrib-bar .map-osm-link")).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
+      await expect(page.locator(".map-attrib-bar .map-osm-link")).toHaveAttribute("target", "_blank");
+      await expect(page.locator(".map-attrib-bar .map-osm-link")).toHaveAttribute("rel", /noopener/);
+      await expect(page.locator(".map-license")).toBeHidden();
+      const bar = await page.locator(".map-attrib-bar").boundingBox();
+      expect(bar.height).toBeGreaterThanOrEqual(28);
+      expect(bar.height).toBeLessThanOrEqual(36);
+      expect(bar.x).toBeLessThan(24);
+      expect(bar.y).toBeGreaterThan(viewport.height - 90);
+      expect(bar.x + bar.width).toBeLessThanOrEqual(viewport.width - 8);
+      expect(bar.y + bar.height).toBeLessThanOrEqual(viewport.height - 4);
+      const coversCenter = bar.x < viewport.width * 0.42
+        && bar.x + bar.width > viewport.width * 0.58
+        && bar.y < viewport.height * 0.62
+        && bar.y + bar.height > viewport.height * 0.38;
+      expect(coversCenter).toBe(false);
+      const mounted = await page.evaluate(() => {
+        const root = document.querySelector(".map-modal");
+        const attrib = document.querySelector(".map-attrib");
+        return !!(root && attrib && root.contains(attrib));
+      });
+      expect(mounted).toBe(true);
+      await page.locator(".map-notice-btn").click();
+      await expect(page.locator(".map-license")).toBeVisible();
+      await expect(page.locator(".map-license")).toContainText(LEGAL);
+      await expect(page.locator(".map-license")).toContainText(LIABILITY);
+      await expect(page.locator(".map-odbl-link")).toHaveAttribute("href", "https://opendatacommons.org/licenses/odbl/1-0/");
+      await expect(page.locator(".map-license")).toContainText("모식도");
+      await expect(page.locator(".map-license")).toContainText("示意图");
+      const pop = await page.locator(".map-license").boundingBox();
+      expect(pop.x).toBeGreaterThanOrEqual(-1);
+      expect(pop.y).toBeGreaterThanOrEqual(-1);
+      expect(pop.x + pop.width).toBeLessThanOrEqual(viewport.width + 1);
+      expect(pop.y + pop.height).toBeLessThanOrEqual(viewport.height + 1);
+      const openOverflow = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollWidth,
+        client: document.documentElement.clientWidth,
+      }));
+      expect(openOverflow.scroll).toBeLessThanOrEqual(openOverflow.client + 1);
       expect(await page.locator(".map-modal img").count()).toBe(0);
+      await page.locator(".map-notice-btn").click();
+      await expect(page.locator(".map-license")).toBeHidden();
       expect(seen.errors).toEqual([]);
       await page.locator(".map-toolbar [data-map-action='close']").click();
       await expect(modal).toHaveCount(0);
@@ -202,8 +241,10 @@ test("building, FAQ, directory, favorites, theme, and language stay in sync", as
   await expect(page.locator(".map-toolbar [data-map-action='reset']")).toHaveText("전체 보기");
   await expect(page.locator(".map-toolbar [data-map-action='north']")).toHaveText("정북");
   await expect(page.locator(".map-privacy")).toContainText("개인정보는 입력하지 마세요");
+  await page.locator(".map-notice-btn").click();
   await expect(page.locator(".map-summary")).toContainText("Copernicus WorldDEM-30");
   await expect(page.locator(".map-schematic")).toContainText("모식도");
+  await page.locator(".map-notice-btn").click();
   await page.locator("#btn-zh").evaluate((el) => el.click());
   await page.locator("#theme-switch").evaluate((el) => el.click());
   await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "light");
@@ -238,7 +279,7 @@ test("missing WebGL shows the directory and official map link", async ({ page })
   await expect(page.locator(".map-fallback")).toContainText("无法显示 3D");
   await expect(page.locator(".map-search")).toBeVisible();
   await expect(page.locator(".map-attrib a[href*='inews.kyungnam.ac.kr']")).toHaveAttribute("target", "_blank");
-  await expect(page.locator(".map-osm-link")).toBeVisible();
+      await expect(page.locator(".map-attrib-bar .map-osm-link")).toBeVisible();
   expect(seen.errors).toEqual([]);
 });
 
@@ -260,4 +301,85 @@ test("blocked storage does not crash the page or the map", async ({ page }) => {
   await expect(page.locator(".map-modal")).toBeVisible();
   await page.locator(".map-clear").click();
   expect(seen.errors.filter((line) => !line.includes("storage blocked"))).toEqual([]);
+});
+
+test("colored hillside, red hubs, on-map labels, and floor search", async ({ page }) => {
+  test.setTimeout(120000);
+  const seen = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+  await openMap(page);
+  const snap = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(snap.chroma).toBeGreaterThan(0.12);
+  expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[0]);
+  expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[2]);
+  const red = snap.buildings.find((item) => item.osmId === 1062073167);
+  expect(red.kind).toBe("red");
+  expect(red.roof).toBe("ef4444");
+  expect(red.mass).toBe("c92a2a");
+  expect(red.edge).toBe("e03131");
+  expect(red.beacon).toBe(true);
+  const oldMuseum = snap.buildings.find((item) => item.osmId === 1061923278);
+  expect(oldMuseum.kind).toBe("neutral");
+  expect(oldMuseum.roof).not.toBe("ef4444");
+  expect(oldMuseum.mass).not.toBe("c92a2a");
+  const mapped = snap.buildings.filter((item) => item.kind === "mapped");
+  expect(mapped.length).toBeGreaterThan(10);
+  expect(mapped.some((item) => item.roof === "ef4444")).toBe(false);
+  expect(snap.labelTexts.join("\n")).not.toContain("博物馆");
+  await expect(page.locator(".map-pill.is-red")).toContainText("设计馆 · 留学生服务中心");
+  await expect(page.locator(".map-intl-pill")).toContainText("国际处 · 创造馆 1F");
+  await expect(page.locator(".map-intl-pill")).toContainText("暂无3D轮廓");
+  await expect(page.locator(".map-intl-banner")).toBeVisible();
+  for (const [query, name] of [["阅览室", "中央图书馆"], ["打印", "中央图书馆"], ["博物馆", "汉马未来馆"], ["食堂", "汉马馆"], ["7层", "设计馆"], ["留学生", "留学生服务中心"], ["国际处", "国际处"], ["1层", "本馆"]]) {
+    await page.locator(".map-search").fill(query);
+    await expect(page.locator(".map-list")).toContainText(name);
+  }
+  await page.locator(".map-search").fill("博物馆");
+  await expect(page.locator(".map-list")).toContainText("庆南大学博物馆");
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await page.locator(".map-pill.is-red").click();
+  await expect(page.locator(".map-info")).toContainText("设计馆 · 留学生服务中心");
+  await expect(page.locator(".map-info")).toContainText("7F");
+  await expect(page.locator(".map-info")).toContainText("留学生服务中心");
+  await expect(page.locator(".map-info")).toContainText("2021-08-30");
+  await expect(page.locator(".map-info")).toContainText("请以现场或官网最新指引为准");
+  const official = page.locator(".map-info a[href='https://www.kyungnam.ac.kr/ko/6382/subview.do']").first();
+  await expect(official).toHaveAttribute("target", "_blank");
+  await expect(official).toHaveAttribute("rel", "noopener noreferrer");
+  await page.locator(".map-detail-close").click();
+  await page.locator("#btn-ko").evaluate((el) => el.click());
+  await expect(page.locator(".map-pill.is-red")).toContainText("디자인관 · 유학생서비스센터");
+  await expect(page.locator(".map-intl-pill")).toContainText("국제처 · 창조관 1층");
+  await expect(page.locator(".map-intl-pill")).toContainText("3D 외곽선 없음");
+  await page.locator("#btn-zh").evaluate((el) => el.click());
+  await page.locator(".map-toolbar [data-map-action='labels']").click();
+  await expect(page.locator(".map-pill")).toHaveCount(0);
+  await page.locator(".map-toolbar [data-map-action='labels']").click();
+  await expect(page.locator(".map-pill.is-red")).toBeVisible();
+  await page.locator(".map-intl-pill").click();
+  await expect(page.locator(".map-info")).toContainText("国际处");
+  await expect(page.locator(".map-info")).toContainText("1F");
+  await expect(page.locator(".map-info")).toContainText("055-249-2299");
+  await expect(page.locator(".map-info")).toContainText("暂无3D轮廓");
+  await expect(page.locator(".map-role-badge")).toContainText("国际服务重点");
+  await expect(page.locator(".map-floor-note")).not.toHaveText("");
+  await page.locator(".map-detail-close").click();
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await page.locator(".map-search").fill("中央图书馆");
+  await page.locator(".map-list button[data-faq-id='F62']").click();
+  await expect(page.locator(".map-info")).toContainText("复印室");
+  await expect(page.locator(".map-info")).toContainText("阅览");
+  await page.locator("#theme-switch").evaluate((el) => el.click());
+  await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "dark");
+  const dark = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(dark.theme).toBe("dark");
+  expect(dark.chroma).toBeGreaterThan(0.08);
+  const redDark = dark.buildings.find((item) => item.osmId === 1062073167);
+  expect(redDark.mass).toBe("c92a2a");
+  expect(redDark.roof === "ef4444" || redDark.roof === "ff5c5c").toBe(true);
+  expect(seen.errors).toEqual([]);
+  expect(seen.urls.filter((url) => EXTERNAL.test(url))).toEqual([]);
 });

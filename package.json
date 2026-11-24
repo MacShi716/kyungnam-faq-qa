@@ -2,9 +2,9 @@
   "private": true,
   "scripts": {
     "build:map": "node scripts/build-map.mjs",
-    "test": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs",
+    "test": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs tests/poi-directory.test.mjs tests/map-presentation.test.mjs",
     "test:browser": "playwright test",
-    "test:all": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs && playwright test"
+    "test:all": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs tests/poi-directory.test.mjs tests/map-presentation.test.mjs && playwright test"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
