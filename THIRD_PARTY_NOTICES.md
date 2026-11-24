@@ -2,6 +2,7 @@
 
 ## OpenStreetMap — ODbL 1.0
 `osm-buildings.json` contains OSM-derived horizontal geometry, IDs and tags only.
+`osm-campus-layers.json` likewise contains only OSM-derived horizontal geometry (roads, footpaths, water, pitches/plazas, and woodland; IDs and tags/subtypes only). It is also published under ODbL 1.0 and uses the same attribution links.
 © OpenStreetMap contributors
 https://www.openstreetmap.org/copyright
 https://opendatacommons.org/licenses/odbl/1-0/
