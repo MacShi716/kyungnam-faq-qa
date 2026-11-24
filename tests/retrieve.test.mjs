@@ -73,6 +73,36 @@ test("generic conversational wording is not accepted as an unrelated FAQ", () =>
   }
 });
 
+test("general map wording selects the campus map FAQ and buildings stay specific", () => {
+  const api = loadApi();
+  const expectId = (q, lang, id) => {
+    const faq = api.acceptedFaq(q, lang);
+    assert.ok(faq, q);
+    assert.equal(faq.id, id, q);
+  };
+  expectId("地图", "zh", "F87");
+  expectId("学校地图", "zh", "F87");
+  expectId("校园地图", "zh", "F87");
+  expectId("3D地图", "zh", "F87");
+  expectId("地图在哪", "zh", "F87");
+  expectId("지도", "ko", "F87");
+  expectId("캠퍼스맵", "ko", "F87");
+  expectId("학교 지도", "ko", "F87");
+  expectId("3D 지도", "ko", "F87");
+  expectId("正门", "zh", "F42");
+  expectId("正门在哪？", "zh", "F42");
+  expectId("本馆", "zh", "F49");
+  expectId("图书馆", "zh", "F26");
+  expectId("留学生服务中心", "zh", "F85");
+  expectId("国际处", "zh", "F86");
+  const f85 = api.FAQ_DATA.find((f) => f.id === "F85");
+  const f86 = api.FAQ_DATA.find((f) => f.id === "F86");
+  assert.match(f85.answer_zh, /（团队确认，请以现场或官网指引为准）/);
+  assert.match(f85.answer, /팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요/);
+  assert.match(f86.answer_zh, /（团队确认，请以现场或官网指引为准）/);
+  assert.match(f86.answer, /팀 확인 정보, 현장 또는 학교 공식 안내 기준 확인 필요/);
+});
+
 test("school questions and paraphrases still select the same FAQ", () => {
   const api = loadApi();
   const expectId = (q, lang, id) => {
