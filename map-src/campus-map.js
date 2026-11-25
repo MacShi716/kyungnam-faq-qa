@@ -100,6 +100,7 @@ const TEXT = {
     move: "移动", look: "环顾",
     lookHint: "WASD 移动 · 空格跳跃 · Shift 疾跑 · V 视角 · Esc 退出",
     lockHint: "点击画面锁定鼠标，移动鼠标环顾",
+    lockDrag: "此环境无法锁定鼠标。按住画面拖动即可环顾。",
     touchHint: "左侧摇杆移动 · 右侧拖动环顾 · 按钮跳跃",
     jump: "跳跃", view: "视角", viewFirst: "第一人称", viewThird: "第三人称",
     forward: "前进", back: "后退", left: "向左", right: "向右",
@@ -146,6 +147,7 @@ const TEXT = {
     move: "이동", look: "둘러보기",
     lookHint: "WASD 이동 · Space 점프 · Shift 달리기 · V 시점 · Esc 나가기",
     lockHint: "화면을 클릭해 마우스를 잠그고 움직여 둘러보세요",
+    lockDrag: "이 환경에서는 마우스를 잠글 수 없습니다. 화면을 누른 채 드래그해 둘러보세요.",
     touchHint: "왼쪽 스틱 이동 · 오른쪽 드래그 둘러보기 · 버튼 점프",
     jump: "점프", view: "시점", viewFirst: "1인칭", viewThird: "3인칭",
     forward: "앞으로", back: "뒤로", left: "왼쪽", right: "오른쪽",
@@ -1786,8 +1788,9 @@ function paintWalkUi(shell) {
     shell.touchHint.textContent = copy.touchHint;
   }
   if (shell.lockHint) {
-    shell.lockHint.hidden = !on || narrow || isTouchControl(shell) || shell.locked || shell.lockFailed;
-    shell.lockHint.textContent = copy.lockHint;
+    const touch = narrow || isTouchControl(shell);
+    shell.lockHint.hidden = !on || touch || shell.locked;
+    shell.lockHint.textContent = shell.lockFailed ? copy.lockDrag : copy.lockHint;
   }
   if (shell.crosshair) shell.crosshair.hidden = !on;
   if (shell.jumpBtn) {
@@ -1971,6 +1974,7 @@ function startWalk(shell, x, z, yaw, pitch, focusId) {
   walk.sprint = false;
   walk.jumpQueued = false;
   walk.t = performance.now();
+  shell.lockFailed = false;
   if (shell.knob) shell.knob.style.transform = "translate(0px, 0px)";
   shell.controls.enabled = false;
   shell.camera.fov = walk.view === VIEW_THIRD ? 62 : 70;
@@ -2161,17 +2165,23 @@ function isTouchControl(shell) {
   return !!(shell && (shell.touch || shell.root.classList.contains("is-narrow")));
 }
 
+function denyPointerLock(shell) {
+  if (!shell || shell.locked) return;
+  shell.lockFailed = true;
+  paintWalkUi(shell);
+}
+
 function requestMouseLook(shell) {
   if (!shell || !shell.canvas || typeof shell.canvas.requestPointerLock !== "function") {
-    if (shell) shell.lockFailed = true;
+    denyPointerLock(shell);
     return;
   }
   shell.lockAt = performance.now();
   try {
-    const result = shell.canvas.requestPointerLock({ unadjustedMovement: true });
-    if (result && typeof result.catch === "function") result.catch(() => { shell.lockFailed = true; });
+    const result = shell.canvas.requestPointerLock();
+    if (result && typeof result.catch === "function") result.catch(() => denyPointerLock(shell));
   } catch (e) {
-    shell.lockFailed = true;
+    denyPointerLock(shell);
   }
 }
 
@@ -2526,10 +2536,16 @@ function bindPointer(shell) {
   });
   bind(shell, document, "pointerlockchange", () => {
     if (session !== shell) return;
-    shell.locked = document.pointerLockElement === shell.canvas;
+    const now = document.pointerLockElement === shell.canvas;
+    shell.locked = now;
     shell.root.classList.toggle("is-locked", shell.locked);
+    if (!now) releaseWalkPointers();
     paintWalkUi(shell);
     poke();
+  });
+  bind(shell, document, "pointerlockerror", () => {
+    if (session !== shell) return;
+    denyPointerLock(shell);
   });
   bind(shell, document, "mousemove", (event) => {
     if (session !== shell || !shell.locked || !shell.walk || !shell.walk.active) return;
