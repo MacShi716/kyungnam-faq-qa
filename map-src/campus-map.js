@@ -2169,8 +2169,20 @@ function onWalkKey(event, down) {
   holdWalk(action, down);
 }
 
+function pointerIsCoarse() {
+  try {
+    return !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  } catch (e) {
+    return false;
+  }
+}
+
 function isTouchControl(shell) {
-  return !!(shell && (shell.touch || shell.root.classList.contains("is-narrow")));
+  if (!shell) return false;
+  const coarse = pointerIsCoarse();
+  shell.touch = coarse;
+  const narrow = !!(shell.root && shell.root.classList.contains("is-narrow"));
+  return coarse || narrow;
 }
 
 function denyPointerLock(shell) {

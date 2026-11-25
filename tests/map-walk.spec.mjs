@@ -449,6 +449,31 @@ test("a desktop canvas click locks the mouse and Esc releases it without leaving
   expect(errors).toEqual([]);
 });
 
+test("a coarse pointer that becomes fine locks on the next canvas click", async ({ page }) => {
+  test.setTimeout(120000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const box = await page.locator(".map-canvas").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  const coarse = await page.evaluate(() => ({
+    media: window.matchMedia("(pointer: coarse)").matches,
+    locked: document.pointerLockElement && document.pointerLockElement.className,
+  }));
+  expect(coarse.media).toBe(true);
+  expect(coarse.locked || "").toBe("");
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: false });
+  await cdp.send("Emulation.clearDeviceMetricsOverride").catch(() => {});
+  const desktop = await page.evaluate(() => window.matchMedia("(pointer: coarse)").matches);
+  expect(desktop).toBe(false);
+  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  await expect.poll(() => page.evaluate(() => document.pointerLockElement && document.pointerLockElement.className)).toBe("map-canvas");
+});
+
 test("narrowing an open walk shows the jump button", async ({ page }) => {
   test.setTimeout(120000);
   await silenceAi(page);

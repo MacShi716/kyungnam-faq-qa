@@ -250,7 +250,7 @@ function paintAsphalt() {
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
         const n = noise(x * 0.8, y * 0.8);
-        const v = 70 + n * 28;
+        const v = 214 + n * 24;
         const o = (y * size + x) * 4;
         data[o] = v;
         data[o + 1] = v + 1;
@@ -392,16 +392,17 @@ export function applyAtmosphereTheme(shell) {
     terrainMat.color.setHex(cast.terrain);
     const coolNight = dark && (shell.tint || 0) <= -0.35;
     if (terrainMat.emissive) {
-      terrainMat.emissive.setHex(coolNight ? cast.terrain : 0x000000);
-      terrainMat.emissiveIntensity = coolNight ? 1.05 : 0;
+      terrainMat.emissive.setHex(dark ? cast.terrain : 0x000000);
+      terrainMat.emissiveIntensity = coolNight ? 1.05 : (dark ? 1.15 : 0);
     }
   }
   const road = shell.layerMeshes && shell.layerMeshes.road;
   if (road && road.material) {
     road.material.color.setHex(cast.road);
     if (road.material.emissive) {
-      road.material.emissive.setHex(0x000000);
-      road.material.emissiveIntensity = 0;
+      road.material.emissive.setHex(cast.road);
+      const coolNight = dark && (shell.tint || 0) <= -0.35;
+      road.material.emissiveIntensity = dark ? (coolNight ? 1.55 : 1.25) : 0.82;
     }
   }
   const curb = shell.layerMeshes && shell.layerMeshes.curb;
@@ -451,6 +452,10 @@ function paintTreeColors(shell) {
     leaves.setColorAt(i, color);
   }
   if (leaves.instanceColor) leaves.instanceColor.needsUpdate = true;
+  if (leaves.material && leaves.material.emissive) {
+    leaves.material.emissive.setHex(dark ? 0x1a2e1f : 0x000000);
+    leaves.material.emissiveIntensity = dark ? 2.6 : 0;
+  }
   const trunks = shell.trees[0];
   if (trunks && trunks.material) trunks.material.color.setHex(0x5c4638);
 }
