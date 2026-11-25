@@ -401,6 +401,17 @@ export function applyAtmosphereTheme(shell) {
     shell.boundary.material.color.set(dark ? 0xc8bba8 : 0x6a6156);
     shell.boundary.material.opacity = dark ? 0.45 : 0.55;
   }
+  const road = shell.layerMeshes && shell.layerMeshes.road;
+  if (road && road.material && road.material.emissive) {
+    road.material.color.setHex(0x7a838c);
+    road.material.emissive.setHex(0x3e464e);
+    road.material.emissiveIntensity = dark ? 0.85 : 0.55;
+  }
+  const path = shell.layerMeshes && shell.layerMeshes.path;
+  if (path && path.material && path.material.emissive) {
+    path.material.emissive.setHex(dark ? 0x9a8468 : 0x000000);
+    path.material.emissiveIntensity = dark ? 0.7 : 0;
+  }
 }
 
 function pushTri(buf, ax, ay, az, bx, by, bz, cx, cy, cz, au, av, bu, bv, cu, cv) {
@@ -1100,7 +1111,7 @@ export function paintRealisticBuildings(shell) {
     const mode = record.osmId === shell.selectedId ? "selected" : record.osmId === shell.hoverId ? "hover" : "idle";
     const boost = mode === "selected" ? 0.28 : mode === "hover" ? 0.12 : 0;
     for (const mat of record.facades || []) {
-      mat.emissiveIntensity = (dark ? 1.05 : 0) + boost;
+      mat.emissiveIntensity = (dark ? 0.9 : 0.06) + boost;
     }
     if (record.edge) {
       record.edge.material.opacity = record.archetype === "crimson"
@@ -1108,8 +1119,8 @@ export function paintRealisticBuildings(shell) {
         : (mode === "idle" ? 0.07 : 0.28);
     }
     if (record.skirt && record.skirt.material && record.skirt.material.emissive) {
-      record.skirt.material.emissive.setHex(dark ? 0x4a433c : 0x000000);
-      record.skirt.material.emissiveIntensity = dark ? 0.55 : 0;
+      record.skirt.material.emissive.setHex(0x6e675f);
+      record.skirt.material.emissiveIntensity = dark ? 0.72 : 0.48;
     }
     if (record.beacon && record.beacon.material) {
       record.beacon.material.emissiveIntensity = dark ? 1.35 : 0.55;

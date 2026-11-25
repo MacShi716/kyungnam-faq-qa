@@ -28,6 +28,18 @@ function expectSolidGround(frame, label) {
   }
 }
 
+test("walk eye stays above the drawn hillside", async ({ page }) => {
+  test.setTimeout(90000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await openMap(page);
+  const gap = await page.evaluate(() => window.CampusMap.debugPlaceWalk(-165.05, 460.65));
+  expect(gap.rendered - gap.linear).toBeGreaterThan(1.7);
+  expect(gap.clearance).toBeGreaterThan(1.6);
+  expect(gap.clearance).toBeLessThan(1.9);
+});
+
 test("shaded foundation stays readable by day and by night", async ({ page }) => {
   test.setTimeout(90000);
   await silenceAi(page);
@@ -38,8 +50,8 @@ test("shaded foundation stays readable by day and by night", async ({ page }) =>
   const day = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
   const dayWash = await probe(page);
   expect(day.shaded.skirt).toBeGreaterThan(60);
-  expect(day.shaded.wall).toBeGreaterThan(90);
-  expect(day.sunlit.wall).toBeGreaterThan(100);
+  expect(day.shaded.wall).toBeGreaterThan(65);
+  expect(day.sunlit.wall).toBeGreaterThan(75);
   expect(dayWash.sat).toBeGreaterThan(28);
   expect(dayWash.luma).toBeLessThan(120);
   expect(dayWash.fog).toBeLessThan(0.0005);

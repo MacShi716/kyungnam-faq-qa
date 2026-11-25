@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import { createSmoothSampler } from "../map-src/dressing.mjs";
 import { HAZE_DENSITY, linearDepthSteps, roadCrossSection } from "../map-src/ground.mjs";
+import { sampleTerrainY } from "../map-src/placement.mjs";
 
 test("an 8cm curb stacked under the road is unresolved on 16-bit depth", () => {
   const steps = linearDepthSteps({
@@ -30,6 +32,21 @@ test("overview haze keeps most surface color inside 800m", () => {
   assert.ok(Math.exp(-HAZE_DENSITY.light * 800) >= 0.78);
   assert.ok(Math.exp(-HAZE_DENSITY.dark * 800) >= 0.72);
   assert.ok(HAZE_DENSITY.light < 0.0005);
+});
+
+test("the drawn hillside rises more than walk eye-height above the linear DEM", () => {
+  const terrain = JSON.parse(fs.readFileSync(new URL("../assets/map/campus-terrain.json", import.meta.url), "utf8"));
+  const smooth = createSmoothSampler(terrain);
+  const x = -165.05;
+  const z = 460.65;
+  const gap = smooth(x, z) - sampleTerrainY(terrain, x, z);
+  assert.ok(gap > 1.7, String(gap));
+});
+
+test("walk eye follows the rendered smooth surface", () => {
+  const src = fs.readFileSync(new URL("../map-src/campus-map.js", import.meta.url), "utf8");
+  assert.match(src, /function renderedSurfaceY/);
+  assert.match(src, /renderedSurfaceY\(shell, shell\.walk\.x, shell\.walk\.z\) \+ EYE_M/);
 });
 
 test("ground materials no longer use a slope polygon offset", () => {

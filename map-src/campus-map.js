@@ -1178,8 +1178,13 @@ function walkBlocked(shell, x, z) {
   return footprintBlocked(x, z, buildingRings(shell), 1.15);
 }
 
+function renderedSurfaceY(shell, x, z) {
+  if (shell && typeof shell.sampleHeight === "function") return shell.sampleHeight(x, z);
+  return sampleTerrainY(shell.terrain, x, z);
+}
+
 function syncWalkCamera(shell) {
-  const eyeY = sampleTerrainY(shell.terrain, shell.walk.x, shell.walk.z) + EYE_M;
+  const eyeY = renderedSurfaceY(shell, shell.walk.x, shell.walk.z) + EYE_M;
   const pose = poseFrom(shell.walk, eyeY);
   shell.walk.eyeY = eyeY;
   shell.camera.position.set(pose.x, pose.y, pose.z);
@@ -1254,7 +1259,7 @@ function walkToBuilding(record) {
   const prefer = shell.camera ? shell.camera.position : { x: record.centroid.x, z: record.centroid.z + 24 };
   const stand = outsideStand(record.centroid, prefer.x, prefer.z, (x, z) => walkBlocked(shell, x, z));
   const yaw = yawFromDirection(record.centroid.x - stand.x, record.centroid.z - stand.z);
-  const eyeY = sampleTerrainY(shell.terrain, stand.x, stand.z) + EYE_M;
+  const eyeY = renderedSurfaceY(shell, stand.x, stand.z) + EYE_M;
   const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.45;
   const horiz = Math.max(1, Math.hypot(record.centroid.x - stand.x, record.centroid.z - stand.z));
   const pitch = Math.max(-0.55, Math.min(0.45, Math.atan2(aimY - eyeY, horiz)));
@@ -2079,6 +2084,63 @@ export function debugFacadeColumn(osmId) {
   shell.controls.target.copy(saved.target);
   shell.renderer.render(shell.scene, shell.camera);
   return { baseY: +record.seat.baseY.toFixed(1), shaded, sunlit };
+}
+
+export function debugHoldView(position, target) {
+  const shell = session;
+  if (!shell || !shell.camera) return null;
+  shell.tween = null;
+  if (shell.walk) shell.walk.active = false;
+  if (shell.controls) shell.controls.enabled = true;
+  shell.camera.position.set(position.x, position.y, position.z);
+  shell.camera.lookAt(target.x, target.y, target.z);
+  shell.camera.updateMatrixWorld(true);
+  if (shell.controls) {
+    shell.controls.target.set(target.x, target.y, target.z);
+    shell.controls.update();
+  }
+  return debugGroundProbe();
+}
+
+export function debugReadWorld(points) {
+  const shell = session;
+  if (!shell || !shell.renderer) return [];
+  shell.renderer.render(shell.scene, shell.camera);
+  return (points || []).map((point) => {
+    const v = new THREE.Vector3(point.x, point.y, point.z);
+    const eye = v.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+    if (eye.z > -0.15) return { name: point.name, visible: false };
+    v.project(shell.camera);
+    if (Math.abs(v.x) > 0.98 || Math.abs(v.y) > 0.98) return { name: point.name, visible: false };
+    const px = readPixel(shell, v);
+    return {
+      name: point.name,
+      visible: true,
+      rgb: [px[0], px[1], px[2]],
+      luma: +(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]).toFixed(1),
+    };
+  });
+}
+
+export function debugPlaceWalk(x, z) {
+  const shell = session;
+  if (!shell || !shell.sampleHeight) return null;
+  shell.walk.active = true;
+  shell.walk.x = x;
+  shell.walk.z = z;
+  shell.walk.yaw = 0;
+  shell.walk.pitch = -0.15;
+  shell.walk.focusId = null;
+  if (shell.controls) shell.controls.enabled = false;
+  syncWalkCamera(shell);
+  const rendered = shell.sampleHeight(x, z);
+  const linear = sampleTerrainY(shell.terrain, x, z);
+  return {
+    eye: +shell.camera.position.y.toFixed(2),
+    rendered: +rendered.toFixed(2),
+    linear: +linear.toFixed(2),
+    clearance: +(shell.camera.position.y - rendered).toFixed(2),
+  };
 }
 
 export function debugGroundProbe() {
