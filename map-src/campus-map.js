@@ -1567,13 +1567,13 @@ function applyThemeMaterials() {
   const rig = lightRig(shell.theme);
   const dark = shell.theme === "dark";
   if (shell.hemi) {
-    shell.hemi.color.setHex(dark ? 0x9eb0c4 : 0xf4f7fb);
-    shell.hemi.groundColor.setHex(dark ? 0x1a201c : 0xa39880);
-    shell.hemi.intensity = dark ? 0.38 : 0.46;
+    shell.hemi.color.setHex(rig.hemi);
+    shell.hemi.groundColor.setHex(rig.hemiGround);
+    shell.hemi.intensity = rig.hemiIntensity;
   }
   if (shell.sun) {
     shell.sun.color.setHex(rig.sun);
-    shell.sun.intensity = dark ? 0.95 : 1.7;
+    shell.sun.intensity = rig.sunIntensity;
   }
   applyAtmosphereTheme(shell);
   paintTerrain(shell);
@@ -1607,8 +1607,8 @@ function buildScene(shell) {
   controls.maxDistance = 1200;
   controls.target.set(0, 40, 0);
   const rig = lightRig(shell.theme);
-  const hemi = new THREE.HemisphereLight(0xf4f7fb, 0xa39880, 0.55);
-  const sun = new THREE.DirectionalLight(rig.sun, 1.7);
+  const hemi = new THREE.HemisphereLight(rig.hemi, rig.hemiGround, rig.hemiIntensity);
+  const sun = new THREE.DirectionalLight(rig.sun, rig.sunIntensity);
   sun.position.set(-260, 540, 280);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -2014,6 +2014,71 @@ function roadLineContrast(shell) {
   const spread = lumas.filter((value) => Math.abs(value - mid) > 70).length / lumas.length;
   const mean = lumas.reduce((sum, value) => sum + value, 0) / lumas.length;
   return { samples: lumas.length, mean, spread };
+}
+
+export function debugFacadeColumn(osmId) {
+  const shell = session;
+  if (!shell || !shell.renderer) return null;
+  const record = shell.buildings.find((item) => item.osmId === osmId);
+  if (!record || !record.ring) return null;
+  const open = record.ring;
+  const sun = shell.sun ? shell.sun.position : new THREE.Vector3(-260, 540, 280);
+  const edges = [];
+  for (let i = 0; i < open.length; i++) {
+    const a = open[i];
+    const b = open[(i + 1) % open.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 8) continue;
+    const mx = (a[0] + b[0]) / 2;
+    const mz = (a[1] + b[1]) / 2;
+    const ox = (b[1] - a[1]) / len;
+    const oz = -(b[0] - a[0]) / len;
+    const facing = ox * (sun.x - mx) + oz * (sun.z - mz);
+    edges.push({ mx, mz, ox, oz, len, facing });
+  }
+  edges.sort((a, b) => a.facing - b.facing);
+  const saved = {
+    pos: shell.camera.position.clone(),
+    quat: shell.camera.quaternion.clone(),
+    target: shell.controls.target.clone(),
+    shadows: shell.renderer.shadowMap.enabled,
+  };
+  const column = (edge) => {
+    const camX = edge.mx + edge.ox * 26;
+    const camZ = edge.mz + edge.oz * 26;
+    const ground = sampleTerrainY(shell.terrain, camX, camZ);
+    shell.camera.position.set(camX, ground + 1.7, camZ);
+    shell.camera.lookAt(edge.mx, record.seat.baseY + 6, edge.mz);
+    shell.camera.updateMatrixWorld(true);
+    shell.renderer.render(shell.scene, shell.camera);
+    const samples = [];
+    for (let h = 0.6; h <= 16; h += 1.1) {
+      const y = record.seat.skirtBottomY + h;
+      const v = new THREE.Vector3(edge.mx + edge.ox * 0.35, y, edge.mz + edge.oz * 0.35);
+      const eye = v.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+      if (eye.z > -0.2) continue;
+      v.project(shell.camera);
+      if (Math.abs(v.x) > 0.92 || Math.abs(v.y) > 0.92) continue;
+      const px = readPixel(shell, v);
+      samples.push({
+        y: +y.toFixed(1),
+        luma: +(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]).toFixed(1),
+      });
+    }
+    const skirt = samples.filter((item) => item.y < record.seat.baseY);
+    const wall = samples.filter((item) => item.y >= record.seat.baseY + 0.4 && item.luma > 28);
+    const avg = (list) => list.reduce((sum, item) => sum + item.luma, 0) / Math.max(1, list.length);
+    return { skirt: +avg(skirt).toFixed(1), wall: +avg(wall).toFixed(1), n: samples.length };
+  };
+  shell.renderer.shadowMap.enabled = true;
+  const shaded = edges.length ? column(edges[0]) : null;
+  const sunlit = edges.length ? column(edges[edges.length - 1]) : null;
+  shell.renderer.shadowMap.enabled = saved.shadows;
+  shell.camera.position.copy(saved.pos);
+  shell.camera.quaternion.copy(saved.quat);
+  shell.controls.target.copy(saved.target);
+  shell.renderer.render(shell.scene, shell.camera);
+  return { baseY: +record.seat.baseY.toFixed(1), shaded, sunlit };
 }
 
 export function debugGroundProbe() {

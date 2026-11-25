@@ -98,24 +98,22 @@ function paintHillAlbedo(sample, bounds, theme) {
         let g;
         let b;
         if (dark) {
-          const lawn = [46 + n * 10, 52 + n * 8, 40 + grain * 6];
-          const forest = [28 + n * 8, 36 + n * 6, 30];
-          const stone = [42 + grain * 8, 44 + grain * 6, 48];
+          const lawn = [42 + n * 8, 62 + n * 8, 40 + grain * 5];
+          const forest = [28 + n * 6, 46 + n * 6, 32];
+          const stone = [48 + grain * 6, 50 + grain * 5, 46];
           const veg = n > 0.55 ? forest : lawn;
           r = mix(veg[0], stone[0], rock);
           g = mix(veg[1], stone[1], rock);
           b = mix(veg[2], stone[2], rock);
         } else {
-          const lawn = [118 + n * 14, 122 + n * 10, 78 + grain * 8];
-          const forest = [78 + n * 12, 92 + n * 8, 58 + grain * 6];
-          const stone = [138 + grain * 10, 128 + grain * 8, 112];
-          const soil = [126, 108, 82];
-          const veg = n > 0.62 ? forest : n < 0.28 ? soil : lawn;
+          const lawn = [96 + n * 12, 142 + n * 10, 68 + grain * 6];
+          const forest = [58 + n * 8, 108 + n * 8, 54 + grain * 4];
+          const stone = [148 + grain * 8, 140 + grain * 6, 122];
+          const soil = [142, 118, 82];
+          const veg = n > 0.62 ? forest : n < 0.22 ? soil : lawn;
           r = mix(veg[0], stone[0], rock);
           g = mix(veg[1], stone[1], rock);
           b = mix(veg[2], stone[2], rock);
-          r = r * 0.92 + grain * 10;
-          g = g * 0.94 + grain * 8;
         }
         const o = (py * size + px) * 4;
         data[o] = r;
@@ -392,7 +390,7 @@ export function applyAtmosphereTheme(shell) {
     shell.scene.fog.density = dark ? HAZE_DENSITY.dark : HAZE_DENSITY.light;
   }
   if (shell.renderer) {
-    shell.renderer.toneMappingExposure = dark ? 0.78 : 1.02;
+    shell.renderer.toneMappingExposure = dark ? 1.12 : 1.0;
     shell.renderer.setClearColor(dark ? 0x121820 : 0xd5e2ee, 1);
   }
   if (shell.terrainMesh && shell.terrainMaps) {
@@ -783,7 +781,7 @@ export function buildCampusLayers(shell) {
   if (!layers || !sample) return;
   const asphaltTex = trackOwned(shell, canvasTexture(paintAsphalt(), THREE.SRGBColorSpace, 0.25, 0.25));
   const parkTex = trackOwned(shell, canvasTexture(paintParking(), THREE.SRGBColorSpace, 0.2, 0.2));
-  const roadMat = surfaceMat(shell, 0x3c4046, 0.93, 0.04, { map: asphaltTex });
+  const roadMat = surfaceMat(shell, 0x5a6168, 0.9, 0.04, { map: asphaltTex });
   const curbMat = surfaceMat(shell, 0xc8c0b4, 0.86, 0.02, {});
   const pathMat = surfaceMat(shell, 0xcbbfae, 0.88, 0.03, {});
   const turfMat = surfaceMat(shell, 0x3e5640, 0.9, 0.01, {});
@@ -1108,6 +1106,10 @@ export function paintRealisticBuildings(shell) {
       record.edge.material.opacity = record.archetype === "crimson"
         ? (mode === "idle" ? 0.62 : 0.9)
         : (mode === "idle" ? 0.07 : 0.28);
+    }
+    if (record.skirt && record.skirt.material && record.skirt.material.emissive) {
+      record.skirt.material.emissive.setHex(dark ? 0x4a433c : 0x000000);
+      record.skirt.material.emissiveIntensity = dark ? 0.55 : 0;
     }
     if (record.beacon && record.beacon.material) {
       record.beacon.material.emissiveIntensity = dark ? 1.35 : 0.55;

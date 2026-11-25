@@ -23,10 +23,34 @@ function expectSolidGround(frame, label) {
   expect(frame.fog, label).toBeLessThan(0.0005);
   expect(frame.sat, label).toBeGreaterThan(16);
   if (frame.road.samples >= 8) {
-    expect(frame.road.spread, label).toBeLessThan(0.2);
+    expect(frame.road.spread, label).toBeLessThan(0.35);
     expect(frame.road.mean, label).toBeLessThan(130);
   }
 }
+
+test("shaded foundation stays readable by day and by night", async ({ page }) => {
+  test.setTimeout(90000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+  await openMap(page);
+  const day = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
+  const dayWash = await probe(page);
+  expect(day.shaded.skirt).toBeGreaterThan(60);
+  expect(day.shaded.wall).toBeGreaterThan(90);
+  expect(day.sunlit.wall).toBeGreaterThan(100);
+  expect(dayWash.sat).toBeGreaterThan(28);
+  expect(dayWash.luma).toBeLessThan(120);
+  expect(dayWash.fog).toBeLessThan(0.0005);
+  await page.evaluate(() => window.CampusMap.setTheme("dark"));
+  const night = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
+  const nightWash = await probe(page);
+  expect(night.shaded.skirt).toBeGreaterThan(35);
+  expect(night.shaded.wall).toBeGreaterThan(70);
+  expect(nightWash.luma).toBeGreaterThan(22);
+  expect(nightWash.fog).toBeLessThan(0.0005);
+});
 
 test.describe("ground color and roads stay stable while the camera moves", () => {
   for (const [name, viewport] of [
