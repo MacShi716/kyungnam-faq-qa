@@ -50,21 +50,21 @@ export function buildingKind(osmId, linked) {
   return "mapped";
 }
 
-/** Smooth 0..1 elevation color. Channels are linear 0..1. */
+function srgbByte(hex, shift) {
+  const n = ((hex >> shift) & 255) / 255;
+  return n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
+}
+
+function hexLin(hex) {
+  return [srgbByte(hex, 16), srgbByte(hex, 8), srgbByte(hex, 0)];
+}
+
+/** Smooth 0..1 elevation color. Channels are linear 0..1, kept in the tech gray. */
 export function terrainColor(t, theme) {
   const u = Math.min(1, Math.max(0, t));
-  if (theme === "dark") {
-    const low = [0.06, 0.15, 0.19];
-    const mid = [0.09, 0.18, 0.28];
-    const high = [0.16, 0.20, 0.38];
-    if (u < 0.58) return mix3(low, mid, u / 0.58);
-    return mix3(mid, high, (u - 0.58) / 0.42);
-  }
-  const lawn = [0.58, 0.78, 0.40];
-  const wood = [0.20, 0.46, 0.26];
-  const ridge = [0.48, 0.40, 0.24];
-  if (u < 0.7) return mix3(lawn, wood, u / 0.7);
-  return mix3(wood, ridge, (u - 0.7) / 0.3);
+  const base = hexLin(theme === "dark" ? 0x303d49 : 0x87949d);
+  const high = hexLin(theme === "dark" ? 0x3a4a58 : 0x9aa6ae);
+  return mix3(base, high, u);
 }
 
 export function skyColor(theme) {
@@ -75,19 +75,19 @@ export function lightRig(theme) {
   if (theme === "dark") {
     return {
       hemi: 0xd5e0f0,
-      hemiGround: 0x5c6858,
-      hemiIntensity: 1.45,
+      hemiGround: 0x3a4650,
+      hemiIntensity: 1.05,
       sun: 0xd5e2f4,
-      sunIntensity: 0.62,
+      sunIntensity: 0.7,
       boundary: 0x8fd0c4,
     };
   }
   return {
-    hemi: 0xf4f8ff,
-    hemiGround: 0xc5d6a2,
-    hemiIntensity: 1.05,
-    sun: 0xfff3dc,
-    sunIntensity: 1.12,
+    hemi: 0xf4f7fa,
+    hemiGround: 0x9aa3ab,
+    hemiIntensity: 0.95,
+    sun: 0xfff6ea,
+    sunIntensity: 1.05,
     boundary: 0xf6f1e6,
   };
 }
@@ -122,9 +122,9 @@ export function paintTokens(kind, osmId, theme, mode) {
       mass: base.mass,
       roof: base.roof,
       skirt: base.skirt,
-      edge: mode === "idle" ? base.edge : mode === "hover" ? 0xd0892a : 0xe39a2b,
-      emissive: mode === "selected" ? (dark ? 0x3a2c14 : 0x5a4020) : 0x000000,
-      emissiveIntensity: mode === "selected" ? 0.22 : mode === "hover" ? 0.06 : 0,
+      edge: mode === "idle" ? base.edge : 0x39b9c5,
+      emissive: mode === "selected" ? 0x0e3c42 : 0x000000,
+      emissiveIntensity: mode === "selected" ? 0.18 : 0,
     };
   }
   throw new Error("unknown building kind: " + kind);

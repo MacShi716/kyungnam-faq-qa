@@ -25,12 +25,15 @@ import {
   EYE_M,
   LOOK_HOLD_RPS,
   LOOK_TAP,
+  STEP_UP_M,
   WALK_HOLD_MPS,
   WALK_TAP_M,
   applyWalkAction,
   footprintBlocked,
   chooseFacadeStand,
   outsideStand,
+  stickAxes,
+  sweptMove,
   poseFrom,
   yawFromDirection,
 } from "./walk.mjs";
@@ -48,7 +51,7 @@ const TEXT = {
   zh: {
     close: "关闭", zoomIn: "放大", zoomOut: "缩小", reset: "回到全校", north: "正北复位",
     walk: "步行", walkHint: "地面行走", walkStop: "结束行走",
-    move: "移动", look: "环顾",
+    move: "移动", look: "环顾", lookHint: "拖动环顾 · WASD 移动 · Esc 关闭",
     forward: "前进", back: "后退", left: "向左", right: "向右",
     lookUp: "抬头", lookDown: "低头", lookLeft: "向左转", lookRight: "向右转",
     full: "全屏", fullExit: "退出全屏", directory: "目录", search: "搜索地点",
@@ -75,7 +78,7 @@ const TEXT = {
   ko: {
     close: "닫기", zoomIn: "확대", zoomOut: "축소", reset: "전체 보기", north: "정북",
     walk: "걷기", walkHint: "지면 걷기", walkStop: "걷기 종료",
-    move: "이동", look: "둘러보기",
+    move: "이동", look: "둘러보기", lookHint: "드래그로 둘러보기 · WASD 이동 · Esc 닫기",
     forward: "앞으로", back: "뒤로", left: "왼쪽", right: "오른쪽",
     lookUp: "위로", lookDown: "아래로", lookLeft: "왼쪽으로", lookRight: "오른쪽으로",
     full: "전체 화면", fullExit: "전체 화면 종료", directory: "목록", search: "장소 검색",
@@ -210,16 +213,22 @@ html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-modal.is-narrow.walk-active .map-more{display:none;position:absolute;top:48px;right:6px;z-index:25;min-width:168px;padding:6px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
 .map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px}
 .map-modal.is-narrow.walk-active .map-more .map-btn{width:100%;min-height:44px;height:44px;order:0}
-.map-modal.is-narrow.walk-active{--walk-pad:140px;--walk-attrib:32px;--walk-summary:0px;--walk-dock:calc(var(--walk-pad) + var(--walk-attrib) + var(--walk-summary) + 12px)}
+.map-stick{position:absolute;z-index:12;left:calc(12px + env(safe-area-inset-left));bottom:calc(44px + env(safe-area-inset-bottom));width:104px;height:104px;touch-action:none;pointer-events:auto}
+.map-stick[hidden]{display:none !important}
+.map-stick-base{position:relative;width:104px;height:104px;border-radius:50%;background:rgba(18,24,30,.28);border:1px solid rgba(57,185,197,.5)}
+.map-stick-knob{position:absolute;left:30px;top:30px;width:44px;height:44px;border-radius:50%;background:rgba(57,185,197,.8)}
+.map-look-hint{position:absolute;z-index:6;top:56px;left:50%;transform:translateX(-50%);margin:0;padding:4px 10px;border-radius:8px;background:rgba(18,24,30,.5);color:#f4f7fb;font-size:12px;line-height:1.3;pointer-events:none;white-space:nowrap}
+.map-modal.is-narrow .map-look-hint{display:none}
+.map-modal.is-narrow.walk-active{--walk-summary:0px;--walk-dock:var(--walk-summary)}
 .map-modal.is-narrow.walk-active.detail-collapsed{--walk-summary:44px}
-.map-modal.is-narrow.walk-active.detail-open{--walk-summary:180px}
-.map-modal.is-narrow.walk-active .map-walk{left:0;right:0;bottom:0;height:var(--walk-pad);margin:0;padding:0 8px;align-items:center;justify-content:space-between;z-index:12}
-.map-modal.is-narrow.walk-active .map-pad-look{margin-right:0}
-.map-modal.is-narrow.walk-active .map-attrib{left:6px;right:6px;bottom:calc(var(--walk-pad) + 4px);max-width:none;z-index:14}
+.map-modal.is-narrow.walk-active.detail-open{--walk-summary:min(180px,30vh)}
+.map-modal.is-narrow.walk-active .map-walk{display:none !important}
+.map-modal.is-narrow.walk-active .map-attrib{left:6px;right:6px;bottom:calc(var(--walk-summary) + 6px);max-width:none;z-index:14}
 .map-modal.is-narrow.walk-active .map-attrib-bar{width:100%;height:32px}
+.map-modal.is-narrow.walk-active .map-stick{bottom:calc(var(--walk-summary) + 32px + 18px)}
 .map-modal.is-narrow.walk-active .map-license{left:0;width:min(100%,440px);bottom:40px;max-height:min(46vh,calc(var(--map-vvh,100dvh) * 0.4))}
 .map-modal.is-narrow.walk-active .map-directory{z-index:26}
-.map-modal.is-narrow.walk-active.detail-collapsed .map-info,.map-modal.is-narrow.walk-active.detail-open .map-info{top:auto;left:6px;right:6px;bottom:calc(var(--walk-pad) + var(--walk-attrib) + 8px);width:auto;height:var(--walk-summary);max-height:var(--walk-summary);padding:0;overflow:auto;border-radius:8px;z-index:15}
+.map-modal.is-narrow.walk-active.detail-collapsed .map-info,.map-modal.is-narrow.walk-active.detail-open .map-info{top:auto;left:0;right:0;bottom:0;width:100%;height:var(--walk-summary);max-height:var(--walk-summary);padding:0;overflow:auto;border-radius:8px 8px 0 0;z-index:15}
 .map-modal.is-narrow.walk-active.detail-collapsed .map-info > :not(.map-detail-summary){display:none}
 .map-modal.is-narrow.walk-active .map-detail-summary{display:flex;width:100%;height:44px;min-height:44px;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;position:sticky;top:0;z-index:2}
 .map-summary-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -380,7 +389,19 @@ function createShell(opts) {
   const walkUi = document.createElement("div");
   walkUi.className = "map-walk";
   walkUi.hidden = true;
-  walkUi.append(makePad("move", MOVE_SLOTS), makePad("look", LOOK_SLOTS));
+  const stick = document.createElement("div");
+  stick.className = "map-stick";
+  stick.hidden = true;
+  stick.setAttribute("role", "application");
+  const stickBase = document.createElement("div");
+  stickBase.className = "map-stick-base";
+  const knob = document.createElement("div");
+  knob.className = "map-stick-knob";
+  stickBase.appendChild(knob);
+  stick.appendChild(stickBase);
+  const lookHint = document.createElement("p");
+  lookHint.className = "map-look-hint";
+  lookHint.hidden = true;
   const attrib = document.createElement("div");
   attrib.className = "map-attrib";
   const attribBar = document.createElement("div");
@@ -389,10 +410,10 @@ function createShell(opts) {
   license.className = "map-license";
   license.hidden = true;
   attrib.append(attribBar, license);
-  stage.append(canvas, status, fallback, labelLayer, walkUi, toolbar, directory, info);
+  stage.append(canvas, status, fallback, labelLayer, walkUi, stick, lookHint, toolbar, directory, info);
   root.append(stage, attrib);
   const shell = {
-    root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, attrib, attribBar, license,
+    root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, stick, knob, lookHint, attrib, attribBar, license,
     lang, theme: opts.theme === "dark" ? "dark" : "light",
     onOpenFaq: opts.onOpenFaq, faqId: opts.faqId || "",
     favorites: readFavs(), category: "all", query: "", labelsOn: true,
@@ -400,7 +421,7 @@ function createShell(opts) {
     raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
     detailEntries: null, detailFocus: null, detailBuilding: null, detailExpanded: false,
     renderer: null, controls: null, scene: null, camera: null,
-    walk: { active: false, x: 0, z: 0, yaw: 0, pitch: -0.2, held: new Set(), heldAt: 0, t: 0, focusId: null, drag: null, eyeY: 0 },
+    walk: { active: false, x: 0, z: 0, yaw: 0, pitch: -0.2, held: new Set(), heldAt: 0, t: 0, focusId: null, drag: null, lookId: null, stick: null, eyeY: 0 },
   };
   paintChrome(shell);
   paintAttribution(shell);
@@ -1258,7 +1279,16 @@ function makePad(kind, slots) {
 function paintWalkUi(shell) {
   if (!shell || !shell.walkUi) return;
   const copy = TEXT[shell.lang];
-  shell.walkUi.hidden = !(shell.walk && shell.walk.active);
+  const on = !!(shell.walk && shell.walk.active);
+  shell.walkUi.hidden = true;
+  if (shell.stick) {
+    shell.stick.hidden = !on;
+    shell.stick.setAttribute("aria-label", copy.move);
+  }
+  if (shell.lookHint) {
+    shell.lookHint.hidden = !on;
+    shell.lookHint.textContent = copy.lookHint;
+  }
   const move = shell.walkUi.querySelector(".map-pad-move");
   const look = shell.walkUi.querySelector(".map-pad-look");
   if (move) move.setAttribute("aria-label", copy.move);
@@ -1280,7 +1310,6 @@ function paintWalkUi(shell) {
   }
   const walkBtn = shell.toolbar && shell.toolbar.querySelector("[data-map-action='walk']");
   if (walkBtn) {
-    const on = !!(shell.walk && shell.walk.active);
     walkBtn.setAttribute("aria-pressed", on ? "true" : "false");
     walkBtn.title = on ? copy.walkStop : copy.walkHint;
     if (shell.root.classList.contains("is-narrow")) walkBtn.textContent = on ? copy.walkStop : copy.walk;
@@ -1292,7 +1321,24 @@ function buildingRings(shell) {
   return shell.buildings.map((record) => record.building.footprintXZ);
 }
 
-function walkBlocked(shell, x, z) {
+const BODY_RADIUS_M = 0.95;
+let groundRay = null;
+
+function surfaceY(shell, x, z) {
+  const smooth = shell && typeof shell.sampleHeight === "function"
+    ? shell.sampleHeight(x, z)
+    : sampleTerrainY(shell.terrain, x, z);
+  if (!shell || !shell.terrainMesh) return smooth;
+  if (!groundRay) groundRay = new THREE.Raycaster();
+  groundRay.set(new THREE.Vector3(x, smooth + 80, z), new THREE.Vector3(0, -1, 0));
+  groundRay.near = 0;
+  groundRay.far = 200;
+  const hits = groundRay.intersectObject(shell.terrainMesh, false);
+  if (!hits.length) return smooth;
+  return Math.max(smooth, hits[0].point.y);
+}
+
+function walkBlocked(shell, x, z, fromX, fromZ) {
   const terrain = shell.terrain;
   if (!terrain) return true;
   const x0 = terrain.xM[0] + 2;
@@ -1300,12 +1346,16 @@ function walkBlocked(shell, x, z) {
   const z0 = terrain.zM[0] + 2;
   const z1 = terrain.zM[terrain.zM.length - 1] - 2;
   if (x < x0 || x > x1 || z < z0 || z > z1) return true;
-  return footprintBlocked(x, z, buildingRings(shell), 1.15);
+  if (footprintBlocked(x, z, buildingRings(shell), BODY_RADIUS_M)) return true;
+  if (fromX != null && fromZ != null) {
+    const rise = surfaceY(shell, x, z) - surfaceY(shell, fromX, fromZ);
+    if (rise > STEP_UP_M) return true;
+  }
+  return false;
 }
 
 function renderedSurfaceY(shell, x, z) {
-  if (shell && typeof shell.sampleHeight === "function") return shell.sampleHeight(x, z);
-  return sampleTerrainY(shell.terrain, x, z);
+  return surfaceY(shell, x, z);
 }
 
 function syncWalkCamera(shell) {
@@ -1333,6 +1383,8 @@ function startWalk(shell, x, z, yaw, pitch, focusId) {
   shell.walk.pitch = Math.max(-1.05, Math.min(0.85, pitch));
   shell.walk.held.clear();
   shell.walk.drag = null;
+  shell.walk.lookId = null;
+  shell.walk.stick = null;
   shell.controls.enabled = false;
   shell.tween = null;
   syncWalkCamera(shell);
@@ -1359,6 +1411,9 @@ function exitWalk(shell) {
   shell.walk.held.clear();
   shell.walk.focusId = null;
   shell.walk.drag = null;
+  shell.walk.lookId = null;
+  shell.walk.stick = null;
+  if (shell.knob) shell.knob.style.transform = "translate(0px, 0px)";
   paintWalkUi(shell);
   layoutLabels();
 }
@@ -1427,21 +1482,38 @@ function holdWalk(action, down) {
 }
 
 function stepWalk(shell) {
-  if (!shell.walk || !shell.walk.active || !shell.walk.held.size) return false;
+  if (!shell.walk || !shell.walk.active) return false;
   const now = performance.now();
   const prev = shell.walk.t || now;
   shell.walk.t = now;
-  if (now - shell.walk.heldAt < 180) return true;
   const dt = Math.min(0.05, (now - prev) / 1000);
-  const blocked = (x, z) => walkBlocked(shell, x, z);
+  const blocked = (x, z, px, pz) => walkBlocked(shell, x, z, px, pz);
   let moved = false;
-  for (const action of shell.walk.held) {
-    const move = action === "forward" || action === "back" || action === "left" || action === "right";
-    const amount = move ? WALK_HOLD_MPS * dt : LOOK_HOLD_RPS * dt;
-    if (applyWalkAction(shell.walk, action, amount, blocked)) moved = true;
+  const stick = shell.walk.stick;
+  if (stick) {
+    const axes = stickAxes(stick.nx, stick.ny);
+    if (axes.power > 0) {
+      const yaw = shell.walk.yaw;
+      const dist = WALK_HOLD_MPS * axes.power * dt;
+      const dx = (Math.sin(yaw) * axes.forward + Math.cos(yaw) * axes.strafe) * dist;
+      const dz = (-Math.cos(yaw) * axes.forward + Math.sin(yaw) * axes.strafe) * dist;
+      const next = sweptMove(shell.walk.x, shell.walk.z, dx, dz, blocked);
+      if (next.x !== shell.walk.x || next.z !== shell.walk.z) {
+        shell.walk.x = next.x;
+        shell.walk.z = next.z;
+        moved = true;
+      }
+    }
+  }
+  if (shell.walk.held.size && now - shell.walk.heldAt >= 180) {
+    for (const action of shell.walk.held) {
+      const move = action === "forward" || action === "back" || action === "left" || action === "right";
+      const amount = move ? WALK_HOLD_MPS * dt : LOOK_HOLD_RPS * dt;
+      if (applyWalkAction(shell.walk, action, amount, blocked)) moved = true;
+    }
   }
   if (moved) syncWalkCamera(shell);
-  return true;
+  return moved || shell.walk.held.size > 0 || !!(stick && stickAxes(stick.nx, stick.ny).power > 0);
 }
 
 function onWalkKey(event, down) {
@@ -1663,36 +1735,96 @@ function pickAt(event) {
   selectBuilding(hits[0].object.userData.osmId, "");
 }
 
+function releaseWalkPointers() {
+  if (!session || !session.walk) return;
+  session.walk.stick = null;
+  session.walk.lookId = null;
+  session.walk.drag = null;
+  session.walk.held.clear();
+  if (session.knob) session.knob.style.transform = "translate(0px, 0px)";
+}
+
+function bindStick(shell) {
+  const node = shell.stick;
+  const knob = shell.knob;
+  if (!node || !knob) return;
+  const end = (event) => {
+    const stick = session && session.walk && session.walk.stick;
+    if (!stick || (event && stick.id !== event.pointerId)) return;
+    session.walk.stick = null;
+    knob.style.transform = "translate(0px, 0px)";
+  };
+  node.addEventListener("pointerdown", (event) => {
+    if (!session || !session.walk || !session.walk.active || session.walk.stick) return;
+    if (event.cancelable) event.preventDefault();
+    event.stopPropagation();
+    try { node.setPointerCapture(event.pointerId); } catch (e) { /* already gone */ }
+    const rect = node.getBoundingClientRect();
+    session.walk.stick = {
+      id: event.pointerId,
+      cx: rect.left + rect.width / 2,
+      cy: rect.top + rect.height / 2,
+      nx: 0,
+      ny: 0,
+    };
+    poke();
+  });
+  node.addEventListener("pointermove", (event) => {
+    const stick = session && session.walk && session.walk.stick;
+    if (!stick || stick.id !== event.pointerId) return;
+    if (event.cancelable) event.preventDefault();
+    const dx = (event.clientX - stick.cx) / 46;
+    const dy = (stick.cy - event.clientY) / 46;
+    const mag = Math.hypot(dx, dy) || 1;
+    const lim = mag > 1 ? 1 / mag : 1;
+    stick.nx = dx * lim;
+    stick.ny = dy * lim;
+    knob.style.transform = `translate(${stick.nx * 30}px, ${-stick.ny * 30}px)`;
+    poke();
+  });
+  node.addEventListener("pointerup", end);
+  node.addEventListener("pointercancel", end);
+}
+
 function bindPointer(shell) {
-  let down = null;
+  bindStick(shell);
   bind(shell, shell.canvas, "pointerdown", (event) => {
-    down = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    if (session && session.walk && session.walk.active) session.walk.drag = { x: event.clientX, y: event.clientY };
+    if (!session || !session.walk || !session.walk.active) return;
+    if (session.walk.stick && session.walk.stick.id === event.pointerId) return;
+    if (session.walk.lookId != null) return;
+    if (event.target !== shell.canvas) return;
+    if (event.cancelable) event.preventDefault();
+    session.walk.lookId = event.pointerId;
+    session.walk.drag = { x: event.clientX, y: event.clientY, moved: 0 };
   });
   bind(shell, shell.canvas, "pointerup", (event) => {
-    if (!down || down.id !== event.pointerId) return;
-    const moved = Math.hypot(event.clientX - down.x, event.clientY - down.y);
-    down = null;
-    if (session && session.walk) session.walk.drag = null;
+    if (!session || !session.walk || session.walk.lookId !== event.pointerId) return;
+    const moved = session.walk.drag ? session.walk.drag.moved : 0;
+    session.walk.lookId = null;
+    session.walk.drag = null;
     if (moved < 6) pickAt(event);
   });
-  bind(shell, shell.canvas, "pointercancel", () => {
-    down = null;
-    if (session && session.walk) session.walk.drag = null;
+  bind(shell, shell.canvas, "pointercancel", (event) => {
+    if (!session || !session.walk || session.walk.lookId !== event.pointerId) return;
+    session.walk.lookId = null;
+    session.walk.drag = null;
   });
   bind(shell, shell.canvas, "pointermove", (event) => {
-    if (session && session.walk && session.walk.active && session.walk.drag && down && down.id === event.pointerId) {
+    if (session && session.walk && session.walk.active && session.walk.lookId === event.pointerId && session.walk.drag) {
       const dx = event.clientX - session.walk.drag.x;
       const dy = event.clientY - session.walk.drag.y;
       session.walk.drag.x = event.clientX;
       session.walk.drag.y = event.clientY;
+      session.walk.drag.moved += Math.hypot(dx, dy);
+      if (event.cancelable) event.preventDefault();
       if (dx || dy) {
         applyWalkAction(session.walk, "look-right", dx * 0.005, () => false);
         applyWalkAction(session.walk, "look-up", -dy * 0.004, () => false);
         syncWalkCamera(session);
       }
     }
-    if (!session || !session.camera || (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) >= 6)) return;
+    const dragging = session && session.walk && session.walk.drag && session.walk.drag.moved >= 6;
+    if (!session || !session.camera || dragging) return;
     const rect = session.canvas.getBoundingClientRect();
     const ndc = new THREE.Vector2(
       ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -2502,6 +2634,10 @@ export async function open(opts) {
     if (session && session.root === shell.root) onWalkKey(event, false);
   }, true);
   bind(shell, window, "resize", resize);
+  bind(shell, window, "blur", releaseWalkPointers);
+  bind(shell, document, "visibilitychange", () => {
+    if (document.visibilityState !== "visible") releaseWalkPointers();
+  });
   if (window.visualViewport) {
     const onVv = () => { if (session === shell) syncWalkChrome(shell); };
     bind(shell, window.visualViewport, "resize", onVv);

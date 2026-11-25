@@ -21,11 +21,11 @@ const RIBBON = new Set([
 ]);
 
 export const ARCHETYPE_COLOR = Object.freeze({
-  crimson: { mass: 0xc92a2a, roof: 0x3a1818, skirt: 0x6e403c, edge: 0xc92a2a, bay: 3.4, floor: 3.5 },
-  limestone: { mass: 0xe4ddd2, roof: 0xcfc6b8, skirt: 0x8a837a, edge: 0x8a8175, bay: 4.2, floor: 3.8 },
-  ribbon: { mass: 0xd4cdc2, roof: 0xb7b0a4, skirt: 0x7c776f, edge: 0x7a756c, bay: 3.3, floor: 3.6 },
-  brick: { mass: 0x8a4e3c, roof: 0x6a6258, skirt: 0x7a5648, edge: 0x5c463c, bay: 3.8, floor: 3.5 },
-  context: { mass: 0xb3aea4, roof: 0x8e8880, skirt: 0x78746e, edge: 0x6e6a64, bay: 4.0, floor: 3.6 },
+  crimson: { mass: 0xc92a2a, roof: 0x3a1818, skirt: 0x9b1c1c, edge: 0xc92a2a, bay: 3.4, floor: 3.5 },
+  limestone: { mass: 0xc6ccd1, roof: 0xb7bec4, skirt: 0x929da6, edge: 0x8e98a1, bay: 4.2, floor: 3.8 },
+  ribbon: { mass: 0xc6ccd1, roof: 0xb7bec4, skirt: 0x929da6, edge: 0x8e98a1, bay: 3.3, floor: 3.6 },
+  brick: { mass: 0xc6ccd1, roof: 0xb7bec4, skirt: 0x929da6, edge: 0x8e98a1, bay: 3.8, floor: 3.5 },
+  context: { mass: 0xc6ccd1, roof: 0xb7bec4, skirt: 0x929da6, edge: 0x8e98a1, bay: 4.0, floor: 3.6 },
 });
 
 export function archetypeFor(osmId, kind) {

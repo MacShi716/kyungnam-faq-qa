@@ -314,9 +314,8 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   await page.goto("/");
   await openMap(page);
   const snap = await page.evaluate(() => window.CampusMap.debugSnapshot());
-  expect(snap.chroma).toBeGreaterThan(0.12);
-  expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[0]);
-  expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[2]);
+  expect(snap.chroma).toBeGreaterThan(0.03);
+  expect(snap.lowColor[2]).toBeGreaterThan(snap.lowColor[0]);
   const red = snap.buildings.find((item) => item.osmId === 1062073167);
   expect(red.kind).toBe("red");
   expect(red.archetype).toBe("crimson");
@@ -384,7 +383,7 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "dark");
   const dark = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(dark.theme).toBe("dark");
-  expect(dark.chroma).toBeGreaterThan(0.08);
+  expect(dark.chroma).toBeGreaterThan(0.02);
   const redDark = dark.buildings.find((item) => item.osmId === 1062073167);
   expect(redDark.mass).toBe("c92a2a");
   expect(redDark.roof).toBe("3a1818");

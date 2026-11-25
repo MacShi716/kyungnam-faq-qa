@@ -98,22 +98,17 @@ function paintHillAlbedo(sample, bounds, theme) {
         let g;
         let b;
         if (dark) {
-          const lawn = [42 + n * 8, 62 + n * 8, 40 + grain * 5];
-          const forest = [28 + n * 6, 46 + n * 6, 32];
-          const stone = [48 + grain * 6, 50 + grain * 5, 46];
-          const veg = n > 0.55 ? forest : lawn;
-          r = mix(veg[0], stone[0], rock);
-          g = mix(veg[1], stone[1], rock);
-          b = mix(veg[2], stone[2], rock);
+          const base = [48 + n * 6, 61 + n * 5, 73 + grain * 4];
+          const high = [58 + grain * 4, 74 + n * 4, 88];
+          r = mix(base[0], high[0], rock);
+          g = mix(base[1], high[1], rock);
+          b = mix(base[2], high[2], rock);
         } else {
-          const lawn = [96 + n * 12, 142 + n * 10, 68 + grain * 6];
-          const forest = [58 + n * 8, 108 + n * 8, 54 + grain * 4];
-          const stone = [148 + grain * 8, 140 + grain * 6, 122];
-          const soil = [142, 118, 82];
-          const veg = n > 0.62 ? forest : n < 0.22 ? soil : lawn;
-          r = mix(veg[0], stone[0], rock);
-          g = mix(veg[1], stone[1], rock);
-          b = mix(veg[2], stone[2], rock);
+          const base = [135 + n * 6, 148 + n * 5, 157 + grain * 4];
+          const high = [154 + grain * 4, 166 + n * 3, 174];
+          r = mix(base[0], high[0], rock);
+          g = mix(base[1], high[1], rock);
+          b = mix(base[2], high[2], rock);
         }
         const o = (py * size + px) * 4;
         data[o] = r;
@@ -402,16 +397,25 @@ export function applyAtmosphereTheme(shell) {
     shell.boundary.material.opacity = dark ? 0.45 : 0.55;
   }
   const road = shell.layerMeshes && shell.layerMeshes.road;
-  if (road && road.material && road.material.emissive) {
-    road.material.color.setHex(0x7a838c);
-    road.material.emissive.setHex(0x3e464e);
-    road.material.emissiveIntensity = dark ? 0.85 : 0.55;
+  if (road && road.material) {
+    road.material.color.setHex(dark ? 0x465a6b : 0x455563);
+    if (road.material.emissive) {
+      road.material.emissive.setHex(0x000000);
+      road.material.emissiveIntensity = 0;
+    }
   }
+  const curb = shell.layerMeshes && shell.layerMeshes.curb;
+  if (curb && curb.material) curb.material.color.setHex(dark ? 0x8596a3 : 0xa9b5bd);
   const path = shell.layerMeshes && shell.layerMeshes.path;
-  if (path && path.material && path.material.emissive) {
-    path.material.emissive.setHex(dark ? 0x9a8468 : 0x000000);
-    path.material.emissiveIntensity = dark ? 0.7 : 0;
+  if (path && path.material) {
+    path.material.color.setHex(dark ? 0x6d7e8c : 0xa7b3bb);
+    if (path.material.emissive) {
+      path.material.emissive.setHex(0x000000);
+      path.material.emissiveIntensity = 0;
+    }
   }
+  const turf = shell.layerMeshes && shell.layerMeshes.turf;
+  if (turf && turf.material) turf.material.color.setHex(dark ? 0x303d49 : 0x87949d);
 }
 
 function pushTri(buf, ax, ay, az, bx, by, bz, cx, cy, cz, au, av, bu, bv, cu, cv) {
@@ -859,7 +863,7 @@ export function buildCampusLayers(shell) {
     else if (subtype === "park" || subtype === "garden" || subtype === "playground") buckets.park.push(geo);
     else buckets.turf.push(geo);
   }
-  mergeAndAdd(shell, buckets.turf, turfMat, false);
+  mergeAndAdd(shell, buckets.turf, turfMat, false, "turf");
   mergeAndAdd(shell, buckets.track, trackMat, false);
   mergeAndAdd(shell, buckets.park, parkMat, false);
   mergeAndAdd(shell, buckets.lot, lotMat, false);
@@ -1109,18 +1113,23 @@ export function paintRealisticBuildings(shell) {
   const dark = shell.theme === "dark";
   for (const record of shell.buildings) {
     const mode = record.osmId === shell.selectedId ? "selected" : record.osmId === shell.hoverId ? "hover" : "idle";
-    const boost = mode === "selected" ? 0.28 : mode === "hover" ? 0.12 : 0;
+    const boost = mode === "selected" ? 0.12 : mode === "hover" ? 0.05 : 0;
+    const massHex = record.archetype === "crimson" ? 0xc92a2a : (dark ? 0x788895 : 0xc6ccd1);
+    const skirtHex = record.archetype === "crimson" ? 0x9b1c1c : (dark ? 0x596c7b : 0x929da6);
     for (const mat of record.facades || []) {
-      mat.emissiveIntensity = (dark ? 0.9 : 0.06) + boost;
+      mat.color.setHex(massHex);
+      mat.emissiveIntensity = (dark ? 0.16 : 0.04) + boost;
     }
+    if (record.mass && record.mass.material && record.mass.material.color) record.mass.material.color.setHex(massHex);
+    if (record.skirt && record.skirt.material && record.skirt.material.color) record.skirt.material.color.setHex(skirtHex);
     if (record.edge) {
       record.edge.material.opacity = record.archetype === "crimson"
         ? (mode === "idle" ? 0.62 : 0.9)
         : (mode === "idle" ? 0.07 : 0.28);
     }
     if (record.skirt && record.skirt.material && record.skirt.material.emissive) {
-      record.skirt.material.emissive.setHex(0x6e675f);
-      record.skirt.material.emissiveIntensity = dark ? 0.72 : 0.48;
+      record.skirt.material.emissive.setHex(0x000000);
+      record.skirt.material.emissiveIntensity = 0;
     }
     if (record.beacon && record.beacon.material) {
       record.beacon.material.emissiveIntensity = dark ? 1.35 : 0.55;

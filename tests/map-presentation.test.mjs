@@ -13,21 +13,19 @@ function chroma(rgb) {
   return Math.max(...rgb) - Math.min(...rgb);
 }
 
-test("hillside colors leave greyscale and stay in palette", () => {
+test("hillside colors stay in the tech gray", () => {
   const lawn = terrainColor(0, "light");
   const ridge = terrainColor(1, "light");
-  assert.ok(lawn[1] > lawn[0] && lawn[1] > lawn[2]);
-  assert.ok(chroma(lawn) > 0.15);
-  assert.ok(chroma(ridge) > 0.08);
-  assert.ok(ridge[1] < lawn[1]);
+  assert.ok(lawn[2] >= lawn[1] - 0.02);
+  assert.ok(lawn[1] > lawn[0]);
+  assert.ok(chroma(lawn) > 0.03 && chroma(lawn) < 0.2);
+  assert.ok(chroma(ridge) > 0.03);
   const nightLow = terrainColor(0, "dark");
   const nightHigh = terrainColor(1, "dark");
-  assert.ok(nightLow[2] > nightLow[0] && nightLow[1] > nightLow[0]);
-  assert.ok(chroma(nightLow) > 0.08);
-  assert.ok(chroma(nightHigh) > 0.1);
-  assert.ok(nightHigh[2] > nightHigh[1]);
-  const mid = terrainColor(0.4, "light");
-  assert.ok(mid[1] > mid[0]);
+  assert.ok(nightLow[2] > nightLow[0]);
+  assert.ok(chroma(nightLow) > 0.02);
+  assert.ok(chroma(nightHigh) > 0.02);
+  assert.ok(nightHigh[2] >= nightHigh[1] - 0.02);
 });
 
 test("international design building is red and unnamed outlines stay neutral", () => {
