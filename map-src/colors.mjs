@@ -140,7 +140,21 @@ export function terrainColor(t, theme, tint = 0) {
 }
 
 export function skyColor(theme) {
-  return theme === "dark" ? 0x101820 : 0xd7eefc;
+  return theme === "dark" ? 0x141c2c : 0x8ebfdf;
+}
+
+/**
+ * Height is the sky-sphere Y divided by its radius.
+ * The default camera looks down, so the visible sky is near the sphere's equator.
+ * That band is the daytime blue. The pale horizon stays below the terrain.
+ */
+export function skyStop(height, theme) {
+  const dark = theme === "dark";
+  const top = dark ? 0x141c2c : 0x8ebfdf;
+  const horizon = dark ? 0x1c2838 : 0xd7e6f0;
+  const y = Number(height);
+  const lift = Math.max(0, Math.min(1, ((Number.isFinite(y) ? y : 0) + 0.25) / 0.08));
+  return lerpHex(horizon, top, lift);
 }
 
 export function lightRig(theme) {

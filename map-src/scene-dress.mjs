@@ -1,7 +1,7 @@
 /** Photoreal campus meshes. Browser only: canvas textures, no network, no external HDR. */
 
 import * as THREE from "three";
-import { buildingKind, materialSet, terrainColor, wallPaint } from "./colors.mjs";
+import { buildingKind, materialSet, skyStop, terrainColor, wallPaint } from "./colors.mjs";
 import {
   ARCHETYPE_COLOR,
   VISUAL_COLS,
@@ -310,16 +310,12 @@ function surfaceMat(shell, color, roughness, metalness, extra) {
 }
 
 function paintSky(sky, dark) {
-  const top = new THREE.Color(dark ? 0x141c2c : 0x8ebfdf);
-  const horizon = new THREE.Color(dark ? 0x1c2838 : 0xd7e6f0);
-  const ground = new THREE.Color(dark ? 0x101820 : 0xc5d4c0);
   const pos = sky.geometry.attributes.position;
   const col = sky.geometry.attributes.color;
   const c = new THREE.Color();
+  const theme = dark ? "dark" : "light";
   for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i) / 2200;
-    if (y > 0.02) c.copy(horizon).lerp(top, Math.min(1, (y - 0.02) / 0.7));
-    else c.copy(ground).lerp(horizon, Math.max(0, (y + 0.25) / 0.31));
+    c.setHex(skyStop(pos.getY(i) / 2200, theme));
     col.setXYZ(i, c.r, c.g, c.b);
   }
   col.needsUpdate = true;
@@ -380,7 +376,7 @@ export function applyAtmosphereTheme(shell) {
   }
   if (shell.renderer) {
     shell.renderer.toneMappingExposure = dark ? 1.12 : 1.0;
-    shell.renderer.setClearColor(dark ? 0x141c2c : 0xd7e6f0, 1);
+    shell.renderer.setClearColor(dark ? 0x141c2c : 0x8ebfdf, 1);
   }
   if (shell.terrainMesh && shell.terrainMaps) {
     shell.terrainMesh.material.map = dark ? shell.terrainMaps.dark : shell.terrainMaps.light;
@@ -392,7 +388,13 @@ export function applyAtmosphereTheme(shell) {
   }
   const cast = materialSet(shell.tint || 0, shell.theme);
   if (shell.terrainMesh && shell.terrainMesh.material) {
-    shell.terrainMesh.material.color.setHex(cast.terrain);
+    const terrainMat = shell.terrainMesh.material;
+    terrainMat.color.setHex(cast.terrain);
+    const coolNight = dark && (shell.tint || 0) <= -0.35;
+    if (terrainMat.emissive) {
+      terrainMat.emissive.setHex(coolNight ? cast.terrain : 0x000000);
+      terrainMat.emissiveIntensity = coolNight ? 1.05 : 0;
+    }
   }
   const road = shell.layerMeshes && shell.layerMeshes.road;
   if (road && road.material) {

@@ -10,6 +10,7 @@ import {
   clearMapFavorites,
   clearSiteData,
   createProfile,
+  saveState,
   deleteProfile,
   exitProfile,
   hasLongDigitRun,
@@ -122,6 +123,46 @@ test("a guest can still wipe every local key, including leftovers and tint", () 
   assert.deepEqual(store.keys().slice().sort(), ["gomoku-save", "korean-site-progress"]);
 });
 
+function localStorageLike() {
+  const data = new Map();
+  return {
+    getItem(key) { return data.has(key) ? data.get(key) : null; },
+    setItem(key, value) { data.set(key, String(value)); },
+    removeItem(key) { data.delete(key); },
+    get length() { return data.size; },
+    key(index) { return [...data.keys()][index] || null; },
+  };
+}
+
+test("a full wipe on a real storage list removes orphan profiles and leaves foreign keys", () => {
+  const store = localStorageLike();
+  createProfile(store, { nickname: "tester-a", gender: "female", id: "p_8295a21f-ae9f-42d4-9f89-c06e722db7b6", now: "2026-11-25T00:00:00.000Z" });
+  exitProfile(store);
+  store.setItem("campus_map_tint", "1");
+  store.setItem("faq_theme", "light");
+  store.setItem("faq_ui_lang", "zh");
+  store.setItem("qa_unrelated_key_do_not_delete", "keep-me");
+  store.setItem("korean-site-progress", "keep");
+  store.setItem("gomoku-save", "keep");
+  clearSiteData(store);
+  assert.equal(store.getItem("faq_local_profiles"), null);
+  assert.equal(store.getItem("faq_local_state_p_8295a21f-ae9f-42d4-9f89-c06e722db7b6"), null);
+  assert.equal(store.getItem("campus_map_tint"), null);
+  assert.equal(store.getItem("faq_theme"), null);
+  assert.equal(store.getItem("faq_ui_lang"), null);
+  assert.equal(store.getItem("campus_map_favorites"), null);
+  assert.equal(store.getItem("qa_unrelated_key_do_not_delete"), "keep-me");
+  assert.equal(store.getItem("korean-site-progress"), "keep");
+  assert.equal(store.getItem("gomoku-save"), "keep");
+  saveState(store, "p_8295a21f-ae9f-42d4-9f89-c06e722db7b6", { searchHistory: [], frequent: [], mapFavorites: [] });
+  noteSearch(store, "left behind");
+  noteFrequent(store, "faq:F49");
+  writeMapFavorites(store, new Set(["faq:F49"]));
+  assert.equal(store.getItem("faq_local_state_p_8295a21f-ae9f-42d4-9f89-c06e722db7b6"), null);
+  assert.equal(store.getItem("faq_local_profiles"), null);
+  assert.equal(store.getItem("qa_unrelated_key_do_not_delete"), "keep-me");
+});
+
 test("clearing accounts keeps theme and clearing the site removes it", () => {
   const store = memory();
   createProfile(store, { nickname: "tester-b", gender: "male", id: "p_b", now: "2026-11-25T00:00:00.000Z" });
@@ -163,6 +204,16 @@ test("the ask request does not carry a local profile", () => {
   assert.match(wipe, /faq_ui_lang/);
   assert.match(wipe, /campus_map_favorites/);
   assert.equal(wipe.includes(".clear()"), false);
+  assert.match(html, /function setLang\(lang, persist\)/);
+  assert.match(html, /if \(persist\) storageSet\("faq_ui_lang"/);
+  assert.match(html, /setLang\(uiLang\);/);
+  assert.doesNotMatch(html, /setLang\(uiLang,\s*true\)/);
+  assert.match(map, /localStorage\.key\(index\)/);
+  const favHandler = map.slice(map.indexOf("clearFav.addEventListener"), map.indexOf("function entryMatches"));
+  assert.match(favHandler, /map-fav-confirm/);
+  assert.equal(favHandler.includes("clearFavStorage()"), false);
+  assert.match(map, /overflow:visible/);
+  assert.doesNotMatch(map, /walk-active \.map-toolbar\{[^}]*overflow:hidden/);
   assert.match(html, /id="local-data-accounts"/);
   assert.match(html, /id="local-data-site"/);
   assert.match(html, /清空本机账号与记录/);

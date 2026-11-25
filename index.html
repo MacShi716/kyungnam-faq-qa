@@ -221,6 +221,7 @@ h1.blur-title {
 .local-data-body { display: flex; flex-direction: column; gap: 8px; }
 .local-data-body p { margin: 0; }
 .local-data-actions, .local-data-confirm { display: flex; flex-wrap: wrap; gap: 8px; }
+.local-data-confirm[hidden] { display: none !important; }
 .local-data-actions button, .local-data-confirm button {
   min-height: 44px;
   padding: 0 12px;
@@ -1768,9 +1769,9 @@ function suggestedFaqs(query, lang, limit) {
     void el.offsetWidth;
     el.classList.add("play");
   }
-  function setLang(lang) {
+  function setLang(lang, persist) {
     uiLang = lang === "ko" ? "ko" : "zh";
-    storageSet("faq_ui_lang", uiLang);
+    if (persist) storageSet("faq_ui_lang", uiLang);
     document.documentElement.lang = uiLang === "ko" ? "ko" : "zh-CN";
     paintTitle();
     $("hint").textContent = t("hint");
@@ -2324,7 +2325,7 @@ function suggestedFaqs(query, lang, limit) {
       armIgnoreClick();
       void lang.querySelector(".lang-thumb").offsetWidth;
       const next = flicked(startPos, pos, travel()) ? (startPos < 0.5 ? "zh" : "ko") : (startPos < 0.5 ? "ko" : "zh");
-      if (next !== uiLang) setLang(next);
+      if (next !== uiLang) setLang(next, true);
       else {
         lang.style.setProperty("--lang-pos", next === "ko" ? "0" : "1");
         paintLabels(next === "ko" ? 0 : 1);
@@ -2386,7 +2387,7 @@ function suggestedFaqs(query, lang, limit) {
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
         e.preventDefault();
         const next = e.key === "ArrowLeft" ? "ko" : "zh";
-        setLang(next);
+        setLang(next, true);
         $(next === "ko" ? "btn-ko" : "btn-zh").focus();
       } else if (e.key === "Escape" && drag) {
         e.preventDefault();
@@ -2550,8 +2551,8 @@ function suggestedFaqs(query, lang, limit) {
       current = null;
     });
   }
-  $("btn-ko").addEventListener("click", () => setLang("ko"));
-  $("btn-zh").addEventListener("click", () => setLang("zh"));
+  $("btn-ko").addEventListener("click", () => setLang("ko", true));
+  $("btn-zh").addEventListener("click", () => setLang("zh", true));
   $("btn-map").addEventListener("click", () => openCampusMap(""));
   $("btn-clear").addEventListener("click", () => {
     history = [];

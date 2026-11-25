@@ -7,6 +7,7 @@ import {
   materialSet,
   paintTokens,
   settleTint,
+  skyStop,
   terrainColor,
   wallPaint,
 } from "../map-src/colors.mjs";
@@ -57,6 +58,11 @@ test("default tint is the natural campus and the ends match cool and warm", () =
   assert.ok(coolLawn[2] > coolLawn[0]);
   const warmLawn = terrainColor(0, "light", 1);
   assert.ok(warmLawn[0] > warmLawn[2]);
+  assert.equal(skyStop(0.2, "light"), 0x8ebfdf);
+  assert.equal(skyStop(0, "light"), 0x8ebfdf);
+  assert.equal(skyStop(-0.3, "light"), 0xd7e6f0);
+  assert.equal(skyStop(0.2, "dark"), 0x141c2c);
+  assert.equal(skyStop(-0.3, "dark"), 0x1c2838);
 });
 
 test("international design building is red and unnamed outlines stay neutral", () => {

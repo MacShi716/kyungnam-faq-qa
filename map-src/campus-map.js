@@ -105,6 +105,7 @@ const TEXT = {
     lookUp: "抬头", lookDown: "低头", lookLeft: "向左转", lookRight: "向右转",
     full: "全屏", fullExit: "退出全屏", directory: "目录", search: "搜索地点",
     privacy: "请勿输入学号、手机号等个人信息", clearFav: "清空收藏",
+    clearFavAsk: "确认清空收藏？取消则保留当前收藏。",
     storage: "仅保存在本机浏览器，公用设备请清空", fav: "收藏", favOn: "已收藏",
     viewFaq: "查看相关 FAQ", noFaq: "暂无对应 FAQ", textOnly: "文字地点",
     notice: "Copernicus · 数据来源与许可", licenseTitle: "数据来源与许可", loading: "正在加载校园地图…",
@@ -150,6 +151,7 @@ const TEXT = {
     lookUp: "위로", lookDown: "아래로", lookLeft: "왼쪽으로", lookRight: "오른쪽으로",
     full: "전체 화면", fullExit: "전체 화면 종료", directory: "목록", search: "장소 검색",
     privacy: "학번·전화번호 등 개인정보는 입력하지 마세요", clearFav: "즐겨찾기 비우기",
+    clearFavAsk: "즐겨찾기를 비울까요? 취소하면 그대로 둡니다.",
     storage: "이 브라우저에만 저장됩니다. 공용 기기에서는 비워 주세요", fav: "즐겨찾기", favOn: "즐겨찾기됨",
     viewFaq: "관련 FAQ 보기", noFaq: "연결된 FAQ 없음", textOnly: "텍스트 안내",
     notice: "Copernicus · 출처·라이선스", licenseTitle: "데이터 출처 및 라이선스", loading: "캠퍼스맵을 불러오는 중…",
@@ -261,9 +263,16 @@ html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-more-btn{display:inline-flex}
 .map-tint{display:none;flex-direction:column;gap:2px;min-width:180px;padding:8px 10px;box-sizing:border-box;color:var(--ink);background:var(--map-panel);border:1px solid var(--map-line);border-radius:12px}
 .map-tint-label{font-size:.78rem;font-weight:650}
-.map-tint input{width:100%;height:44px;min-height:44px;margin:0;accent-color:#39b9c5}
-.map-tint-marks{display:flex;justify-content:space-between;gap:4px}
-.map-tint-marks button{min-height:32px;padding:0 6px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.72rem;cursor:pointer}
+.map-tint-slider{display:flex;align-items:center;min-height:44px}
+.map-tint input{width:100%;height:28px;min-height:0;margin:0;accent-color:#39b9c5}
+.map-tint-marks{position:relative;display:block;height:32px}
+.map-tint-marks button{position:absolute;top:0;width:auto;min-width:0;height:auto;min-height:32px;padding:0 4px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.72rem;cursor:pointer;transform:translateX(-50%)}
+.map-tint-marks button[data-tint-key="cool"]{left:0;transform:none}
+.map-tint-marks button[data-tint-key="neutral"]{left:50%}
+.map-tint-marks button[data-tint-key="warm"]{left:100%;transform:translateX(-100%)}
+.map-fav-confirm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.map-fav-confirm[hidden]{display:none !important}
+.map-fav-confirm p{margin:0;flex:1 0 100%;font-size:.75rem}
 .map-toolbar:has(.map-more.is-open){z-index:20}
 .map-more.is-open .map-tint{display:flex;position:absolute;top:48px;left:8px;z-index:30}
 .map-toolbar [data-map-action="close"]{order:1}
@@ -279,7 +288,8 @@ html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-detail-summary{display:none}
 .map-modal.is-narrow.walk-active{top:var(--map-vv-off,0px);height:var(--map-vvh,100dvh);bottom:auto}
 .map-modal.is-narrow.walk-active .map-canvas,.map-modal.is-narrow.walk-active .map-labels{top:44px;right:0;bottom:auto;left:0;width:100%;height:calc(100% - 44px - var(--walk-dock,220px))}
-.map-modal.is-narrow.walk-active .map-toolbar{top:0;left:0;right:0;height:44px;max-width:none;flex-wrap:nowrap;align-items:stretch;gap:4px;padding:0 6px;z-index:24;overflow:hidden}
+.map-modal.is-narrow .map-toolbar{overflow:visible}
+.map-modal.is-narrow.walk-active .map-toolbar{top:0;left:0;right:0;height:44px;max-width:none;flex-wrap:nowrap;align-items:stretch;gap:4px;padding:0 6px;z-index:24;overflow:visible}
 .map-modal.is-narrow.walk-active .map-toolbar > .map-btn:not(.map-intl-pill),.map-modal.is-narrow.walk-active .map-more-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;min-width:0;flex:1 1 0;padding:0 6px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .map-modal.is-narrow.walk-active .map-toolbar [data-map-action="close"]{order:1}
 .map-modal.is-narrow.walk-active .map-toolbar [data-map-action="directory"]{order:2}
@@ -287,10 +297,11 @@ html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-modal.is-narrow.walk-active .map-more-btn{order:4}
 .map-modal.is-narrow.walk-active .map-toolbar > .map-intl-pill{display:none}
 .map-modal.is-narrow.walk-active .map-more{display:none;position:absolute;top:48px;right:6px;z-index:25;min-width:168px;padding:6px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
-.map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px;max-height:min(42vh,280px);overflow:auto;width:min(220px,calc(100% - 128px))}
-.map-modal.is-narrow.walk-active .map-more.is-open .map-tint{position:static;width:100%;border:0;background:transparent;padding:4px 2px 8px}
-.map-modal.is-narrow.walk-active .map-more-actions{display:flex;flex-direction:column;gap:4px}
-.map-modal.is-narrow.walk-active .map-more .map-btn{width:100%;min-height:44px;height:44px;order:0}
+.map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px;max-height:min(220px,34vh);overflow:auto;width:min(240px,calc(100% - 16px))}
+.map-modal.is-narrow:not(.walk-active) .map-more.is-open{display:flex;flex-direction:column;gap:4px;position:absolute;top:calc(100% + 4px);right:0;left:auto;z-index:30;width:min(240px,calc(100% - 12px));max-height:min(220px,36vh);overflow:auto;padding:8px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
+.map-modal.is-narrow .map-more.is-open .map-tint{position:static;width:100%;min-width:0;border:0;background:transparent;padding:4px 2px 8px}
+.map-modal.is-narrow.walk-active .map-more-actions,.map-modal.is-narrow:not(.walk-active) .map-more.is-open .map-more-actions{display:flex;flex-direction:column;gap:4px}
+.map-modal.is-narrow.walk-active .map-more .map-btn:not(.map-tint-mark){width:100%;min-height:44px;height:44px;order:0}
 .map-stick{position:absolute;z-index:12;left:calc(12px + env(safe-area-inset-left));bottom:calc(44px + env(safe-area-inset-bottom));width:104px;height:104px;touch-action:none;pointer-events:auto}
 .map-stick[hidden]{display:none !important}
 .map-stick-base{position:relative;width:104px;height:104px;border-radius:50%;background:rgba(18,24,30,.28);border:1px solid rgba(57,185,197,.5)}
@@ -360,6 +371,12 @@ const browserStore = {
   },
   removeItem(key) {
     try { localStorage.removeItem(key); } catch (e) { /* private mode */ }
+  },
+  get length() {
+    try { return localStorage.length; } catch (e) { return 0; }
+  },
+  key(index) {
+    try { return localStorage.key(index); } catch (e) { return null; }
   },
 };
 
@@ -907,6 +924,9 @@ function paintChrome(shell) {
     tintInput.step = "0.01";
     tintInput.value = String(shell.tint || 0);
     tintInput.setAttribute("aria-label", copy.tint);
+    const tintSlider = document.createElement("div");
+    tintSlider.className = "map-tint-slider";
+    tintSlider.appendChild(tintInput);
     const marks = document.createElement("div");
     marks.className = "map-tint-marks";
     for (const key of ["cool", "neutral", "warm"]) {
@@ -916,7 +936,7 @@ function paintChrome(shell) {
       mark.dataset.tintKey = key;
       marks.appendChild(mark);
     }
-    tint.append(tintLabel, tintInput, marks);
+    tint.append(tintLabel, tintSlider, marks);
     const previewCast = () => {
       if (!session) return;
       session.tint = clampTint(tintInput.value);
@@ -1034,6 +1054,9 @@ function paintChrome(shell) {
     shell.search.setAttribute("aria-label", copy.search);
     shell.privacy.textContent = copy.privacy;
     shell.clearFav.textContent = copy.clearFav;
+    if (shell.favConfirmText) shell.favConfirmText.textContent = copy.clearFavAsk;
+    if (shell.favYes) shell.favYes.textContent = copy.confirm;
+    if (shell.favNo) shell.favNo.textContent = copy.cancel;
     shell.storage.textContent = copy.storage;
     for (const node of shell.filters.querySelectorAll("button")) {
       node.textContent = copy.cats[node.dataset.cat];
@@ -1070,10 +1093,22 @@ function mountDirectory(shell) {
   const list = document.createElement("ul");
   list.className = "map-list";
   const clearFav = button(copy.clearFav, "map-btn map-clear");
+  const favConfirm = document.createElement("div");
+  favConfirm.className = "map-fav-confirm";
+  favConfirm.hidden = true;
+  const favConfirmText = document.createElement("p");
+  favConfirmText.textContent = copy.clearFavAsk;
+  const favYes = button(copy.confirm, "map-btn");
+  const favNo = button(copy.cancel, "map-btn");
+  favConfirm.append(favConfirmText, favYes, favNo);
+  shell.favConfirm = favConfirm;
+  shell.favConfirmText = favConfirmText;
+  shell.favYes = favYes;
+  shell.favNo = favNo;
   const storage = document.createElement("p");
   storage.className = "map-storage";
   storage.textContent = copy.storage;
-  shell.directory.replaceChildren(banner, search, privacy, filters, list, clearFav, storage);
+  shell.directory.replaceChildren(banner, search, privacy, filters, list, clearFav, favConfirm, storage);
   shell.intlBanner = banner;
   shell.search = search;
   shell.privacy = privacy;
@@ -1096,12 +1131,21 @@ function mountDirectory(shell) {
     }
     renderDirectory();
   });
-  clearFav.addEventListener("click", () => {
-    if (!session) return;
+  favNo.addEventListener("click", () => {
+    favConfirm.hidden = true;
+  });
+  favYes.addEventListener("click", () => {
+    if (!session || favConfirm.hidden) return;
+    favConfirm.hidden = true;
     session.favorites = new Set();
     clearFavStorage();
     renderDirectory();
     refreshDetail();
+  });
+  clearFav.addEventListener("click", () => {
+    if (!session) return;
+    const confirm = session.directory.querySelector(".map-fav-confirm");
+    if (confirm) confirm.hidden = false;
   });
 }
 
@@ -2075,6 +2119,13 @@ function stepWalk(shell) {
   return travelled > 0 || walk.held.size > 0 || !!(stickAxis && stickAxis.power > 0) || !walk.grounded;
 }
 
+function queueJump(walk) {
+  if (!walk || !walk.active) return;
+  walk.jumpQueued = true;
+  walk.t = performance.now();
+  poke();
+}
+
 function onWalkKey(event, down) {
   if (!session || !session.walk) return;
   const tag = event.target && event.target.tagName;
@@ -2083,10 +2134,7 @@ function onWalkKey(event, down) {
   if (event.code === "Space") {
     if (!walk.active) return;
     event.preventDefault();
-    if (down && !event.repeat) {
-      walk.jumpQueued = true;
-      poke();
-    }
+    if (down && !event.repeat) queueJump(walk);
     return;
   }
   if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
@@ -2404,8 +2452,7 @@ function bindPointer(shell) {
       if (!session || !session.walk || !session.walk.active) return;
       if (event.cancelable) event.preventDefault();
       event.stopPropagation();
-      session.walk.jumpQueued = true;
-      poke();
+      queueJump(session.walk);
     });
   }
   bind(shell, shell.canvas, "pointerdown", (event) => {

@@ -113,6 +113,8 @@ export function loadState(storage, id) {
 }
 
 export function saveState(storage, id, state) {
+  const book = loadBook(storage);
+  if (!id || !book.profiles.some((item) => item.id === id)) return;
   writeJson(storage, stateKey(id), {
     searchHistory: (state.searchHistory || []).slice(0, 50),
     frequent: (state.frequent || []).slice(0, 20),
