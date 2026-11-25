@@ -2,7 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   RED_OSM_ID,
+  clampTint,
   lightRig,
+  materialSet,
+  settleTint,
 } from "./colors.mjs";
 import { layoutLabelBoxes, measureLabel } from "./labels.mjs";
 import { displayTitle, directoryRank, faqButtonLabel, officialLinkLabel } from "./present.mjs";
@@ -39,6 +42,7 @@ import {
 } from "./walk.mjs";
 
 const FAV_KEY = "campus_map_favorites";
+const TINT_KEY = "campus_map_tint";
 const OFFICIAL_MAP = "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517";
 const OSM_COPYRIGHT = "https://www.openstreetmap.org/copyright";
 const ODBL_LICENSE = "https://opendatacommons.org/licenses/odbl/1-0/";
@@ -64,7 +68,8 @@ const TEXT = {
     summary: "地形高程使用 Copernicus WorldDEM-30 公开数据，只用于这张校园示意图。欧盟、ESA、DLR 与 Airbus 不对使用该数据承担责任，也不表示认可本页面。",
     officialMap: "庆南大学 2026 校园地图", ext: "外部官方链接", empty: "没有匹配的地点", phone: "电话",
     dialog: "庆南大学 3D 校园示意图",
-    labels: "标注", more: "更多", expandDetail: "展开详情", collapseDetail: "收起详情",
+    labels: "标注", more: "更多", tint: "色调", cool: "冷", neutral: "默认", warm: "暖",
+    expandDetail: "展开详情", collapseDetail: "收起详情",
     floorTitle: "各楼层教室与用途", facilities: "设施", hours: "时间",
     roleBadge: "国际服务重点", noMesh: "暂无3D轮廓",
     designLabel: "设计馆 · 留学生服务中心",
@@ -91,7 +96,8 @@ const TEXT = {
     summary: "지형 고도는 Copernicus WorldDEM-30 공개 자료를 사용하며 이 캠퍼스 모식도에만 씁니다. EU, ESA, DLR, Airbus는 이 자료의 사용에 책임을 지지 않으며 이 페이지를 보증하거나 승인하지 않습니다.",
     officialMap: "경남대 2026 캠퍼스맵", ext: "외부 공식 링크", empty: "일치하는 장소가 없습니다", phone: "전화",
     dialog: "경남대학교 3D 캠퍼스 모식도",
-    labels: "라벨", more: "더보기", expandDetail: "상세 열기", collapseDetail: "상세 접기",
+    labels: "라벨", more: "더보기", tint: "색조", cool: "차가움", neutral: "기본", warm: "따뜻함",
+    expandDetail: "상세 열기", collapseDetail: "상세 접기",
     floorTitle: "층별 강의실·시설 안내", facilities: "시설", hours: "시간",
     roleBadge: "유학생 핵심", noMesh: "3D 외곽선 없음",
     designLabel: "디자인관 · 유학생서비스센터",
@@ -189,7 +195,15 @@ const MAP_CSS = `
 .map-modal.is-narrow.info-open .map-attrib{bottom:calc(min(62vh, 560px) + 12px);z-index:12}
 html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-more{display:contents}
-.map-more-btn{display:none}
+.map-more-actions{display:contents}
+.map-more-btn{display:inline-flex}
+.map-tint{display:none;flex-direction:column;gap:2px;min-width:180px;padding:8px 10px;box-sizing:border-box;color:var(--ink);background:var(--map-panel);border:1px solid var(--map-line);border-radius:12px}
+.map-tint-label{font-size:.78rem;font-weight:650}
+.map-tint input{width:100%;height:44px;min-height:44px;margin:0;accent-color:#39b9c5}
+.map-tint-marks{display:flex;justify-content:space-between;gap:4px}
+.map-tint-marks button{min-height:32px;padding:0 6px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.72rem;cursor:pointer}
+.map-toolbar:has(.map-more.is-open){z-index:20}
+.map-more.is-open .map-tint{display:flex;position:absolute;top:48px;left:8px;z-index:30}
 .map-toolbar [data-map-action="close"]{order:1}
 .map-more [data-map-action="zoom-in"]{order:2}
 .map-more [data-map-action="zoom-out"]{order:3}
@@ -212,6 +226,8 @@ html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-modal.is-narrow.walk-active .map-toolbar > .map-intl-pill{display:none}
 .map-modal.is-narrow.walk-active .map-more{display:none;position:absolute;top:48px;right:6px;z-index:25;min-width:168px;padding:6px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
 .map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px}
+.map-modal.is-narrow.walk-active .map-more.is-open .map-tint{position:static;width:100%;border:0;background:transparent;padding:4px 2px 8px}
+.map-modal.is-narrow.walk-active .map-more-actions{display:flex;flex-direction:column;gap:4px}
 .map-modal.is-narrow.walk-active .map-more .map-btn{width:100%;min-height:44px;height:44px;order:0}
 .map-stick{position:absolute;z-index:12;left:calc(12px + env(safe-area-inset-left));bottom:calc(44px + env(safe-area-inset-bottom));width:104px;height:104px;touch-action:none;pointer-events:auto}
 .map-stick[hidden]{display:none !important}
@@ -261,6 +277,32 @@ function writeFavs(set) {
   } catch (e) {
     /* incognito or blocked storage */
   }
+}
+
+function readTint() {
+  try {
+    const raw = localStorage.getItem(TINT_KEY);
+    if (raw == null || raw === "") return 0;
+    return clampTint(raw);
+  } catch (e) {
+    return 0;
+  }
+}
+
+function writeTint(value) {
+  try {
+    localStorage.setItem(TINT_KEY, String(value));
+  } catch (e) {
+    /* on-device only */
+  }
+}
+
+function applyCast(shell) {
+  if (!shell) return;
+  applyAtmosphereTheme(shell);
+  paintBuildings();
+  repaintTerrainColors(shell);
+  poke();
 }
 
 function clearFavStorage() {
@@ -414,7 +456,7 @@ function createShell(opts) {
   root.append(stage, attrib);
   const shell = {
     root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, stick, knob, lookHint, attrib, attribBar, license,
-    lang, theme: opts.theme === "dark" ? "dark" : "light",
+    lang, theme: opts.theme === "dark" ? "dark" : "light", tint: readTint(),
     onOpenFaq: opts.onOpenFaq, faqId: opts.faqId || "",
     favorites: readFavs(), category: "all", query: "", labelsOn: true,
     unbinds: [], buildings: [], pickables: [], webgl: false, glDisposed: false,
@@ -529,6 +571,49 @@ function paintChrome(shell) {
     moreBtn.dataset.mapAction = "more";
     moreBtn.setAttribute("aria-expanded", "false");
     moreBtn.setAttribute("aria-haspopup", "true");
+    const tint = document.createElement("div");
+    tint.className = "map-tint";
+    const tintLabel = document.createElement("span");
+    tintLabel.className = "map-tint-label";
+    tintLabel.textContent = copy.tint;
+    const tintInput = document.createElement("input");
+    tintInput.type = "range";
+    tintInput.min = "-1";
+    tintInput.max = "1";
+    tintInput.step = "0.01";
+    tintInput.value = String(shell.tint || 0);
+    tintInput.setAttribute("aria-label", copy.tint);
+    const marks = document.createElement("div");
+    marks.className = "map-tint-marks";
+    for (const key of ["cool", "neutral", "warm"]) {
+      const mark = button(copy[key], "map-tint-mark");
+      mark.dataset.mapAction = "tint";
+      mark.dataset.tint = key === "cool" ? "-1" : key === "warm" ? "1" : "0";
+      mark.dataset.tintKey = key;
+      marks.appendChild(mark);
+    }
+    tint.append(tintLabel, tintInput, marks);
+    const previewCast = () => {
+      if (!session) return;
+      session.tint = clampTint(tintInput.value);
+      applyCast(session);
+    };
+    tintInput.addEventListener("input", previewCast);
+    tintInput.addEventListener("change", () => {
+      if (!session) return;
+      const next = settleTint(tintInput.value);
+      session.tint = next;
+      tintInput.value = String(next);
+      writeTint(next);
+      applyCast(session);
+    });
+    tintInput.addEventListener("pointerdown", (event) => event.stopPropagation());
+    const actions = document.createElement("div");
+    actions.className = "map-more-actions";
+    morePanel.append(tint, actions);
+    shell.tintLabel = tintLabel;
+    shell.tintInput = tintInput;
+    shell.tintMarks = marks;
     const inRow = new Set(["close", "directory", "walk"]);
     for (const [key, label] of specs) {
       const node = button(label, "map-btn");
@@ -537,7 +622,7 @@ function paintChrome(shell) {
       if (key === "zoom-out") node.title = copy.zoomOut;
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
       if (inRow.has(key)) shell.toolbar.appendChild(node);
-      else morePanel.appendChild(node);
+      else actions.appendChild(node);
     }
     shell.moreBtn = moreBtn;
     shell.morePanel = morePanel;
@@ -552,6 +637,14 @@ function paintChrome(shell) {
       if (action === "more") {
         const open = shell.morePanel.classList.toggle("is-open");
         shell.moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        return;
+      }
+      if (action === "tint") {
+        const next = settleTint(node.dataset.tint);
+        session.tint = next;
+        if (shell.tintInput) shell.tintInput.value = String(next);
+        writeTint(next);
+        applyCast(session);
         return;
       }
       if (shell.morePanel) {
@@ -585,6 +678,14 @@ function paintChrome(shell) {
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
     }
     if (shell.moreBtn) shell.moreBtn.textContent = copy.more;
+    if (shell.tintLabel) shell.tintLabel.textContent = copy.tint;
+    if (shell.tintInput) shell.tintInput.setAttribute("aria-label", copy.tint);
+    if (shell.tintMarks) {
+      for (const mark of shell.tintMarks.querySelectorAll("button")) {
+        const key = mark.dataset.tintKey;
+        if (key && copy[key]) mark.textContent = copy[key];
+      }
+    }
   }
   paintIntl(shell);
   if (shell.search) {
@@ -1312,7 +1413,7 @@ function paintWalkUi(shell) {
   if (walkBtn) {
     walkBtn.setAttribute("aria-pressed", on ? "true" : "false");
     walkBtn.title = on ? copy.walkStop : copy.walkHint;
-    if (shell.root.classList.contains("is-narrow")) walkBtn.textContent = on ? copy.walkStop : copy.walk;
+    walkBtn.textContent = on ? copy.walkStop : copy.walk;
   }
   syncWalkChrome(shell);
 }
@@ -1976,6 +2077,31 @@ export function projectBuilding(osmId) {
     x: rect.left + (v.x * 0.5 + 0.5) * rect.width,
     y: rect.top + (-v.y * 0.5 + 0.5) * rect.height,
     behind: v.z > 1,
+  };
+}
+
+export function debugCast() {
+  if (!session) return null;
+  const cast = materialSet(session.tint || 0, session.theme);
+  const hex = (n) => n.toString(16).padStart(6, "0");
+  const live = (mesh) => (mesh && mesh.material && mesh.material.color ? mesh.material.color.getHexString() : "");
+  const plain = session.buildings.find((record) => record.archetype !== "crimson");
+  const red = session.buildings.find((record) => record.archetype === "crimson");
+  return {
+    tint: session.tint || 0,
+    theme: session.theme,
+    terrain: hex(cast.terrain),
+    building: hex(cast.building),
+    foundation: hex(cast.foundation),
+    road: hex(cast.road),
+    shoulder: hex(cast.shoulder),
+    roadLive: live(session.layerMeshes && session.layerMeshes.road),
+    shoulderLive: live(session.layerMeshes && session.layerMeshes.curb),
+    terrainLive: live(session.terrainMesh),
+    buildingLive: plain ? live(plain.mass) : "",
+    foundationLive: plain ? live(plain.skirt) : "",
+    redMass: red ? live(red.mass) : "",
+    redRoof: red ? live(red.roof) : "",
   };
 }
 

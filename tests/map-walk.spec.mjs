@@ -73,6 +73,7 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   await expect(page.locator(".map-stick")).toBeVisible();
   await expect(page.locator(".map-look-hint")).toBeVisible();
   await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   const entered = await page.evaluate(() => window.CampusMap.debugSnapshot());
   await page.keyboard.press("KeyW");
   await page.keyboard.press("KeyW");
@@ -92,7 +93,7 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   expect(Math.abs(north.yaw)).toBeLessThan(0.05);
 
   await page.locator("#btn-ko").evaluate((el) => el.click());
-  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("걷기");
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("걷기 종료");
   await expect(page.locator(".map-stick")).toHaveAttribute("aria-label", "이동");
   await page.locator("#theme-switch").evaluate((el) => el.click());
   await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "dark");
@@ -104,7 +105,9 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   expect(darkInk.color).not.toBe(darkInk.background);
 
   await page.locator("#btn-zh").evaluate((el) => el.click());
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   await page.locator(".map-list button[data-faq-id='F49']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   await expect(page.locator(".map-info")).toContainText("本馆");
   const atHall = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(atHall.viewMode).toBe("walk");
@@ -113,6 +116,8 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   expect(atHall.focusDistance).toBeLessThan(80);
   expect(Math.abs(atHall.eyeGap - 1.7)).toBeLessThan(1.2);
   await page.locator(".map-toolbar [data-map-action='reset']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveAttribute("aria-pressed", "false");
   const reset = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(reset.viewMode).toBe("orbit");
   expect(reset.focusId).toBe(null);
@@ -125,6 +130,13 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   const intl = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(intl.viewMode).toBe("orbit");
   expect(intl.focusId).toBe(null);
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   expect(errors).toEqual([]);
 });
 

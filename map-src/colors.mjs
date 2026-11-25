@@ -59,12 +59,69 @@ function hexLin(hex) {
   return [srgbByte(hex, 16), srgbByte(hex, 8), srgbByte(hex, 0)];
 }
 
-/** Smooth 0..1 elevation color. Channels are linear 0..1, kept in the tech gray. */
-export function terrainColor(t, theme) {
+const CAST_ROLES = ["terrain", "building", "foundation", "road", "shoulder"];
+
+const CAST = Object.freeze({
+  light: {
+    cool: { terrain: 0x87949d, building: 0xc6ccd1, foundation: 0x929da6, road: 0x455563, shoulder: 0xa9b5bd },
+    warm: { terrain: 0xa39686, building: 0xd4ccc4, foundation: 0xb3a79b, road: 0x5c534b, shoulder: 0xc4b8ac },
+  },
+  dark: {
+    cool: { terrain: 0x303d49, building: 0x788895, foundation: 0x596c7b, road: 0x465a6b, shoulder: 0x8596a3 },
+    warm: { terrain: 0x4a4038, building: 0x8a8076, foundation: 0x6b6057, road: 0x5a5249, shoulder: 0x9a8e82 },
+  },
+});
+
+function byteAt(hex, shift) {
+  return (hex >> shift) & 255;
+}
+
+function packHex(r, g, b) {
+  return ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
+}
+
+function lerpHex(a, b, t) {
+  const ch = (shift) => Math.round(byteAt(a, shift) + (byteAt(b, shift) - byteAt(a, shift)) * t);
+  return packHex(ch(16), ch(8), ch(0));
+}
+
+function neutralHex(cool, warm) {
+  const mid = lerpHex(cool, warm, 0.5);
+  const y = Math.round(0.2126 * byteAt(mid, 16) + 0.7152 * byteAt(mid, 8) + 0.0722 * byteAt(mid, 0));
+  return packHex(y, y, y);
+}
+
+export function clampTint(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(-1, Math.min(1, n));
+}
+
+/** Release near the center returns to no cast. */
+export function settleTint(value) {
+  const n = clampTint(value);
+  return Math.abs(n) <= 0.12 ? 0 : n;
+}
+
+/** tint -1 cool, 0 neutral gray, +1 warm. One value drives day and night. */
+export function materialSet(tint, theme) {
+  const t = clampTint(tint);
+  const pair = theme === "dark" ? CAST.dark : CAST.light;
+  const end = t < 0 ? pair.cool : pair.warm;
+  const amount = Math.abs(t);
+  const out = {};
+  for (const key of CAST_ROLES) {
+    out[key] = lerpHex(neutralHex(pair.cool[key], pair.warm[key]), end[key], amount);
+  }
+  return out;
+}
+
+/** Smooth 0..1 elevation color. Channels are linear 0..1. */
+export function terrainColor(t, theme, tint = 0) {
   const u = Math.min(1, Math.max(0, t));
-  const base = hexLin(theme === "dark" ? 0x303d49 : 0x87949d);
-  const high = hexLin(theme === "dark" ? 0x3a4a58 : 0x9aa6ae);
-  return mix3(base, high, u);
+  const base = hexLin(materialSet(tint, theme).terrain);
+  const lift = 1 + (u - 0.5) * 0.06;
+  return base.map((channel) => Math.min(1, Math.max(0, channel * lift)));
 }
 
 export function skyColor(theme) {
@@ -74,17 +131,17 @@ export function skyColor(theme) {
 export function lightRig(theme) {
   if (theme === "dark") {
     return {
-      hemi: 0xd5e0f0,
-      hemiGround: 0x3a4650,
+      hemi: 0xe2e2e2,
+      hemiGround: 0x424242,
       hemiIntensity: 1.05,
-      sun: 0xd5e2f4,
+      sun: 0xe6e6e6,
       sunIntensity: 0.7,
       boundary: 0x8fd0c4,
     };
   }
   return {
-    hemi: 0xf4f7fa,
-    hemiGround: 0x9aa3ab,
+    hemi: 0xf5f5f5,
+    hemiGround: 0xa3a3a3,
     hemiIntensity: 0.95,
     sun: 0xfff6ea,
     sunIntensity: 1.05,

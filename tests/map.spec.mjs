@@ -314,8 +314,8 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   await page.goto("/");
   await openMap(page);
   const snap = await page.evaluate(() => window.CampusMap.debugSnapshot());
-  expect(snap.chroma).toBeGreaterThan(0.03);
-  expect(snap.lowColor[2]).toBeGreaterThan(snap.lowColor[0]);
+  expect(snap.chroma).toBeLessThan(0.04);
+  expect(Math.abs(snap.lowColor[0] - snap.lowColor[2])).toBeLessThan(0.02);
   const red = snap.buildings.find((item) => item.osmId === 1062073167);
   expect(red.kind).toBe("red");
   expect(red.archetype).toBe("crimson");
@@ -383,7 +383,8 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "dark");
   const dark = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(dark.theme).toBe("dark");
-  expect(dark.chroma).toBeGreaterThan(0.02);
+  expect(dark.chroma).toBeLessThan(0.04);
+  expect(Math.abs(dark.lowColor[0] - dark.lowColor[2])).toBeLessThan(0.02);
   const redDark = dark.buildings.find((item) => item.osmId === 1062073167);
   expect(redDark.mass).toBe("c92a2a");
   expect(redDark.roof).toBe("3a1818");
@@ -478,6 +479,114 @@ test("directory leads with a place name and detail actions stay distinct", async
   const labels = await page.locator(".map-info .map-ext-link").allTextContents();
   expect(labels.length).toBeGreaterThan(0);
   expect(labels.every((label) => label === "官方说明")).toBe(false);
+});
+
+test("tint slider lives in more and drives day and night materials", async ({ page }) => {
+  test.setTimeout(120000);
+  const seen = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.evaluate(() => localStorage.removeItem("campus_map_tint"));
+  await openMap(page);
+  const fresh = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(fresh.tint).toBe(0);
+  expect(fresh.terrain[0]).toBe(fresh.terrain[2]);
+  expect(fresh.road).not.toBe(fresh.shoulder);
+  expect(fresh.road).not.toBe(fresh.terrain);
+  expect(fresh.building).not.toBe(fresh.foundation);
+  expect(fresh.roadLive).toBe(fresh.road);
+  expect(fresh.redMass).toBe("c92a2a");
+  await expect(page.locator(".map-tint")).toBeHidden();
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await page.locator(".map-list button[data-faq-id='F49']").click();
+  await page.locator(".map-more-btn").click();
+  const tint = page.locator(".map-tint");
+  await expect(tint).toBeVisible();
+  await expect(tint.locator(".map-tint-label")).toHaveText("色调");
+  const first = await page.locator(".map-more").evaluate((panel) => panel.firstElementChild.className);
+  expect(first).toContain("map-tint");
+  const blocked = await page.evaluate(() => {
+    const box = (sel) => {
+      const el = document.querySelector(sel);
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const overlap = (a, b) => {
+      const x = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+      const y = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+      return x * y;
+    };
+    const canvas = box(".map-canvas");
+    const tintBox = box(".map-tint");
+    const cx = canvas.x + canvas.w / 2;
+    const cy = canvas.y + canvas.h / 2;
+    const coversCenter = cx >= tintBox.x && cx <= tintBox.x + tintBox.w && cy >= tintBox.y && cy <= tintBox.y + tintBox.h;
+    return {
+      stick: overlap(tintBox, box(".map-stick")),
+      attrib: overlap(tintBox, box(".map-attrib")),
+      coversCenter,
+      belowBar: tintBox.y >= 44,
+    };
+  });
+  expect(blocked.stick).toBe(0);
+  expect(blocked.attrib).toBe(0);
+  expect(blocked.coversCenter).toBe(false);
+  expect(blocked.belowBar).toBe(true);
+  await page.locator(".map-tint-marks button[data-tint='-1']").click();
+  const cool = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(cool.tint).toBe(-1);
+  expect(cool.roadLive).toBe("455563");
+  expect(cool.terrainLive).toBe("87949d");
+  expect(cool.buildingLive).toBe("c6ccd1");
+  expect(cool.foundationLive).toBe("929da6");
+  expect(cool.shoulderLive).toBe("a9b5bd");
+  expect(cool.redMass).toBe("c92a2a");
+  await page.evaluate(() => window.CampusMap.setTheme("dark"));
+  const night = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(night.tint).toBe(-1);
+  expect(night.roadLive).toBe("465a6b");
+  expect(night.terrainLive).toBe("303d49");
+  expect(night.buildingLive).toBe("788895");
+  expect(night.redMass).toBe("c92a2a");
+  await page.locator(".map-tint-marks button[data-tint='1']").click();
+  const warmNight = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(warmNight.roadLive).toBe("5a5249");
+  expect(warmNight.terrainLive).toBe("4a4038");
+  expect(warmNight.buildingLive).toBe("8a8076");
+  await page.evaluate(() => window.CampusMap.setTheme("light"));
+  const warmDay = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(warmDay.tint).toBe(1);
+  expect(warmDay.roadLive).toBe("5c534b");
+  expect(warmDay.terrainLive).toBe("a39686");
+  expect(warmDay.shoulderLive).toBe("c4b8ac");
+  await page.locator(".map-tint input").evaluate((input) => {
+    input.value = "0.08";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  const dragging = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(dragging.tint).toBeCloseTo(0.08, 2);
+  expect(dragging.roadLive).not.toBe("5c534b");
+  expect(dragging.roadLive).not.toBe(fresh.road);
+  await page.locator(".map-tint input").evaluate((input) => {
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  const snapped = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(snapped.tint).toBe(0);
+  expect(snapped.roadLive).toBe(fresh.road);
+  await page.locator(".map-tint-marks button[data-tint='-1']").click();
+  await page.locator(".map-toolbar [data-map-action='close']").click();
+  await openMap(page);
+  const kept = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(kept.tint).toBe(-1);
+  expect(kept.roadLive).toBe("455563");
+  await page.evaluate(() => localStorage.removeItem("campus_map_tint"));
+  await page.locator(".map-toolbar [data-map-action='close']").click();
+  await openMap(page);
+  const cleared = await page.evaluate(() => window.CampusMap.debugCast());
+  expect(cleared.tint).toBe(0);
+  expect(cleared.roadLive).toBe(fresh.road);
+  expect(seen.errors).toEqual([]);
 });
 
 test("student system answer keeps a clean sugang host", async ({ page }) => {

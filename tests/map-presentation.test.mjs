@@ -4,28 +4,62 @@ import {
   NEUTRAL_OSM_IDS,
   RED_OSM_ID,
   buildingKind,
+  materialSet,
   paintTokens,
+  settleTint,
   terrainColor,
 } from "../map-src/colors.mjs";
 import { layoutLabelBoxes, measureLabel } from "../map-src/labels.mjs";
 
-function chroma(rgb) {
-  return Math.max(...rgb) - Math.min(...rgb);
-}
-
-test("hillside colors stay in the tech gray", () => {
-  const lawn = terrainColor(0, "light");
-  const ridge = terrainColor(1, "light");
-  assert.ok(lawn[2] >= lawn[1] - 0.02);
-  assert.ok(lawn[1] > lawn[0]);
-  assert.ok(chroma(lawn) > 0.03 && chroma(lawn) < 0.2);
-  assert.ok(chroma(ridge) > 0.03);
-  const nightLow = terrainColor(0, "dark");
-  const nightHigh = terrainColor(1, "dark");
-  assert.ok(nightLow[2] > nightLow[0]);
-  assert.ok(chroma(nightLow) > 0.02);
-  assert.ok(chroma(nightHigh) > 0.02);
-  assert.ok(nightHigh[2] >= nightHigh[1] - 0.02);
+test("default tint is gray and the ends match the cool and warm hexes", () => {
+  const day = materialSet(0, "light");
+  const night = materialSet(0, "dark");
+  for (const set of [day, night]) {
+    for (const key of ["terrain", "building", "foundation", "road", "shoulder"]) {
+      const r = (set[key] >> 16) & 255;
+      const g = (set[key] >> 8) & 255;
+      const b = set[key] & 255;
+      assert.equal(r, g);
+      assert.equal(g, b);
+    }
+  }
+  assert.notEqual(day.road, day.shoulder);
+  assert.notEqual(day.road, day.terrain);
+  assert.notEqual(day.building, day.foundation);
+  const cool = materialSet(-1, "light");
+  assert.equal(cool.terrain, 0x87949d);
+  assert.equal(cool.building, 0xc6ccd1);
+  assert.equal(cool.foundation, 0x929da6);
+  assert.equal(cool.road, 0x455563);
+  assert.equal(cool.shoulder, 0xa9b5bd);
+  const warm = materialSet(1, "light");
+  assert.equal(warm.terrain, 0xa39686);
+  assert.equal(warm.building, 0xd4ccc4);
+  assert.equal(warm.foundation, 0xb3a79b);
+  assert.equal(warm.road, 0x5c534b);
+  assert.equal(warm.shoulder, 0xc4b8ac);
+  const nightCool = materialSet(-1, "dark");
+  assert.equal(nightCool.terrain, 0x303d49);
+  assert.equal(nightCool.building, 0x788895);
+  assert.equal(nightCool.foundation, 0x596c7b);
+  assert.equal(nightCool.road, 0x465a6b);
+  assert.equal(nightCool.shoulder, 0x8596a3);
+  const nightWarm = materialSet(1, "dark");
+  assert.equal(nightWarm.terrain, 0x4a4038);
+  assert.equal(nightWarm.building, 0x8a8076);
+  assert.equal(nightWarm.foundation, 0x6b6057);
+  assert.equal(nightWarm.road, 0x5a5249);
+  assert.equal(nightWarm.shoulder, 0x9a8e82);
+  assert.equal(settleTint(0.08), 0);
+  assert.equal(settleTint(-0.08), 0);
+  assert.equal(settleTint(0.4), 0.4);
+  const lawn = terrainColor(0, "light", 0);
+  assert.ok(Math.abs(lawn[0] - lawn[1]) < 0.01);
+  assert.ok(Math.abs(lawn[1] - lawn[2]) < 0.01);
+  const coolLawn = terrainColor(0, "light", -1);
+  assert.ok(coolLawn[2] > coolLawn[0]);
+  const warmLawn = terrainColor(0, "light", 1);
+  assert.ok(warmLawn[0] > warmLawn[2]);
 });
 
 test("international design building is red and unnamed outlines stay neutral", () => {

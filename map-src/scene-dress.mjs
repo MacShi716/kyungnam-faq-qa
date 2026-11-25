@@ -1,7 +1,7 @@
 /** Photoreal campus meshes. Browser only: canvas textures, no network, no external HDR. */
 
 import * as THREE from "three";
-import { buildingKind, terrainColor } from "./colors.mjs";
+import { buildingKind, materialSet, terrainColor } from "./colors.mjs";
 import {
   ARCHETYPE_COLOR,
   VISUAL_COLS,
@@ -82,7 +82,6 @@ function mix(a, b, t) {
 function paintHillAlbedo(sample, bounds, theme) {
   const size = 1024;
   const { x0, x1, z0, z1 } = bounds;
-  const dark = theme === "dark";
   return fillImage(size, (data) => {
     for (let py = 0; py < size; py++) {
       const v = 1 - (py + 0.5) / size;
@@ -97,19 +96,10 @@ function paintHillAlbedo(sample, bounds, theme) {
         let r;
         let g;
         let b;
-        if (dark) {
-          const base = [48 + n * 6, 61 + n * 5, 73 + grain * 4];
-          const high = [58 + grain * 4, 74 + n * 4, 88];
-          r = mix(base[0], high[0], rock);
-          g = mix(base[1], high[1], rock);
-          b = mix(base[2], high[2], rock);
-        } else {
-          const base = [135 + n * 6, 148 + n * 5, 157 + grain * 4];
-          const high = [154 + grain * 4, 166 + n * 3, 174];
-          r = mix(base[0], high[0], rock);
-          g = mix(base[1], high[1], rock);
-          b = mix(base[2], high[2], rock);
-        }
+        const shade = Math.max(0, Math.min(255, 248 + (n - 0.5) * 10 + rock * 4 + (grain - 0.5) * 4));
+        r = shade;
+        g = shade;
+        b = shade;
         const o = (py * size + px) * 4;
         data[o] = r;
         data[o + 1] = g;
@@ -381,12 +371,12 @@ export function applyAtmosphereTheme(shell) {
   const dark = shell.theme === "dark";
   if (shell.sky) paintSky(shell.sky, dark);
   if (shell.scene && shell.scene.fog) {
-    shell.scene.fog.color.set(dark ? 0x121820 : 0xc5d4e2);
+    shell.scene.fog.color.set(dark ? 0x171717 : 0xd2d2d2);
     shell.scene.fog.density = dark ? HAZE_DENSITY.dark : HAZE_DENSITY.light;
   }
   if (shell.renderer) {
     shell.renderer.toneMappingExposure = dark ? 1.12 : 1.0;
-    shell.renderer.setClearColor(dark ? 0x121820 : 0xd5e2ee, 1);
+    shell.renderer.setClearColor(dark ? 0x171717 : 0xe0e0e0, 1);
   }
   if (shell.terrainMesh && shell.terrainMaps) {
     shell.terrainMesh.material.map = dark ? shell.terrainMaps.dark : shell.terrainMaps.light;
@@ -396,26 +386,30 @@ export function applyAtmosphereTheme(shell) {
     shell.boundary.material.color.set(dark ? 0xc8bba8 : 0x6a6156);
     shell.boundary.material.opacity = dark ? 0.45 : 0.55;
   }
+  const cast = materialSet(shell.tint || 0, shell.theme);
+  if (shell.terrainMesh && shell.terrainMesh.material) {
+    shell.terrainMesh.material.color.setHex(cast.terrain);
+  }
   const road = shell.layerMeshes && shell.layerMeshes.road;
   if (road && road.material) {
-    road.material.color.setHex(dark ? 0x465a6b : 0x455563);
+    road.material.color.setHex(cast.road);
     if (road.material.emissive) {
       road.material.emissive.setHex(0x000000);
       road.material.emissiveIntensity = 0;
     }
   }
   const curb = shell.layerMeshes && shell.layerMeshes.curb;
-  if (curb && curb.material) curb.material.color.setHex(dark ? 0x8596a3 : 0xa9b5bd);
+  if (curb && curb.material) curb.material.color.setHex(cast.shoulder);
   const path = shell.layerMeshes && shell.layerMeshes.path;
   if (path && path.material) {
-    path.material.color.setHex(dark ? 0x6d7e8c : 0xa7b3bb);
+    path.material.color.setHex(cast.shoulder);
     if (path.material.emissive) {
       path.material.emissive.setHex(0x000000);
       path.material.emissiveIntensity = 0;
     }
   }
   const turf = shell.layerMeshes && shell.layerMeshes.turf;
-  if (turf && turf.material) turf.material.color.setHex(dark ? 0x303d49 : 0x87949d);
+  if (turf && turf.material) turf.material.color.setHex(cast.terrain);
 }
 
 function pushTri(buf, ax, ay, az, bx, by, bz, cx, cy, cz, au, av, bu, bv, cu, cv) {
@@ -613,7 +607,7 @@ export function buildRealisticTerrain(shell) {
       const idx = j * VISUAL_COLS + i;
       uvs[idx * 2] = i / (VISUAL_COLS - 1);
       uvs[idx * 2 + 1] = j / (VISUAL_ROWS - 1);
-      const tone = terrainColor((grid.heights[idx] - minY) / span, shell.theme);
+      const tone = terrainColor((grid.heights[idx] - minY) / span, shell.theme, shell.tint || 0);
       colors[idx * 3] = tone[0];
       colors[idx * 3 + 1] = tone[1];
       colors[idx * 3 + 2] = tone[2];
@@ -1094,6 +1088,7 @@ export function buildRealisticBuildings(shell) {
       skirt: skirtMesh,
       mass,
       roof,
+      gravel: gravelMesh,
       edge: edges,
       beacon,
       group,
@@ -1114,14 +1109,23 @@ export function paintRealisticBuildings(shell) {
   for (const record of shell.buildings) {
     const mode = record.osmId === shell.selectedId ? "selected" : record.osmId === shell.hoverId ? "hover" : "idle";
     const boost = mode === "selected" ? 0.12 : mode === "hover" ? 0.05 : 0;
-    const massHex = record.archetype === "crimson" ? 0xc92a2a : (dark ? 0x788895 : 0xc6ccd1);
-    const skirtHex = record.archetype === "crimson" ? 0x9b1c1c : (dark ? 0x596c7b : 0x929da6);
+    const cast = materialSet(shell.tint || 0, shell.theme);
+    const massHex = record.archetype === "crimson" ? 0xc92a2a : cast.building;
+    const skirtHex = record.archetype === "crimson" ? 0x9b1c1c : cast.foundation;
     for (const mat of record.facades || []) {
       mat.color.setHex(massHex);
       mat.emissiveIntensity = (dark ? 0.16 : 0.04) + boost;
     }
     if (record.mass && record.mass.material && record.mass.material.color) record.mass.material.color.setHex(massHex);
     if (record.skirt && record.skirt.material && record.skirt.material.color) record.skirt.material.color.setHex(skirtHex);
+    if (record.archetype !== "crimson" && record.roof && record.roof.material && record.roof.material.color) {
+      const roof = new THREE.Color(cast.building);
+      roof.multiplyScalar(0.92);
+      record.roof.material.color.copy(roof);
+    }
+    if (record.archetype !== "crimson" && record.gravel && record.gravel.material && record.gravel.material.color) {
+      record.gravel.material.color.setHex(cast.foundation);
+    }
     if (record.edge) {
       record.edge.material.opacity = record.archetype === "crimson"
         ? (mode === "idle" ? 0.62 : 0.9)
@@ -1143,7 +1147,7 @@ export function repaintTerrainColors(shell) {
   const span = Math.max(1, maxY - minY);
   const colors = shell.terrainMesh.geometry.attributes.color.array;
   for (let i = 0; i < heights.length; i++) {
-    const tone = terrainColor((heights[i] - minY) / span, shell.theme);
+    const tone = terrainColor((heights[i] - minY) / span, shell.theme, shell.tint || 0);
     colors[i * 3] = tone[0];
     colors[i * 3 + 1] = tone[1];
     colors[i * 3 + 2] = tone[2];
