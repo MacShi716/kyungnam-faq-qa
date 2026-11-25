@@ -1325,6 +1325,7 @@ function syncWalkChrome(shell) {
   const off = vv && Number.isFinite(vv.offsetTop) ? Math.round(vv.offsetTop) : 0;
   shell.root.style.setProperty("--map-vvh", height + "px");
   shell.root.style.setProperty("--map-vv-off", off + "px");
+  syncJumpButton(shell);
   requestAnimationFrame(() => {
     if (session === shell) resize();
   });
@@ -1794,7 +1795,7 @@ function paintWalkUi(shell) {
   }
   if (shell.crosshair) shell.crosshair.hidden = !on;
   if (shell.jumpBtn) {
-    shell.jumpBtn.hidden = !on || !narrow;
+    syncJumpButton(shell);
     shell.jumpBtn.setAttribute("aria-label", copy.jump);
     shell.jumpBtn.title = copy.jump;
   }
@@ -2131,10 +2132,17 @@ function queueJump(walk) {
   poke();
 }
 
+function uiOwnsKey(event) {
+  const el = event.target;
+  if (!el || !el.tagName) return false;
+  const tag = el.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") return true;
+  return !!el.isContentEditable;
+}
+
 function onWalkKey(event, down) {
   if (!session || !session.walk) return;
-  const tag = event.target && event.target.tagName;
-  if (tag === "INPUT" || tag === "TEXTAREA" || (event.target && event.target.isContentEditable)) return;
+  if (uiOwnsKey(event)) return;
   const walk = session.walk;
   if (event.code === "Space") {
     if (!walk.active) return;
@@ -2384,8 +2392,16 @@ function resize() {
   shell.camera.updateProjectionMatrix();
   const modalWidth = shell.root.clientWidth;
   if (modalWidth > 0) shell.root.classList.toggle("is-narrow", modalWidth < 800);
+  syncJumpButton(shell);
   syncAccountPlace(shell);
   poke();
+}
+
+function syncJumpButton(shell) {
+  if (!shell || !shell.jumpBtn) return;
+  const on = !!(shell.walk && shell.walk.active);
+  const narrow = !!(shell.root && shell.root.classList.contains("is-narrow"));
+  shell.jumpBtn.hidden = !on || !narrow;
 }
 
 function pickAt(event) {
@@ -2469,6 +2485,8 @@ function bindPointer(shell) {
   bind(shell, shell.canvas, "pointerdown", (event) => {
     if (!session || !session.walk || !session.walk.active) return;
     if (event.target !== shell.canvas) return;
+    const active = document.activeElement;
+    if (active && active !== shell.canvas && typeof active.blur === "function") active.blur();
     if (session.walk.stick && session.walk.stick.id === event.pointerId) return;
     if (event.pointerType === "mouse" && !isTouchControl(shell)) {
       if (session.locked) {

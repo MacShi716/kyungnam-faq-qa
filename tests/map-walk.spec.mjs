@@ -448,3 +448,56 @@ test("a desktop canvas click locks the mouse and Esc releases it without leaving
   await expect(page.locator(".map-lock-hint")).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+test("narrowing an open walk shows the jump button", async ({ page }) => {
+  test.setTimeout(120000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const desktop = await page.locator(".map-jump").evaluate((el) => ({ hidden: el.hidden, h: el.getBoundingClientRect().height }));
+  expect(desktop.hidden).toBe(true);
+  expect(desktop.h).toBe(0);
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.waitForTimeout(400);
+  const phone = await page.locator(".map-jump").evaluate((el) => ({
+    hidden: el.hidden,
+    display: getComputedStyle(el).display,
+    h: el.getBoundingClientRect().height,
+  }));
+  expect(phone.hidden).toBe(false);
+  expect(phone.display).not.toBe("none");
+  expect(phone.h).toBeGreaterThan(40);
+});
+
+test("a scene click takes Space for jump and a focused button keeps Space", async ({ page }) => {
+  test.setTimeout(120000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const view = page.locator(".map-toolbar [data-map-action='view']");
+  const before = await view.innerText();
+  await view.click();
+  const focused = await view.innerText();
+  expect(focused).not.toBe(before);
+  const yFocused = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(150);
+  const afterFocusedSpace = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  expect(await view.innerText()).toBe(before);
+  expect(Math.abs(afterFocusedSpace - yFocused)).toBeLessThan(0.2);
+  const box = await page.locator(".map-canvas").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  const active = await page.evaluate(() => document.activeElement && document.activeElement.dataset.mapAction);
+  expect(active).not.toBe("view");
+  const y0 = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  const label = await view.innerText();
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(180);
+  const y1 = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  expect(y1).toBeGreaterThan(y0 + 0.2);
+  expect(await view.innerText()).toBe(label);
+});
