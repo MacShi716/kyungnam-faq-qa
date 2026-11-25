@@ -3,9 +3,11 @@ import fs from "node:fs";
 import test from "node:test";
 import { applyAvatarLook, buildAvatar } from "../map-src/avatar.mjs";
 import {
+  accountActionVisibility,
   activeProfile,
   avatarKind,
   clearAccounts,
+  clearMapFavorites,
   clearSiteData,
   createProfile,
   deleteProfile,
@@ -27,6 +29,8 @@ function memory() {
     getItem(key) { return data.has(key) ? data.get(key) : null; },
     setItem(key, value) { data.set(key, String(value)); },
     removeItem(key) { data.delete(key); },
+    get length() { return data.size; },
+    key(index) { return [...data.keys()][index] || null; },
     keys() { return [...data.keys()]; },
   };
 }
@@ -66,6 +70,53 @@ test("guest stays anonymous and a profile stores only nickname and gender", () =
   assert.equal(store.getItem("faq_local_state_p_test"), null);
 });
 
+test("clearing favorites empties the store for the current mode", () => {
+  const store = memory();
+  createProfile(store, { nickname: "tester-a", gender: "female", now: "2026-11-25T00:00:00.000Z", id: "p_test" });
+  writeMapFavorites(store, new Set(["faq:F49"]));
+  store.setItem("campus_map_favorites", JSON.stringify(["faq:guest"]));
+  clearMapFavorites(store);
+  assert.deepEqual(loadState(store, "p_test").mapFavorites, []);
+  assert.deepEqual([...readMapFavorites(store)], []);
+  assert.equal(store.getItem("campus_map_favorites"), JSON.stringify(["faq:guest"]));
+  exitProfile(store);
+  writeMapFavorites(store, new Set(["faq:F1"]));
+  clearMapFavorites(store);
+  assert.equal(store.getItem("campus_map_favorites"), "[]");
+  assert.deepEqual([...readMapFavorites(store)], []);
+});
+
+test("a guest can still wipe every local key, including leftovers and tint", () => {
+  const store = memory();
+  assert.deepEqual(accountActionVisibility(false), {
+    exit: false,
+    deleteProfile: false,
+    clearAccounts: true,
+    clearSite: true,
+  });
+  assert.equal(accountActionVisibility(true).exit, true);
+  assert.equal(accountActionVisibility(true).deleteProfile, true);
+  createProfile(store, { nickname: "tester-b", gender: "male", id: "p_b", now: "2026-11-25T00:00:00.000Z" });
+  store.setItem("faq_local_state_orphan", "{\"searchHistory\":[{\"q\":\"left\"}]}");
+  store.setItem("campus_map_tint", "1");
+  store.setItem("faq_theme", "dark");
+  store.setItem("faq_ui_lang", "ko");
+  clearAccounts(store);
+  assert.equal(store.getItem("faq_local_profiles"), null);
+  assert.equal(store.getItem("faq_local_state_p_b"), null);
+  assert.equal(store.getItem("faq_local_state_orphan"), null);
+  assert.equal(store.getItem("campus_map_tint"), "1");
+  assert.equal(store.getItem("faq_theme"), "dark");
+  store.setItem("faq_local_state_orphan", "{\"mapFavorites\":[\"faq:F9\"]}");
+  store.setItem("faq_local_profiles", "{\"v\":1,\"activeId\":null,\"profiles\":[]}");
+  clearSiteData(store);
+  assert.equal(store.getItem("campus_map_tint"), null);
+  assert.equal(store.getItem("faq_local_state_orphan"), null);
+  assert.equal(store.getItem("faq_theme"), null);
+  assert.equal(store.getItem("faq_ui_lang"), null);
+  assert.equal(store.keys().length, 0);
+});
+
 test("clearing accounts keeps theme and clearing the site removes it", () => {
   const store = memory();
   createProfile(store, { nickname: "tester-b", gender: "male", id: "p_b", now: "2026-11-25T00:00:00.000Z" });
@@ -96,6 +147,16 @@ test("the ask request does not carry a local profile", () => {
   assert.match(map, /建立本机资料/);
   assert.match(map, /选用本机资料/);
   assert.match(html, /faq_local_state_/);
+  const chatClear = html.slice(html.indexOf('$("btn-clear").addEventListener'), html.indexOf("attachMagnet"));
+  assert.equal(chatClear.includes("faq_local"), false);
+  assert.equal(chatClear.includes("clearAllSiteData"), false);
+  assert.match(html, /id="local-data-accounts"/);
+  assert.match(html, /id="local-data-site"/);
+  assert.match(html, /清空本机账号与记录/);
+  assert.match(html, /清空本站全部本机数据/);
+  assert.equal(map.includes("exitBtn.parentElement.hidden"), false);
+  assert.match(map, /clearMapFavorites\(browserStore\)/);
+  assert.match(map, /accountActionVisibility\(/);
 });
 
 test("guest, male, and female avatars share a skeleton and differ by look", () => {

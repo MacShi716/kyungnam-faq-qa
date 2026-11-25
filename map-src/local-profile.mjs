@@ -5,6 +5,29 @@ export const STATE_PREFIX = "faq_local_state_";
 export const GUEST_FAV_KEY = "campus_map_favorites";
 export const THEME_KEY = "faq_theme";
 export const LANG_KEY = "faq_ui_lang";
+export const TINT_KEY = "campus_map_tint";
+
+export function storageKeys(storage) {
+  if (storage && typeof storage.keys === "function") {
+    const listed = storage.keys();
+    if (Array.isArray(listed)) return listed.filter((key) => typeof key === "string" && key);
+  }
+  if (storage && typeof storage.length === "number" && typeof storage.key === "function") {
+    const out = [];
+    for (let i = 0; i < storage.length; i += 1) {
+      const key = storage.key(i);
+      if (typeof key === "string" && key) out.push(key);
+    }
+    return out;
+  }
+  return [];
+}
+
+function dropKeys(storage, keys) {
+  for (const key of keys) {
+    try { storage.removeItem(key); } catch (e) { /* already gone */ }
+  }
+}
 
 export function stateKey(id) {
   return STATE_PREFIX + id;
@@ -151,19 +174,34 @@ export function deleteProfile(storage, id) {
 
 export function clearAccounts(storage) {
   const book = loadBook(storage);
-  for (const profile of book.profiles) {
-    try { storage.removeItem(stateKey(profile.id)); } catch (e) { /* already gone */ }
-  }
-  try { storage.removeItem(PROFILES_KEY); } catch (e) { /* already gone */ }
-  try { storage.removeItem(GUEST_FAV_KEY); } catch (e) { /* already gone */ }
+  const known = [PROFILES_KEY, GUEST_FAV_KEY, ...book.profiles.map((profile) => stateKey(profile.id))];
+  const scanned = storageKeys(storage).filter((key) => key === PROFILES_KEY || key === GUEST_FAV_KEY || key.startsWith("faq_local_"));
+  dropKeys(storage, [...known, ...scanned]);
   return { ok: true };
 }
 
 export function clearSiteData(storage) {
-  clearAccounts(storage);
-  try { storage.removeItem(THEME_KEY); } catch (e) { /* already gone */ }
-  try { storage.removeItem(LANG_KEY); } catch (e) { /* already gone */ }
+  const scanned = storageKeys(storage);
+  dropKeys(storage, scanned);
+  dropKeys(storage, [PROFILES_KEY, GUEST_FAV_KEY, THEME_KEY, LANG_KEY, TINT_KEY]);
+  const leftover = storageKeys(storage).filter((key) => key.startsWith("faq_local_"));
+  dropKeys(storage, leftover);
   return { ok: true };
+}
+
+export function clearMapFavorites(storage) {
+  writeMapFavorites(storage, new Set());
+  return { ok: true };
+}
+
+/** Exit and delete need a selected profile. The two wipe actions stay available to a guest. */
+export function accountActionVisibility(hasProfile) {
+  return {
+    exit: !!hasProfile,
+    deleteProfile: !!hasProfile,
+    clearAccounts: true,
+    clearSite: true,
+  };
 }
 
 export function activeProfile(storage) {

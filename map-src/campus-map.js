@@ -55,7 +55,9 @@ import {
 import { applyAvatarLook, buildAvatar, poseAvatar } from "./avatar.mjs";
 import {
   avatarKind,
+  accountActionVisibility,
   clearAccounts,
+  clearMapFavorites,
   clearSiteData,
   createProfile,
   deleteProfile,
@@ -396,11 +398,7 @@ function applyCast(shell) {
 }
 
 function clearFavStorage() {
-  try {
-    localStorage.removeItem(FAV_KEY);
-  } catch (e) {
-    /* incognito or blocked storage */
-  }
+  clearMapFavorites(browserStore);
 }
 
 function dataUrl(name) {
@@ -782,7 +780,11 @@ function mountAccount(shell) {
     else if (pending === "clear") clearAccounts(browserStore);
     else if (pending === "wipe") {
       clearSiteData(browserStore);
+      shell.tint = 0;
+      if (shell.tintInput) shell.tintInput.value = "0";
+      applyCast(shell);
       document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
     }
     pending = "";
     confirmBox.hidden = true;
@@ -837,7 +839,11 @@ function paintAccount(shell) {
   nodes.useBtn.hidden = !guest || book.profiles.length === 0;
   nodes.who.hidden = guest;
   nodes.maleLive.parentElement.hidden = guest;
-  nodes.exitBtn.parentElement.hidden = guest;
+  const shown = accountActionVisibility(!guest);
+  nodes.exitBtn.hidden = !shown.exit;
+  nodes.deleteBtn.hidden = !shown.deleteProfile;
+  nodes.clearBtn.hidden = !shown.clearAccounts;
+  nodes.wipeBtn.hidden = !shown.clearSite;
   nodes.who.textContent = active ? active.nickname : "";
   nodes.maleLive.setAttribute("aria-pressed", active && active.gender === "male" ? "true" : "false");
   nodes.femaleLive.setAttribute("aria-pressed", active && active.gender === "female" ? "true" : "false");
