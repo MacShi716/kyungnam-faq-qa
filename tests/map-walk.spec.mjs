@@ -284,3 +284,35 @@ test("phone walk separates the map from the controls", async ({ page }) => {
   expect(top).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test("360 walk reset and reentry keep the label and a campus view", async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await page.locator(".map-list button[data-faq-id='F49']").click();
+  const walk = page.locator(".map-toolbar [data-map-action='walk']");
+  await expect(walk).toHaveText("结束行走");
+  await page.locator(".map-more-btn").click();
+  await page.locator(".map-more [data-map-action='reset']").click();
+  await expect(walk).toHaveText("步行");
+  await expect(walk).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".map-walk")).toBeHidden();
+  await walk.click();
+  await expect(walk).toHaveText("结束行走");
+  await walk.click();
+  await expect(walk).toHaveText("步行");
+  await expect(page.locator(".map-walk")).toBeHidden();
+  await walk.click();
+  await expect(walk).toHaveText("结束行走");
+  const again = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  expect(again.viewMode).toBe("walk");
+  expect(again.clearanceMesh).toBeGreaterThan(1.2);
+  expect(again.visible.std[0]).toBeGreaterThan(30);
+  const upper = (again.view || []).slice(0, 3);
+  expect(upper.every((hit) => hit && hit.kind === "terrain")).toBe(false);
+  expect(errors).toEqual([]);
+});

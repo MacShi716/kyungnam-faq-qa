@@ -1283,7 +1283,7 @@ function paintWalkUi(shell) {
     const on = !!(shell.walk && shell.walk.active);
     walkBtn.setAttribute("aria-pressed", on ? "true" : "false");
     walkBtn.title = on ? copy.walkStop : copy.walkHint;
-    if (shell.root.classList.contains("is-narrow") && on) walkBtn.textContent = copy.walkStop;
+    if (shell.root.classList.contains("is-narrow")) walkBtn.textContent = on ? copy.walkStop : copy.walk;
   }
   syncWalkChrome(shell);
 }
@@ -1343,14 +1343,15 @@ function startWalk(shell, x, z, yaw, pitch, focusId) {
 function exitWalk(shell) {
   if (!shell || !shell.walk) return;
   if (shell.walk.active && shell.camera && shell.controls) {
-    const eye = shell.camera.position;
+    const eye = shell.camera.position.clone();
     const yaw = shell.walk.yaw;
-    const dist = 64;
-    shell.controls.target.set(
-      eye.x + Math.sin(yaw) * dist,
-      eye.y - 28,
-      eye.z - Math.cos(yaw) * dist,
+    const back = 42;
+    shell.camera.position.set(
+      eye.x - Math.sin(yaw) * back,
+      eye.y + 24,
+      eye.z + Math.cos(yaw) * back,
     );
+    shell.controls.target.set(eye.x, eye.y + 3, eye.z);
     shell.controls.enabled = true;
     shell.controls.update();
   }
@@ -1374,9 +1375,23 @@ function toggleWalk() {
   shell.camera.getWorldDirection(dir);
   const spot = shell.controls.target;
   const yaw = yawFromDirection(dir.x, dir.z);
-  const pitched = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
-  const level = pitched > 0 ? Math.min(0.12, pitched) : 0;
-  startWalk(shell, spot.x, spot.z, yaw, level, null);
+  const ground = renderedSurfaceY(shell, shell.camera.position.x, shell.camera.position.z);
+  const fromOverview = shell.camera.position.y > ground + 80;
+  if (fromOverview) {
+    const pitched = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
+    const level = pitched > 0 ? Math.min(0.12, pitched) : 0;
+    startWalk(shell, spot.x, spot.z, yaw, level, null);
+    return;
+  }
+  const look = { x: Math.sin(yaw), z: -Math.cos(yaw) };
+  let x = spot.x - look.x * 32;
+  let z = spot.z - look.z * 32;
+  if (walkBlocked(shell, x, z)) {
+    const cleared = outsideStand({ x: spot.x, z: spot.z }, x, z, (px, pz) => walkBlocked(shell, px, pz), 18);
+    x = cleared.x;
+    z = cleared.z;
+  }
+  startWalk(shell, x, z, yaw, 0.05, null);
 }
 
 function walkToBuilding(record) {
