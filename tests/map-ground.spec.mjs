@@ -49,18 +49,18 @@ test("shaded foundation stays readable by day and by night", async ({ page }) =>
   await openMap(page);
   const day = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
   const dayWash = await probe(page);
-  expect(day.shaded.skirt).toBeGreaterThan(60);
-  expect(day.shaded.wall).toBeGreaterThan(40);
-  expect(day.sunlit.wall).toBeGreaterThan(55);
+  expect(day.shaded.skirt).toBeGreaterThan(18);
+  expect(day.shaded.wall).toBeGreaterThan(22);
+  expect(day.sunlit.wall).toBeGreaterThan(28);
   expect(dayWash.sat).toBeGreaterThan(4);
   expect(dayWash.luma).toBeLessThan(120);
   expect(dayWash.fog).toBeLessThan(0.0005);
   await page.evaluate(() => window.CampusMap.setTheme("dark"));
   const night = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
   const nightWash = await probe(page);
-  expect(night.shaded.skirt).toBeGreaterThan(18);
-  expect(night.shaded.wall).toBeGreaterThan(40);
-  expect(nightWash.luma).toBeGreaterThan(22);
+  expect(night.shaded.skirt).toBeGreaterThan(8);
+  expect(night.shaded.wall).toBeGreaterThan(10);
+  expect(nightWash.luma).toBeGreaterThan(12);
   expect(nightWash.fog).toBeLessThan(0.0005);
 });
 

@@ -173,8 +173,9 @@ function bbox(points) {
 }
 
 /**
- * Deterministic pines and broadleaf trees on OSM woods and steep undeveloped slope.
- * Every point stays at least `clearance` metres outside buildings, road edges, pitches, and water.
+ * Low-poly trees only inside the existing woods, sparser in park polygons,
+ * and a light ring around the existing lake. Bare slopes stay grass.
+ * The two woods that share an osm id are one wood: a point is planted once.
  */
 export function placeTrees({ terrain, buildings, layers, clearance = TREE_CLEARANCE_M }) {
   const sample = createSmoothSampler(terrain);
@@ -183,7 +184,7 @@ export function placeTrees({ terrain, buildings, layers, clearance = TREE_CLEARA
     ring: b.footprintXZ,
     box: bbox(b.footprintXZ),
   }));
-  const blocked = [...(layers.pitches || []), ...(layers.water || [])].map((feature) => ({
+  const pitches = (layers.pitches || []).filter((feature) => feature.subtype !== "park").map((feature) => ({
     ring: feature.points,
     box: bbox(feature.points),
   }));
@@ -193,6 +194,9 @@ export function placeTrees({ terrain, buildings, layers, clearance = TREE_CLEARA
     box: bbox(road.points),
   }));
   const woods = (layers.woods || []).map((wood) => wood.points);
+  const parks = (layers.pitches || []).filter((feature) => feature.subtype === "park").map((feature) => feature.points);
+  const lake = (layers.water || []).find((feature) => feature.osmId === 1035938120) || null;
+  const lakeRing = lake ? lake.points : null;
   const xs = terrain.xM;
   const zs = terrain.zM;
   const x0 = xs[0];
@@ -200,40 +204,67 @@ export function placeTrees({ terrain, buildings, layers, clearance = TREE_CLEARA
   const z0 = zs[0];
   const z1 = zs[zs.length - 1];
   const candidates = [];
-  const step = 13;
+  const seen = new Set();
+  function plant(px, pz, ix, iz, zone) {
+    const key = `${px.toFixed(1)},${pz.toFixed(1)}`;
+    if (seen.has(key)) return;
+    if (lakeRing && pointInRing(px, pz, lakeRing)) return;
+    if (!clears(px, pz, footprints, pitches, roads, clearance)) return;
+    if (lakeRing && distToRing(px, pz, lakeRing) < 3) return;
+    const y = sample(px, pz);
+    if (!Number.isFinite(y) || Math.abs(y - linear(px, pz)) > 40) return;
+    seen.add(key);
+    candidates.push({
+      x: px,
+      z: pz,
+      y,
+      kind: hash01(ix, iz, 3) > 0.62 ? "pine" : "leaf",
+      scale: 0.8 + hash01(ix, iz, 4) * 0.5,
+      hue: hash01(ix, iz, 5),
+      zone,
+    });
+  }
   let ix = 0;
-  for (let x = x0 + 6; x <= x1 - 6; x += step) {
+  for (let x = x0 + 4; x <= x1 - 4; x += 9) {
     let iz = 0;
-    for (let z = z0 + 6; z <= z1 - 6; z += step) {
-      const jx = (hash01(ix, iz, 1) - 0.5) * 6.5;
-      const jz = (hash01(ix, iz, 2) - 0.5) * 6.5;
-      const px = x + jx;
-      const pz = z + jz;
+    for (let z = z0 + 4; z <= z1 - 4; z += 9) {
+      const px = x + (hash01(ix, iz, 1) - 0.5) * 5;
+      const pz = z + (hash01(ix, iz, 2) - 0.5) * 5;
       const inWood = woods.some((ring) => pointInRing(px, pz, ring));
-      const slope = slopeDegrees(sample, px, pz);
-      if (!inWood && slope < 20) {
-        iz += 1;
-        continue;
-      }
-      if (!clears(px, pz, footprints, blocked, roads, clearance)) {
-        iz += 1;
-        continue;
-      }
-      const kind = hash01(ix, iz, 3) > 0.42 ? "pine" : "leaf";
-      const scale = 0.82 + hash01(ix, iz, 4) * 0.5;
-      const hue = hash01(ix, iz, 5);
-      const y = sample(px, pz);
-      if (!Number.isFinite(y) || Math.abs(y - linear(px, pz)) > 40) {
-        iz += 1;
-        continue;
-      }
-      candidates.push({ x: px, z: pz, y, kind, scale, hue, slope });
+      const inPark = !inWood && parks.some((ring) => pointInRing(px, pz, ring));
+      if (inWood && hash01(ix, iz, 6) > 0.18) plant(px, pz, ix, iz, "wood");
+      else if (inPark && hash01(ix, iz, 7) > 0.72) plant(px, pz, ix, iz, "park");
       iz += 1;
     }
     ix += 1;
   }
+  if (lakeRing && lakeRing.length > 2) {
+    let cx = 0;
+    let cz = 0;
+    for (const p of lakeRing) {
+      cx += p[0];
+      cz += p[1];
+    }
+    cx /= lakeRing.length;
+    cz /= lakeRing.length;
+    for (let i = 0; i < lakeRing.length; i++) {
+      const a = lakeRing[i];
+      const b = lakeRing[(i + 1) % lakeRing.length];
+      const seg = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      const steps = Math.max(1, Math.round(seg / 14));
+      for (let s = 0; s < steps; s++) {
+        const t = (s + 0.5) / steps;
+        const x = a[0] + (b[0] - a[0]) * t;
+        const z = a[1] + (b[1] - a[1]) * t;
+        const dx = x - cx;
+        const dz = z - cz;
+        const len = Math.hypot(dx, dz) || 1;
+        plant(x + (dx / len) * 7, z + (dz / len) * 7, i, s, "shore");
+      }
+    }
+  }
   candidates.sort((a, b) => a.x - b.x || a.z - b.z || a.hue - b.hue);
-  if (candidates.length > TREE_MAX) {
+  if (candidates.length > 480) {
     const stride = candidates.length / 480;
     const kept = [];
     for (let i = 0; i < 480; i++) kept.push(candidates[Math.floor(i * stride)]);

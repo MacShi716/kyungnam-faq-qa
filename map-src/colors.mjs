@@ -61,6 +61,15 @@ function hexLin(hex) {
 
 const CAST_ROLES = ["terrain", "building", "foundation", "road", "shoulder"];
 
+export const MAIN_HALL_ID = 1062064821;
+export const DESIGN_HALL_ID = 1062073167;
+
+/** Natural campus at tint 0. Cool and warm are the extra casts, not the default. */
+const NATURAL = Object.freeze({
+  light: { terrain: 0x6b8f5a, building: 0xd5d2cb, foundation: 0xb8b3ab, road: 0x5c6670, shoulder: 0xb4b8b0 },
+  dark: { terrain: 0x2a3a2c, building: 0x6e7278, foundation: 0x4e555c, road: 0x3e4852, shoulder: 0x6a7068 },
+});
+
 const CAST = Object.freeze({
   light: {
     cool: { terrain: 0x87949d, building: 0xc6ccd1, foundation: 0x929da6, road: 0x455563, shoulder: 0xa9b5bd },
@@ -85,12 +94,6 @@ function lerpHex(a, b, t) {
   return packHex(ch(16), ch(8), ch(0));
 }
 
-function neutralHex(cool, warm) {
-  const mid = lerpHex(cool, warm, 0.5);
-  const y = Math.round(0.2126 * byteAt(mid, 16) + 0.7152 * byteAt(mid, 8) + 0.0722 * byteAt(mid, 0));
-  return packHex(y, y, y);
-}
-
 export function clampTint(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
@@ -103,17 +106,29 @@ export function settleTint(value) {
   return Math.abs(n) <= 0.12 ? 0 : n;
 }
 
-/** tint -1 cool, 0 neutral gray, +1 warm. One value drives day and night. */
+/** tint -1 cool, 0 natural campus, +1 warm. One value drives day and night. */
 export function materialSet(tint, theme) {
   const t = clampTint(tint);
+  const base = theme === "dark" ? NATURAL.dark : NATURAL.light;
   const pair = theme === "dark" ? CAST.dark : CAST.light;
   const end = t < 0 ? pair.cool : pair.warm;
   const amount = Math.abs(t);
   const out = {};
-  for (const key of CAST_ROLES) {
-    out[key] = lerpHex(neutralHex(pair.cool[key], pair.warm[key]), end[key], amount);
-  }
+  for (const key of CAST_ROLES) out[key] = lerpHex(base[key], end[key], amount);
   return out;
+}
+
+/** Design Hall and 본관 keep their own colors. Ordinary walls follow the tint. */
+export function wallPaint(osmId, archetype, tint, theme) {
+  const dark = theme === "dark";
+  if (archetype === "crimson" || osmId === DESIGN_HALL_ID) {
+    return { mass: 0xc92a2a, skirt: 0x9b1c1c, tinted: false };
+  }
+  if (osmId === MAIN_HALL_ID) {
+    return { mass: dark ? 0x5a322c : 0x9a5346, skirt: dark ? 0x3e2420 : 0x7a4038, tinted: false };
+  }
+  const cast = materialSet(tint, theme);
+  return { mass: cast.building, skirt: cast.foundation, tinted: true };
 }
 
 /** Smooth 0..1 elevation color. Channels are linear 0..1. */
@@ -131,17 +146,17 @@ export function skyColor(theme) {
 export function lightRig(theme) {
   if (theme === "dark") {
     return {
-      hemi: 0xe2e2e2,
-      hemiGround: 0x424242,
+      hemi: 0xd5dde8,
+      hemiGround: 0x243028,
       hemiIntensity: 1.05,
-      sun: 0xe6e6e6,
+      sun: 0xe4e0d4,
       sunIntensity: 0.7,
       boundary: 0x8fd0c4,
     };
   }
   return {
-    hemi: 0xf5f5f5,
-    hemiGround: 0xa3a3a3,
+    hemi: 0xe7f1f8,
+    hemiGround: 0x6b8f5a,
     hemiIntensity: 0.95,
     sun: 0xfff6ea,
     sunIntensity: 1.05,

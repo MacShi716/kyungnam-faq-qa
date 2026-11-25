@@ -1536,7 +1536,37 @@ function suggestedFaqs(query, lang, limit) {
       .trim();
     return { body, notes };
   }
+  function rememberLocalQuery(text, faqId) {
+    try {
+      const raw = localStorage.getItem("faq_local_profiles");
+      if (!raw) return;
+      const book = JSON.parse(raw);
+      if (!book || !book.activeId) return;
+      if (/\d{10,}/.test(text) || /^\d{8,}$/.test(String(text || "").trim())) return;
+      const key = "faq_local_state_" + book.activeId;
+      const state = JSON.parse(localStorage.getItem(key) || "{}");
+      const history = Array.isArray(state.searchHistory) ? state.searchHistory : [];
+      const q = String(text || "").trim().slice(0, 80);
+      if (!q) return;
+      state.searchHistory = [{ q: q, at: new Date().toISOString() }].concat(history.filter((item) => item && item.q !== q)).slice(0, 50);
+      const frequent = Array.isArray(state.frequent) ? state.frequent : [];
+      if (faqId) {
+        const found = frequent.find((item) => item && item.id === faqId);
+        if (found) found.n += 1;
+        else frequent.push({ id: faqId, n: 1 });
+        frequent.sort((a, b) => b.n - a.n);
+        state.frequent = frequent.slice(0, 20);
+      }
+      if (!Array.isArray(state.mapFavorites)) state.mapFavorites = [];
+      localStorage.setItem(key, JSON.stringify({
+        searchHistory: state.searchHistory,
+        frequent: state.frequent,
+        mapFavorites: state.mapFavorites,
+      }));
+    } catch (e) { /* private mode */ }
+  }
   function markSearched(text, faq) {
+    rememberLocalQuery(text, faq && faq.id);
     const add = (v) => { const n = normalize(v); if (n) searchedNorm.add(n); };
     add(text);
     if (faq) {

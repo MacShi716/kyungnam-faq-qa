@@ -314,8 +314,8 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   await page.goto("/");
   await openMap(page);
   const snap = await page.evaluate(() => window.CampusMap.debugSnapshot());
-  expect(snap.chroma).toBeLessThan(0.04);
-  expect(Math.abs(snap.lowColor[0] - snap.lowColor[2])).toBeLessThan(0.02);
+  expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[0]);
+  expect(snap.lowColor[1]).toBeGreaterThan(snap.lowColor[2]);
   const red = snap.buildings.find((item) => item.osmId === 1062073167);
   expect(red.kind).toBe("red");
   expect(red.archetype).toBe("crimson");
@@ -326,8 +326,8 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   expect(snap.pbr).toBe(true);
   expect(snap.toneMapping).toBe("ACESFilmic");
   expect(snap.roads).toBe(81);
-  expect(snap.trees).toBeGreaterThanOrEqual(350);
-  expect(snap.trees).toBeLessThanOrEqual(550);
+  expect(snap.trees).toBeGreaterThanOrEqual(40);
+  expect(snap.trees).toBeLessThanOrEqual(480);
   const oldMuseum = snap.buildings.find((item) => item.osmId === 1061923278);
   expect(oldMuseum.kind).toBe("neutral");
   expect(oldMuseum.roof).not.toBe("ef4444");
@@ -383,8 +383,7 @@ test("colored hillside, red hubs, on-map labels, and floor search", async ({ pag
   await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "dark");
   const dark = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(dark.theme).toBe("dark");
-  expect(dark.chroma).toBeLessThan(0.04);
-  expect(Math.abs(dark.lowColor[0] - dark.lowColor[2])).toBeLessThan(0.02);
+  expect(dark.lowColor[1]).toBeGreaterThan(dark.lowColor[2] - 0.02);
   const redDark = dark.buildings.find((item) => item.osmId === 1062073167);
   expect(redDark.mass).toBe("c92a2a");
   expect(redDark.roof).toBe("3a1818");
@@ -491,7 +490,8 @@ test("tint slider lives in more and drives day and night materials", async ({ pa
   await openMap(page);
   const fresh = await page.evaluate(() => window.CampusMap.debugCast());
   expect(fresh.tint).toBe(0);
-  expect(fresh.terrain[0]).toBe(fresh.terrain[2]);
+  expect(fresh.terrain).toBe("6b8f5a");
+  expect(fresh.road).toBe("5c6670");
   expect(fresh.road).not.toBe(fresh.shoulder);
   expect(fresh.road).not.toBe(fresh.terrain);
   expect(fresh.building).not.toBe(fresh.foundation);

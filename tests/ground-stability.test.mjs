@@ -43,10 +43,12 @@ test("the drawn hillside rises more than walk eye-height above the linear DEM", 
   assert.ok(gap > 1.7, String(gap));
 });
 
-test("walk eye follows the rendered smooth surface", () => {
+test("walk feet follow the rendered smooth surface", () => {
   const src = fs.readFileSync(new URL("../map-src/campus-map.js", import.meta.url), "utf8");
-  assert.match(src, /function renderedSurfaceY/);
-  assert.match(src, /renderedSurfaceY\(shell, shell\.walk\.x, shell\.walk\.z\) \+ EYE_M/);
+  assert.match(src, /function surfaceY/);
+  assert.match(src, /walk\.y = surfaceY\(shell, x, z\)/);
+  assert.match(src, /ground: \(x, z\) => surfaceY\(shell, x, z\)/);
+  assert.match(src, /walk\.eyeY = walk\.y \+ EYE_M/);
 });
 
 test("ground materials no longer use a slope polygon offset", () => {

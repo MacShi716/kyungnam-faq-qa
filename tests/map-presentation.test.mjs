@@ -8,21 +8,18 @@ import {
   paintTokens,
   settleTint,
   terrainColor,
+  wallPaint,
 } from "../map-src/colors.mjs";
 import { layoutLabelBoxes, measureLabel } from "../map-src/labels.mjs";
 
-test("default tint is gray and the ends match the cool and warm hexes", () => {
+test("default tint is the natural campus and the ends match cool and warm", () => {
   const day = materialSet(0, "light");
   const night = materialSet(0, "dark");
-  for (const set of [day, night]) {
-    for (const key of ["terrain", "building", "foundation", "road", "shoulder"]) {
-      const r = (set[key] >> 16) & 255;
-      const g = (set[key] >> 8) & 255;
-      const b = set[key] & 255;
-      assert.equal(r, g);
-      assert.equal(g, b);
-    }
-  }
+  assert.equal(day.terrain, 0x6b8f5a);
+  assert.equal(day.building, 0xd5d2cb);
+  assert.equal(day.road, 0x5c6670);
+  assert.equal(night.terrain, 0x2a3a2c);
+  assert.equal(night.building, 0x6e7278);
   assert.notEqual(day.road, day.shoulder);
   assert.notEqual(day.road, day.terrain);
   assert.notEqual(day.building, day.foundation);
@@ -54,8 +51,8 @@ test("default tint is gray and the ends match the cool and warm hexes", () => {
   assert.equal(settleTint(-0.08), 0);
   assert.equal(settleTint(0.4), 0.4);
   const lawn = terrainColor(0, "light", 0);
-  assert.ok(Math.abs(lawn[0] - lawn[1]) < 0.01);
-  assert.ok(Math.abs(lawn[1] - lawn[2]) < 0.01);
+  assert.ok(lawn[1] > lawn[0]);
+  assert.ok(lawn[1] > lawn[2]);
   const coolLawn = terrainColor(0, "light", -1);
   assert.ok(coolLawn[2] > coolLawn[0]);
   const warmLawn = terrainColor(0, "light", 1);
@@ -68,6 +65,10 @@ test("international design building is red and unnamed outlines stay neutral", (
   assert.equal(buildingKind(1062071802, false), "neutral");
   assert.equal(buildingKind(1062063659, false), "neutral");
   assert.equal(buildingKind(1062064821, true), "mapped");
+  assert.equal(wallPaint(1062073167, "crimson", 1, "light").mass, 0xc92a2a);
+  assert.equal(wallPaint(1062064821, "limestone", -1, "light").mass, 0x9a5346);
+  assert.equal(wallPaint(1062064821, "limestone", 0, "dark").mass, 0x5a322c);
+  assert.equal(wallPaint(1061923278, "brick", 0, "light").mass, 0xd5d2cb);
   for (const id of NEUTRAL_OSM_IDS) assert.equal(buildingKind(id, false), "neutral");
   const red = paintTokens("red", RED_OSM_ID, "light", "idle");
   assert.equal(red.roof, 0xef4444);
