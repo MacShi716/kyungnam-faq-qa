@@ -78,7 +78,137 @@ export function slideMove(x, z, yaw, action, distance, blocked) {
   return { x: cx, z: cz };
 }
 
-export function outsideStand(centroid, preferX, preferZ, blocked) {
+function angDiff(from, to) {
+  return wrapYaw(to - from);
+}
+
+function ringOpen(ring) {
+  const out = ring.map((p) => [p[0], p[1]]);
+  if (out.length > 1) {
+    const a = out[0];
+    const b = out[out.length - 1];
+    if (a[0] === b[0] && a[1] === b[1]) out.pop();
+  }
+  return out;
+}
+
+function gapToRing(x, z, ring) {
+  if (pointInRing(x, z, ring)) return 0;
+  let best = Infinity;
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i];
+    const b = ring[(i + 1) % ring.length];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const len2 = dx * dx + dz * dz;
+    let t = len2 < 1e-8 ? 0 : ((x - a[0]) * dx + (z - a[1]) * dz) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const d = Math.hypot(x - (a[0] + dx * t), z - (a[1] + dz * t));
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+function seesFacade(x, z, yaw, ring, half) {
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i];
+    const b = ring[(i + 1) % ring.length];
+    const mx = (a[0] + b[0]) / 2;
+    const mz = (a[1] + b[1]) / 2;
+    const bearing = yawFromDirection(mx - x, mz - z);
+    const dist = Math.hypot(mx - x, mz - z);
+    if (dist > 6 && dist < 96 && Math.abs(angDiff(yaw, bearing)) < half) return true;
+  }
+  return false;
+}
+
+function groundAhead(x, z, yaw, ring) {
+  const look = lookVector(yaw, 0);
+  const px = x + look.x * 14;
+  const pz = z + look.z * 14;
+  return gapToRing(px, pz, ring) > 3;
+}
+
+/**
+ * Stand outside a footprint so forward, a left turn, and forward again
+ * still see the facade with open ground ahead. Pitch stays near level.
+ */
+export function chooseFacadeStand(ring, blocked) {
+  const open = ringOpen(ring);
+  if (open.length < 3) return null;
+  let cx = 0;
+  let cz = 0;
+  for (const p of open) {
+    cx += p[0];
+    cz += p[1];
+  }
+  cx /= open.length;
+  cz /= open.length;
+  const half = 0.34;
+  const pitch = 0.06;
+  let best = null;
+  for (let i = 0; i < open.length; i++) {
+    const a = open[i];
+    const b = open[(i + 1) % open.length];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const len = Math.hypot(dx, dz);
+    if (len < 8) continue;
+    let ox = dz / len;
+    let oz = -dx / len;
+    const mx = (a[0] + b[0]) / 2;
+    const mz = (a[1] + b[1]) / 2;
+    if (pointInRing(mx + ox * 3, mz + oz * 3, open)) {
+      ox = -ox;
+      oz = -oz;
+    }
+    const face = yawFromDirection(-ox, -oz);
+    const along = yawFromDirection(dx, dz);
+    const back = wrapYaw(along + Math.PI);
+    const yaws = [
+      face,
+      wrapYaw(along + Math.max(-0.28, Math.min(0.28, angDiff(along, face)))),
+      wrapYaw(back + Math.max(-0.28, Math.min(0.28, angDiff(back, face)))),
+    ];
+    for (const dist of [22, 30, 38]) {
+      const x = mx + ox * dist;
+      const z = mz + oz * dist;
+      if (blocked(x, z)) continue;
+      if (Math.hypot(x - cx, z - cz) > 76) continue;
+      if (gapToRing(x, z, open) < 12) continue;
+      for (const yaw of yaws) {
+        const state = { x, z, yaw, pitch };
+        if (!seesFacade(x, z, yaw, open, half) || !groundAhead(x, z, yaw, open)) continue;
+        let minGap = gapToRing(x, z, open);
+        let ok = true;
+        for (const [action, amount] of [["forward", 7], ["look-left", 0.42], ["forward", 7]]) {
+          applyWalkAction(state, action, amount, blocked);
+          const gap = gapToRing(state.x, state.z, open);
+          if (gap < minGap) minGap = gap;
+          if (gap < 12 || !seesFacade(state.x, state.z, state.yaw, open, half) || !groundAhead(state.x, state.z, state.yaw, open)) {
+            ok = false;
+            break;
+          }
+        }
+        if (!ok) continue;
+        const side = { x, z, yaw, pitch };
+        for (const action of ["back", "left", "right"]) {
+          applyWalkAction(side, action, 7, blocked);
+          if (gapToRing(side.x, side.z, open) < 8) ok = false;
+          side.x = x;
+          side.z = z;
+          side.yaw = yaw;
+        }
+        if (!ok) continue;
+        if (!best || minGap > best.gap) best = { x, z, yaw, pitch, gap: minGap };
+      }
+    }
+  }
+  return best;
+}
+
+export function outsideStand(centroid, preferX, preferZ, blocked, beyond = 0) {
+  const extra = Math.max(0, beyond || 0);
   const seeds = [];
   const dx = preferX - centroid.x;
   const dz = preferZ - centroid.z;
@@ -88,7 +218,16 @@ export function outsideStand(centroid, preferX, preferZ, blocked) {
     const len = Math.hypot(rx, rz) || 1;
     const ux = rx / len;
     const uz = rz / len;
+    let first = 0;
     for (let d = 4; d <= 96; d += 1.25) {
+      const x = centroid.x + ux * d;
+      const z = centroid.z + uz * d;
+      if (blocked(x, z)) continue;
+      first = d;
+      break;
+    }
+    if (!first) continue;
+    for (let d = Math.min(96, first + extra); d >= first - 0.01; d -= 1.25) {
       const x = centroid.x + ux * d;
       const z = centroid.z + uz * d;
       if (!blocked(x, z)) return { x, z };

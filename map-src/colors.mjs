@@ -74,20 +74,20 @@ export function skyColor(theme) {
 export function lightRig(theme) {
   if (theme === "dark") {
     return {
-      hemi: 0x9eb4d0,
-      hemiGround: 0x142028,
-      hemiIntensity: 0.55,
+      hemi: 0xd5e0f0,
+      hemiGround: 0x5c6858,
+      hemiIntensity: 1.45,
       sun: 0xd5e2f4,
-      sunIntensity: 0.85,
+      sunIntensity: 0.62,
       boundary: 0x8fd0c4,
     };
   }
   return {
-    hemi: 0xf3fbff,
-    hemiGround: 0x9cbe78,
-    hemiIntensity: 0.82,
-    sun: 0xfff6e4,
-    sunIntensity: 1.28,
+    hemi: 0xf4f8ff,
+    hemiGround: 0xc5d6a2,
+    hemiIntensity: 1.05,
+    sun: 0xfff3dc,
+    sunIntensity: 1.12,
     boundary: 0xf6f1e6,
   };
 }

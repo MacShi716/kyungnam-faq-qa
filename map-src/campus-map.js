@@ -29,6 +29,7 @@ import {
   WALK_TAP_M,
   applyWalkAction,
   footprintBlocked,
+  chooseFacadeStand,
   outsideStand,
   poseFrom,
   yawFromDirection,
@@ -60,7 +61,8 @@ const TEXT = {
     summary: "地形高程使用 Copernicus WorldDEM-30 公开数据，只用于这张校园示意图。欧盟、ESA、DLR 与 Airbus 不对使用该数据承担责任，也不表示认可本页面。",
     officialMap: "庆南大学 2026 校园地图", ext: "外部官方链接", empty: "没有匹配的地点", phone: "电话",
     dialog: "庆南大学 3D 校园示意图",
-    labels: "标注", floorTitle: "各楼层教室与用途", facilities: "设施", hours: "时间",
+    labels: "标注", more: "更多", expandDetail: "展开详情", collapseDetail: "收起详情",
+    floorTitle: "各楼层教室与用途", facilities: "设施", hours: "时间",
     roleBadge: "国际服务重点", noMesh: "暂无3D轮廓",
     designLabel: "设计馆 · 留学生服务中心",
     intlTitle: "国际处 · 创造馆 1F",
@@ -86,7 +88,8 @@ const TEXT = {
     summary: "지형 고도는 Copernicus WorldDEM-30 공개 자료를 사용하며 이 캠퍼스 모식도에만 씁니다. EU, ESA, DLR, Airbus는 이 자료의 사용에 책임을 지지 않으며 이 페이지를 보증하거나 승인하지 않습니다.",
     officialMap: "경남대 2026 캠퍼스맵", ext: "외부 공식 링크", empty: "일치하는 장소가 없습니다", phone: "전화",
     dialog: "경남대학교 3D 캠퍼스 모식도",
-    labels: "라벨", floorTitle: "층별 강의실·시설 안내", facilities: "시설", hours: "시간",
+    labels: "라벨", more: "더보기", expandDetail: "상세 열기", collapseDetail: "상세 접기",
+    floorTitle: "층별 강의실·시설 안내", facilities: "시설", hours: "시간",
     roleBadge: "유학생 핵심", noMesh: "3D 외곽선 없음",
     designLabel: "디자인관 · 유학생서비스센터",
     intlTitle: "국제처 · 창조관 1층",
@@ -119,6 +122,8 @@ const MAP_CSS = `
 .map-modal.is-narrow:not(.dir-collapsed) .map-walk{bottom:calc(48% + 50px)}
 .map-modal.is-narrow.info-open .map-walk{bottom:calc(min(62vh, 560px) + 52px)}
 .map-modal:not(.is-narrow):not(.dir-collapsed) .map-pad-look{margin-right:324px}
+.map-modal:not(.is-narrow).info-open:not(.dir-collapsed) .map-pad-look{margin-right:calc(336px + min(400px,100vw - 360px))}
+.map-modal:not(.is-narrow).info-open.dir-collapsed .map-pad-look{margin-right:calc(min(420px,100vw - 24px) + 20px)}
 .map-btn{min-height:44px;padding:0 11px;border-radius:8px;border:1px solid var(--map-line);background:var(--map-panel);color:var(--ink);font:inherit;font-weight:600;font-size:.82rem;letter-spacing:.01em;cursor:pointer;backdrop-filter:blur(18px) saturate(1.2);box-shadow:none}
 .map-btn[aria-pressed="true"]{background:var(--pressed-bg);box-shadow:inset 0 0 0 1px var(--map-line)}
 .map-btn:focus-visible,.map-search:focus-visible,.map-ext-link:focus-visible,.map-osm-link:focus-visible,.map-pill:focus-visible,.map-odbl-link:focus-visible{outline:2px solid var(--rim);outline-offset:2px}
@@ -173,12 +178,53 @@ const MAP_CSS = `
 .map-osm-link,.map-odbl-link,.map-ext-link{color:var(--ink);font-weight:700}
 .map-license .map-osm-link,.map-license .map-odbl-link{display:inline-block;margin:0 0 6px;font-size:12px}
 .map-ext-tag{margin-left:6px;color:var(--muted);font-size:.75rem;font-weight:500}
-.map-modal.is-narrow .map-directory{top:auto;left:0;right:0;width:100%;max-height:48%;border-left:0;border-top:1px solid var(--map-line);padding:10px;transform:none}
+.map-modal.is-narrow .map-directory{top:auto;left:0;right:0;width:100%;max-height:48%;border-left:0;border-top:1px solid var(--map-line);padding:10px;transform:none;overflow:auto}
+.map-modal.is-narrow .map-list{flex:0 0 auto;overflow:visible}
 .map-modal.is-narrow.dir-collapsed .map-directory{display:none}
 .map-modal.is-narrow .map-info{z-index:18;left:0;right:0;top:auto;bottom:0;width:100%;max-height:min(62vh,560px);border-radius:12px 12px 0 0}
 .map-modal.is-narrow:not(.dir-collapsed) .map-attrib{bottom:calc(48% + 10px)}
 .map-modal.is-narrow.info-open .map-attrib{bottom:calc(min(62vh, 560px) + 12px);z-index:12}
 html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
+.map-more{display:contents}
+.map-more-btn{display:none}
+.map-toolbar [data-map-action="close"]{order:1}
+.map-more [data-map-action="zoom-in"]{order:2}
+.map-more [data-map-action="zoom-out"]{order:3}
+.map-more [data-map-action="reset"]{order:4}
+.map-more [data-map-action="north"]{order:5}
+.map-toolbar [data-map-action="walk"]{order:6}
+.map-more [data-map-action="full"]{order:7}
+.map-toolbar [data-map-action="directory"]{order:8}
+.map-more [data-map-action="labels"]{order:9}
+.map-intl-pill{order:10}
+.map-detail-summary{display:none}
+.map-modal.is-narrow.walk-active{top:var(--map-vv-off,0px);height:var(--map-vvh,100dvh);bottom:auto}
+.map-modal.is-narrow.walk-active .map-canvas,.map-modal.is-narrow.walk-active .map-labels{top:44px;right:0;bottom:auto;left:0;width:100%;height:calc(100% - 44px - var(--walk-dock,220px))}
+.map-modal.is-narrow.walk-active .map-toolbar{top:0;left:0;right:0;height:44px;max-width:none;flex-wrap:nowrap;align-items:stretch;gap:4px;padding:0 6px;z-index:24}
+.map-modal.is-narrow.walk-active .map-toolbar > .map-btn:not(.map-intl-pill),.map-modal.is-narrow.walk-active .map-more-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;min-width:44px;padding:0 10px}
+.map-modal.is-narrow.walk-active .map-toolbar [data-map-action="close"]{order:1}
+.map-modal.is-narrow.walk-active .map-toolbar [data-map-action="directory"]{order:2}
+.map-modal.is-narrow.walk-active .map-toolbar [data-map-action="walk"]{order:3}
+.map-modal.is-narrow.walk-active .map-more-btn{order:4}
+.map-modal.is-narrow.walk-active .map-toolbar > .map-intl-pill{display:none}
+.map-modal.is-narrow.walk-active .map-more{display:none;position:absolute;top:48px;right:6px;z-index:25;min-width:168px;padding:6px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
+.map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px}
+.map-modal.is-narrow.walk-active .map-more .map-btn{width:100%;min-height:44px;height:44px;order:0}
+.map-modal.is-narrow.walk-active{--walk-pad:140px;--walk-attrib:32px;--walk-summary:0px;--walk-dock:calc(var(--walk-pad) + var(--walk-attrib) + var(--walk-summary) + 12px)}
+.map-modal.is-narrow.walk-active.detail-collapsed{--walk-summary:44px}
+.map-modal.is-narrow.walk-active.detail-open{--walk-summary:180px}
+.map-modal.is-narrow.walk-active .map-walk{left:0;right:0;bottom:0;height:var(--walk-pad);margin:0;padding:0 8px;align-items:center;justify-content:space-between;z-index:12}
+.map-modal.is-narrow.walk-active .map-pad-look{margin-right:0}
+.map-modal.is-narrow.walk-active .map-attrib{left:6px;right:6px;bottom:calc(var(--walk-pad) + 4px);max-width:none;z-index:14}
+.map-modal.is-narrow.walk-active .map-attrib-bar{width:100%;height:32px}
+.map-modal.is-narrow.walk-active .map-license{left:0;width:min(100%,440px);bottom:40px;max-height:min(46vh,calc(var(--map-vvh,100dvh) * 0.4))}
+.map-modal.is-narrow.walk-active .map-directory{z-index:26}
+.map-modal.is-narrow.walk-active.detail-collapsed .map-info,.map-modal.is-narrow.walk-active.detail-open .map-info{top:auto;left:6px;right:6px;bottom:calc(var(--walk-pad) + var(--walk-attrib) + 8px);width:auto;height:var(--walk-summary);max-height:var(--walk-summary);padding:0;overflow:auto;border-radius:8px;z-index:15}
+.map-modal.is-narrow.walk-active.detail-collapsed .map-info > :not(.map-detail-summary){display:none}
+.map-modal.is-narrow.walk-active .map-detail-summary{display:flex;width:100%;height:44px;min-height:44px;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;position:sticky;top:0;z-index:2}
+.map-summary-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-summary-action{flex:0 0 auto;font-size:.75rem}
+.map-modal.is-narrow.walk-active.detail-open .map-info{padding:0 0 8px}
 `;
 
 let session = null;
@@ -352,7 +398,7 @@ function createShell(opts) {
     favorites: readFavs(), category: "all", query: "", labelsOn: true,
     unbinds: [], buildings: [], pickables: [], webgl: false, glDisposed: false,
     raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
-    detailEntries: null, detailFocus: null, detailBuilding: null,
+    detailEntries: null, detailFocus: null, detailBuilding: null, detailExpanded: false,
     renderer: null, controls: null, scene: null, camera: null,
     walk: { active: false, x: 0, z: 0, yaw: 0, pitch: -0.2, held: new Set(), heldAt: 0, t: 0, focusId: null, drag: null, eyeY: 0 },
   };
@@ -456,14 +502,25 @@ function paintChrome(shell) {
     ["labels", copy.labels],
   ];
   if (!shell.toolbar.childElementCount) {
+    const morePanel = document.createElement("div");
+    morePanel.className = "map-more";
+    const moreBtn = button(copy.more, "map-btn map-more-btn");
+    moreBtn.dataset.mapAction = "more";
+    moreBtn.setAttribute("aria-expanded", "false");
+    moreBtn.setAttribute("aria-haspopup", "true");
+    const inRow = new Set(["close", "directory", "walk"]);
     for (const [key, label] of specs) {
       const node = button(label, "map-btn");
       node.dataset.mapAction = key;
       if (key === "zoom-in") node.title = copy.zoomIn;
       if (key === "zoom-out") node.title = copy.zoomOut;
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
-      shell.toolbar.appendChild(node);
+      if (inRow.has(key)) shell.toolbar.appendChild(node);
+      else morePanel.appendChild(node);
     }
+    shell.moreBtn = moreBtn;
+    shell.morePanel = morePanel;
+    shell.toolbar.append(moreBtn, morePanel);
     shell.intlPill = makeIntlButton("map-btn map-intl-pill");
     shell.toolbar.appendChild(shell.intlPill);
     shell.intlPill.addEventListener("click", () => openInternational());
@@ -471,6 +528,15 @@ function paintChrome(shell) {
       const node = event.target.closest("button");
       if (!node || !session || node.classList.contains("map-intl-pill")) return;
       const action = node.dataset.mapAction;
+      if (action === "more") {
+        const open = shell.morePanel.classList.toggle("is-open");
+        shell.moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        return;
+      }
+      if (shell.morePanel) {
+        shell.morePanel.classList.remove("is-open");
+        shell.moreBtn.setAttribute("aria-expanded", "false");
+      }
       if (action === "close") close();
       else if (action === "zoom-in") zoomBy(0.82);
       else if (action === "zoom-out") zoomBy(1.22);
@@ -497,6 +563,7 @@ function paintChrome(shell) {
       else node.textContent = found[1];
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
     }
+    if (shell.moreBtn) shell.moreBtn.textContent = copy.more;
   }
   paintIntl(shell);
   if (shell.search) {
@@ -693,11 +760,60 @@ function cites6382(entry) {
 function hideDetail() {
   if (!session) return;
   session.info.hidden = true;
+  session.detailExpanded = false;
   session.root.classList.remove("info-open");
   session.detailEntries = null;
   session.detailFocus = null;
   session.detailBuilding = null;
+  syncWalkChrome(session);
   layoutLabels();
+}
+
+function appendDetailSummary(shell, title, noMesh) {
+  const btn = button("", "map-btn map-detail-summary");
+  const name = document.createElement("span");
+  name.className = "map-summary-name";
+  name.textContent = title;
+  const action = document.createElement("span");
+  action.className = "map-summary-action";
+  btn.append(name, action);
+  if (noMesh) {
+    const badge = document.createElement("span");
+    badge.className = "map-badge";
+    badge.textContent = t().noMesh;
+    btn.append(badge);
+  }
+  btn.addEventListener("click", () => {
+    if (!session) return;
+    session.detailExpanded = !session.detailExpanded;
+    syncWalkChrome(session);
+  });
+  shell.info.appendChild(btn);
+}
+
+function syncWalkChrome(shell) {
+  if (!shell || !shell.root) return;
+  const active = !!(shell.walk && shell.walk.active);
+  const narrow = shell.root.classList.contains("is-narrow");
+  const phoneWalk = active && narrow;
+  const hasDetail = !!(shell.info && !shell.info.hidden);
+  shell.root.classList.toggle("walk-active", phoneWalk);
+  shell.root.classList.toggle("detail-collapsed", phoneWalk && hasDetail && !shell.detailExpanded);
+  shell.root.classList.toggle("detail-open", phoneWalk && hasDetail && !!shell.detailExpanded);
+  const summary = shell.info && shell.info.querySelector(".map-detail-summary");
+  if (summary) {
+    const action = summary.querySelector(".map-summary-action");
+    if (action) action.textContent = " · " + (shell.detailExpanded ? t().collapseDetail : t().expandDetail);
+    summary.setAttribute("aria-expanded", shell.detailExpanded ? "true" : "false");
+  }
+  const vv = window.visualViewport;
+  const height = vv && vv.height ? Math.round(vv.height) : (shell.root.clientHeight || window.innerHeight);
+  const off = vv && Number.isFinite(vv.offsetTop) ? Math.round(vv.offsetTop) : 0;
+  shell.root.style.setProperty("--map-vvh", height + "px");
+  shell.root.style.setProperty("--map-vv-off", off + "px");
+  requestAnimationFrame(() => {
+    if (session === shell) resize();
+  });
 }
 
 function revealDetail(shell) {
@@ -752,6 +868,8 @@ function showUnlinked(building) {
   missing.className = "map-no-faq";
   missing.textContent = copy.noFaq + " · OSM " + building.osmId;
   shell.info.append(missing, favButton("osm:" + building.osmId));
+  appendDetailSummary(shell, name, false);
+  syncWalkChrome(shell);
 }
 
 function showDetail(entries, focus, building) {
@@ -927,7 +1045,10 @@ function showDetail(entries, focus, building) {
     shell.info.appendChild(faq);
   }
   shell.info.appendChild(favButton(favId(focusEntry)));
+  const intl = list.some((entry) => entry.faqId === "F86" || entry.faqId === "F83");
+  appendDetailSummary(shell, title, !mapped && intl);
   layoutLabels();
+  syncWalkChrome(shell);
 }
 
 function refreshDetail() {
@@ -1058,6 +1179,7 @@ function selectBuilding(osmId, faqId) {
   if (!shell) return;
   const record = shell.buildings.find((item) => item.osmId === osmId);
   if (!record) return;
+  shell.detailExpanded = false;
   shell.selectedId = osmId;
   paintBuildings();
   const focus = (faqId && record.entries.find((entry) => entry.faqId === faqId)) || record.entries[0] || null;
@@ -1158,9 +1280,12 @@ function paintWalkUi(shell) {
   }
   const walkBtn = shell.toolbar && shell.toolbar.querySelector("[data-map-action='walk']");
   if (walkBtn) {
-    walkBtn.setAttribute("aria-pressed", shell.walk && shell.walk.active ? "true" : "false");
-    walkBtn.title = shell.walk && shell.walk.active ? copy.walkStop : copy.walkHint;
+    const on = !!(shell.walk && shell.walk.active);
+    walkBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    walkBtn.title = on ? copy.walkStop : copy.walkHint;
+    if (shell.root.classList.contains("is-narrow")) walkBtn.textContent = on ? copy.walkStop : copy.walk;
   }
+  syncWalkChrome(shell);
 }
 
 function buildingRings(shell) {
@@ -1178,8 +1303,13 @@ function walkBlocked(shell, x, z) {
   return footprintBlocked(x, z, buildingRings(shell), 1.15);
 }
 
+function renderedSurfaceY(shell, x, z) {
+  if (shell && typeof shell.sampleHeight === "function") return shell.sampleHeight(x, z);
+  return sampleTerrainY(shell.terrain, x, z);
+}
+
 function syncWalkCamera(shell) {
-  const eyeY = sampleTerrainY(shell.terrain, shell.walk.x, shell.walk.z) + EYE_M;
+  const eyeY = renderedSurfaceY(shell, shell.walk.x, shell.walk.z) + EYE_M;
   const pose = poseFrom(shell.walk, eyeY);
   shell.walk.eyeY = eyeY;
   shell.camera.position.set(pose.x, pose.y, pose.z);
@@ -1213,14 +1343,15 @@ function startWalk(shell, x, z, yaw, pitch, focusId) {
 function exitWalk(shell) {
   if (!shell || !shell.walk) return;
   if (shell.walk.active && shell.camera && shell.controls) {
-    const eye = shell.camera.position;
+    const eye = shell.camera.position.clone();
     const yaw = shell.walk.yaw;
-    const dist = 64;
-    shell.controls.target.set(
-      eye.x + Math.sin(yaw) * dist,
-      eye.y - 28,
-      eye.z - Math.cos(yaw) * dist,
+    const back = 42;
+    shell.camera.position.set(
+      eye.x - Math.sin(yaw) * back,
+      eye.y + 24,
+      eye.z + Math.cos(yaw) * back,
     );
+    shell.controls.target.set(eye.x, eye.y + 3, eye.z);
     shell.controls.enabled = true;
     shell.controls.update();
   }
@@ -1244,21 +1375,38 @@ function toggleWalk() {
   shell.camera.getWorldDirection(dir);
   const spot = shell.controls.target;
   const yaw = yawFromDirection(dir.x, dir.z);
-  const pitched = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
-  startWalk(shell, spot.x, spot.z, yaw, Math.max(-0.35, Math.min(0.2, pitched)), null);
+  const ground = renderedSurfaceY(shell, shell.camera.position.x, shell.camera.position.z);
+  const fromOverview = shell.camera.position.y > ground + 80;
+  if (fromOverview) {
+    const pitched = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
+    const level = pitched > 0 ? Math.min(0.12, pitched) : 0;
+    startWalk(shell, spot.x, spot.z, yaw, level, null);
+    return;
+  }
+  const look = { x: Math.sin(yaw), z: -Math.cos(yaw) };
+  let x = spot.x - look.x * 32;
+  let z = spot.z - look.z * 32;
+  if (walkBlocked(shell, x, z)) {
+    const cleared = outsideStand({ x: spot.x, z: spot.z }, x, z, (px, pz) => walkBlocked(shell, px, pz), 18);
+    x = cleared.x;
+    z = cleared.z;
+  }
+  startWalk(shell, x, z, yaw, 0.05, null);
 }
 
 function walkToBuilding(record) {
   const shell = session;
   if (!shell || !record || !shell.terrain) return;
+  const ring = record.ring || record.building.footprintXZ;
+  const picked = chooseFacadeStand(ring, (x, z) => walkBlocked(shell, x, z));
+  if (picked) {
+    startWalk(shell, picked.x, picked.z, picked.yaw, picked.pitch, record.osmId);
+    return;
+  }
   const prefer = shell.camera ? shell.camera.position : { x: record.centroid.x, z: record.centroid.z + 24 };
-  const stand = outsideStand(record.centroid, prefer.x, prefer.z, (x, z) => walkBlocked(shell, x, z));
+  const stand = outsideStand(record.centroid, prefer.x, prefer.z, (x, z) => walkBlocked(shell, x, z), 22);
   const yaw = yawFromDirection(record.centroid.x - stand.x, record.centroid.z - stand.z);
-  const eyeY = sampleTerrainY(shell.terrain, stand.x, stand.z) + EYE_M;
-  const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.45;
-  const horiz = Math.max(1, Math.hypot(record.centroid.x - stand.x, record.centroid.z - stand.z));
-  const pitch = Math.max(-0.55, Math.min(0.45, Math.atan2(aimY - eyeY, horiz)));
-  startWalk(shell, stand.x, stand.z, yaw, pitch, record.osmId);
+  startWalk(shell, stand.x, stand.z, yaw, -0.04, record.osmId);
 }
 
 function holdWalk(action, down) {
@@ -1488,13 +1636,15 @@ function tick() {
 function resize() {
   const shell = session;
   if (!shell || !shell.renderer) return;
-  const w = Math.max(1, shell.stage.clientWidth);
-  const h = Math.max(1, shell.stage.clientHeight);
+  const box = shell.canvas.getBoundingClientRect();
+  const w = Math.max(1, Math.round(box.width) || shell.stage.clientWidth);
+  const h = Math.max(1, Math.round(box.height) || shell.stage.clientHeight);
   shell.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   shell.renderer.setSize(w, h, false);
   shell.camera.aspect = w / h;
   shell.camera.updateProjectionMatrix();
-  shell.root.classList.toggle("is-narrow", w < 800);
+  const modalWidth = shell.root.clientWidth;
+  if (modalWidth > 0) shell.root.classList.toggle("is-narrow", modalWidth < 800);
   poke();
 }
 
@@ -1567,13 +1717,13 @@ function applyThemeMaterials() {
   const rig = lightRig(shell.theme);
   const dark = shell.theme === "dark";
   if (shell.hemi) {
-    shell.hemi.color.setHex(dark ? 0x9eb0c4 : 0xf4f7fb);
-    shell.hemi.groundColor.setHex(dark ? 0x1a201c : 0xa39880);
-    shell.hemi.intensity = dark ? 0.38 : 0.46;
+    shell.hemi.color.setHex(rig.hemi);
+    shell.hemi.groundColor.setHex(rig.hemiGround);
+    shell.hemi.intensity = rig.hemiIntensity;
   }
   if (shell.sun) {
     shell.sun.color.setHex(rig.sun);
-    shell.sun.intensity = dark ? 0.95 : 1.7;
+    shell.sun.intensity = rig.sunIntensity;
   }
   applyAtmosphereTheme(shell);
   paintTerrain(shell);
@@ -1588,6 +1738,7 @@ function buildScene(shell) {
     alpha: false,
     powerPreference: "high-performance",
     preserveDrawingBuffer: true,
+    logarithmicDepthBuffer: true,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.shadowMap.enabled = true;
@@ -1606,8 +1757,8 @@ function buildScene(shell) {
   controls.maxDistance = 1200;
   controls.target.set(0, 40, 0);
   const rig = lightRig(shell.theme);
-  const hemi = new THREE.HemisphereLight(0xf4f7fb, 0xa39880, 0.55);
-  const sun = new THREE.DirectionalLight(rig.sun, 1.7);
+  const hemi = new THREE.HemisphereLight(rig.hemi, rig.hemiGround, rig.hemiIntensity);
+  const sun = new THREE.DirectionalLight(rig.sun, rig.sunIntensity);
   sun.position.set(-260, 540, 280);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -1720,6 +1871,8 @@ export function debugSnapshot() {
     highColor: at(highI),
     clear: session.renderer ? session.renderer.getClearColor(new THREE.Color()).getHexString() : "",
     toneMapping: session.renderer && session.renderer.toneMapping === THREE.ACESFilmicToneMapping ? "ACESFilmic" : "",
+    logDepth: !!(session.renderer && session.renderer.capabilities && session.renderer.capabilities.logarithmicDepthBuffer),
+    fog: session.scene && session.scene.fog ? session.scene.fog.density : 0,
     trees: session.treeCount || 0,
     roads: session.layerStats ? session.layerStats.roads : 0,
     pbr: !!(session.terrainMesh && session.terrainMesh.material && session.terrainMesh.material.map),
@@ -1952,6 +2105,343 @@ export function debugOcclusion(osmId, mode) {
   }
 }
 
+function canvasWash(shell) {
+  const gl = shell.renderer.getContext();
+  const w = shell.renderer.domElement.width;
+  const h = shell.renderer.domElement.height;
+  const step = Math.max(4, Math.floor(Math.min(w, h) / 48));
+  const px = new Uint8Array(4);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  let n = 0;
+  let sat = 0;
+  let luma = 0;
+  const x0 = Math.floor(w * 0.18);
+  const x1 = Math.floor(w * 0.82);
+  const y0 = Math.floor(h * 0.22);
+  const y1 = Math.floor(h * 0.78);
+  for (let y = y0; y < y1; y += step) {
+    for (let x = x0; x < x1; x += step) {
+      gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      const r = px[0];
+      const g = px[1];
+      const b = px[2];
+      sat += Math.max(r, g, b) - Math.min(r, g, b);
+      luma += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      n += 1;
+    }
+  }
+  return { sat: n ? sat / n : 0, luma: n ? luma / n : 0, n };
+}
+
+function roadLineContrast(shell) {
+  const marks = shell.roadTrace || [];
+  const ray = new THREE.Raycaster();
+  const lumas = [];
+  const road = shell.layerMeshes && shell.layerMeshes.road;
+  for (let i = 0; i < marks.length; i += 2) {
+    const mark = marks[i];
+    const point = new THREE.Vector3(mark.x, mark.y, mark.z);
+    const dir = point.clone().sub(shell.camera.position);
+    const dist = dir.length();
+    if (dist < 2) continue;
+    dir.multiplyScalar(1 / dist);
+    ray.set(shell.camera.position, dir);
+    ray.near = 0.1;
+    ray.far = dist + 3;
+    const hits = road ? ray.intersectObject(road, false) : [];
+    if (!hits.length || hits[0].distance > dist + 1.5) continue;
+    const v = hits[0].point.clone();
+    const eye = v.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+    if (eye.z > -0.5) continue;
+    v.project(shell.camera);
+    if (Math.abs(v.x) > 0.92 || Math.abs(v.y) > 0.9) continue;
+    const px = readPixel(shell, v);
+    lumas.push(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]);
+  }
+  if (!lumas.length) return { samples: 0, mean: 0, spread: 0 };
+  const sorted = lumas.slice().sort((a, b) => a - b);
+  const mid = sorted[Math.floor(sorted.length / 2)];
+  const spread = lumas.filter((value) => Math.abs(value - mid) > 70).length / lumas.length;
+  const mean = lumas.reduce((sum, value) => sum + value, 0) / lumas.length;
+  return { samples: lumas.length, mean, spread };
+}
+
+export function debugFacadeColumn(osmId) {
+  const shell = session;
+  if (!shell || !shell.renderer) return null;
+  const record = shell.buildings.find((item) => item.osmId === osmId);
+  if (!record || !record.ring) return null;
+  const open = record.ring;
+  const sun = shell.sun ? shell.sun.position : new THREE.Vector3(-260, 540, 280);
+  const edges = [];
+  for (let i = 0; i < open.length; i++) {
+    const a = open[i];
+    const b = open[(i + 1) % open.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 8) continue;
+    const mx = (a[0] + b[0]) / 2;
+    const mz = (a[1] + b[1]) / 2;
+    const ox = (b[1] - a[1]) / len;
+    const oz = -(b[0] - a[0]) / len;
+    const facing = ox * (sun.x - mx) + oz * (sun.z - mz);
+    edges.push({ mx, mz, ox, oz, len, facing });
+  }
+  edges.sort((a, b) => a.facing - b.facing);
+  const saved = {
+    pos: shell.camera.position.clone(),
+    quat: shell.camera.quaternion.clone(),
+    target: shell.controls.target.clone(),
+    shadows: shell.renderer.shadowMap.enabled,
+  };
+  const column = (edge) => {
+    const camX = edge.mx + edge.ox * 26;
+    const camZ = edge.mz + edge.oz * 26;
+    const ground = sampleTerrainY(shell.terrain, camX, camZ);
+    shell.camera.position.set(camX, ground + 1.7, camZ);
+    shell.camera.lookAt(edge.mx, record.seat.baseY + 6, edge.mz);
+    shell.camera.updateMatrixWorld(true);
+    shell.renderer.render(shell.scene, shell.camera);
+    const samples = [];
+    for (let h = 0.6; h <= 16; h += 1.1) {
+      const y = record.seat.skirtBottomY + h;
+      const v = new THREE.Vector3(edge.mx + edge.ox * 0.35, y, edge.mz + edge.oz * 0.35);
+      const eye = v.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+      if (eye.z > -0.2) continue;
+      v.project(shell.camera);
+      if (Math.abs(v.x) > 0.92 || Math.abs(v.y) > 0.92) continue;
+      const px = readPixel(shell, v);
+      samples.push({
+        y: +y.toFixed(1),
+        luma: +(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]).toFixed(1),
+      });
+    }
+    const skirt = samples.filter((item) => item.y < record.seat.baseY);
+    const wall = samples.filter((item) => item.y >= record.seat.baseY + 0.4 && item.luma > 28);
+    const avg = (list) => list.reduce((sum, item) => sum + item.luma, 0) / Math.max(1, list.length);
+    return { skirt: +avg(skirt).toFixed(1), wall: +avg(wall).toFixed(1), n: samples.length };
+  };
+  shell.renderer.shadowMap.enabled = true;
+  const shaded = edges.length ? column(edges[0]) : null;
+  const sunlit = edges.length ? column(edges[edges.length - 1]) : null;
+  shell.renderer.shadowMap.enabled = saved.shadows;
+  shell.camera.position.copy(saved.pos);
+  shell.camera.quaternion.copy(saved.quat);
+  shell.controls.target.copy(saved.target);
+  shell.renderer.render(shell.scene, shell.camera);
+  return { baseY: +record.seat.baseY.toFixed(1), shaded, sunlit };
+}
+
+export function debugHoldView(position, target) {
+  const shell = session;
+  if (!shell || !shell.camera) return null;
+  shell.tween = null;
+  if (shell.walk) shell.walk.active = false;
+  if (shell.controls) shell.controls.enabled = true;
+  shell.camera.position.set(position.x, position.y, position.z);
+  shell.camera.lookAt(target.x, target.y, target.z);
+  shell.camera.updateMatrixWorld(true);
+  if (shell.controls) {
+    shell.controls.target.set(target.x, target.y, target.z);
+    shell.controls.update();
+  }
+  return debugGroundProbe();
+}
+
+export function debugReadWorld(points) {
+  const shell = session;
+  if (!shell || !shell.renderer) return [];
+  shell.renderer.render(shell.scene, shell.camera);
+  return (points || []).map((point) => {
+    const v = new THREE.Vector3(point.x, point.y, point.z);
+    const eye = v.clone().applyMatrix4(shell.camera.matrixWorldInverse);
+    if (eye.z > -0.15) return { name: point.name, visible: false };
+    v.project(shell.camera);
+    if (Math.abs(v.x) > 0.98 || Math.abs(v.y) > 0.98) return { name: point.name, visible: false };
+    const px = readPixel(shell, v);
+    return {
+      name: point.name,
+      visible: true,
+      rgb: [px[0], px[1], px[2]],
+      luma: +(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]).toFixed(1),
+    };
+  });
+}
+
+function hitKind(shell, object) {
+  if (!object) return "none";
+  if (object === shell.terrainMesh) return "terrain";
+  if (shell.trees && shell.trees.includes(object)) return "tree";
+  if (object.userData && object.userData.layer) return object.userData.layer;
+  let node = object;
+  while (node) {
+    if (node.userData && node.userData.osmId) return "building";
+    if (node.children && node.children.some((child) => child.userData && child.userData.osmId)) return "building";
+    node = node.parent;
+  }
+  if (object === shell.sky) return "sky";
+  return "other";
+}
+
+function describeHit(shell, hit) {
+  if (!hit) return null;
+  let normalY = null;
+  if (hit.face && hit.face.normal) {
+    const normal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+    normalY = +normal.y.toFixed(2);
+  }
+  return {
+    kind: hitKind(shell, hit.object),
+    dist: +hit.distance.toFixed(2),
+    y: +hit.point.y.toFixed(2),
+    ny: normalY,
+  };
+}
+
+function firstSolidHit(shell, hits) {
+  for (const hit of hits) {
+    if (hit.object === shell.sky) continue;
+    return hit;
+  }
+  return null;
+}
+
+export function debugWalkProbe() {
+  const shell = session;
+  if (!shell || !shell.camera || !shell.renderer) return null;
+  const eye = shell.camera.position.clone();
+  const look = new THREE.Vector3();
+  shell.camera.getWorldDirection(look);
+  const rendered = shell.sampleHeight ? shell.sampleHeight(eye.x, eye.z) : null;
+  const linear = shell.terrain ? sampleTerrainY(shell.terrain, eye.x, eye.z) : null;
+  const down = new THREE.Raycaster(
+    new THREE.Vector3(eye.x, eye.y + 40, eye.z),
+    new THREE.Vector3(0, -1, 0),
+    0,
+    120,
+  );
+  const meshHit = shell.terrainMesh ? firstSolidHit(shell, down.intersectObject(shell.terrainMesh, false)) : null;
+  const meshY = meshHit ? meshHit.point.y : null;
+  const ahead = new THREE.Raycaster(eye, look.clone().normalize(), 0, 80);
+  const lookHit = firstSolidHit(shell, ahead.intersectObjects(shell.scene.children, true));
+  const ndc = [[-0.7, 0.7], [0, 0.7], [0.7, 0.7], [0, 0], [0, -0.55]];
+  const view = [];
+  const caster = new THREE.Raycaster();
+  for (const [nx, ny] of ndc) {
+    caster.setFromCamera(new THREE.Vector2(nx, ny), shell.camera);
+    caster.near = 0;
+    caster.far = 80;
+    view.push(describeHit(shell, firstSolidHit(shell, caster.intersectObjects(shell.scene.children, true))));
+  }
+  shell.renderer.render(shell.scene, shell.camera);
+  const gl = shell.renderer.getContext();
+  const canvas = shell.canvas;
+  const rect = canvas.getBoundingClientRect();
+  const bw = canvas.width;
+  const bh = canvas.height;
+  const px = new Uint8Array(4);
+  let n = 0;
+  let sr = 0;
+  let sg = 0;
+  let sb = 0;
+  let sr2 = 0;
+  let sg2 = 0;
+  let sb2 = 0;
+  const step = 16;
+  for (let y = rect.top + 4; y < rect.bottom - 4; y += step) {
+    for (let x = rect.left + 4; x < rect.right - 4; x += step) {
+      if (document.elementFromPoint(x, y) !== canvas) continue;
+      const sx = Math.min(bw - 1, Math.max(0, Math.floor(((x - rect.left) / rect.width) * bw)));
+      const sy = Math.min(bh - 1, Math.max(0, Math.floor((1 - (y - rect.top) / rect.height) * bh)));
+      gl.readPixels(sx, sy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      sr += px[0];
+      sg += px[1];
+      sb += px[2];
+      sr2 += px[0] * px[0];
+      sg2 += px[1] * px[1];
+      sb2 += px[2] * px[2];
+      n += 1;
+    }
+  }
+  const mean = n ? [sr / n, sg / n, sb / n] : [0, 0, 0];
+  const std = n ? [
+    Math.sqrt(Math.max(0, sr2 / n - mean[0] * mean[0])),
+    Math.sqrt(Math.max(0, sg2 / n - mean[1] * mean[1])),
+    Math.sqrt(Math.max(0, sb2 / n - mean[2] * mean[2])),
+  ] : [0, 0, 0];
+  const clearanceMesh = meshY == null ? null : eye.y - meshY;
+  return {
+    viewMode: shell.walk && shell.walk.active ? "walk" : "orbit",
+    x: +eye.x.toFixed(2),
+    y: +eye.y.toFixed(2),
+    z: +eye.z.toFixed(2),
+    yaw: shell.walk ? +shell.walk.yaw.toFixed(3) : null,
+    pitch: shell.walk ? +shell.walk.pitch.toFixed(3) : +Math.asin(THREE.MathUtils.clamp(look.y, -1, 1)).toFixed(3),
+    rendered: rendered == null ? null : +rendered.toFixed(2),
+    linear: linear == null ? null : +linear.toFixed(2),
+    clearanceSmooth: rendered == null ? null : +(eye.y - rendered).toFixed(2),
+    clearanceMesh: clearanceMesh == null ? null : +clearanceMesh.toFixed(2),
+    near: shell.camera.near,
+    fov: shell.camera.fov,
+    look: describeHit(shell, lookHit),
+    view,
+    visible: {
+      n,
+      rgb: mean.map((v) => +v.toFixed(1)),
+      std: std.map((v) => +v.toFixed(1)),
+    },
+  };
+}
+
+export function debugPlaceWalk(x, z) {
+  const shell = session;
+  if (!shell || !shell.sampleHeight) return null;
+  shell.walk.active = true;
+  shell.walk.x = x;
+  shell.walk.z = z;
+  shell.walk.yaw = 0;
+  shell.walk.pitch = -0.15;
+  shell.walk.focusId = null;
+  if (shell.controls) shell.controls.enabled = false;
+  syncWalkCamera(shell);
+  const rendered = shell.sampleHeight(x, z);
+  const linear = sampleTerrainY(shell.terrain, x, z);
+  return {
+    eye: +shell.camera.position.y.toFixed(2),
+    rendered: +rendered.toFixed(2),
+    linear: +linear.toFixed(2),
+    clearance: +(shell.camera.position.y - rendered).toFixed(2),
+  };
+}
+
+export function debugGroundProbe() {
+  const shell = session;
+  if (!shell || !shell.renderer || !shell.camera) return null;
+  shell.renderer.render(shell.scene, shell.camera);
+  const wash = canvasWash(shell);
+  const road = roadLineContrast(shell);
+  const offset = (shell.surfaceMaterials || []).some((mat) => mat.polygonOffset && Math.abs(mat.polygonOffsetFactor) >= 1);
+  return {
+    sat: wash.sat,
+    luma: wash.luma,
+    samples: wash.n,
+    road,
+    fog: shell.scene.fog ? shell.scene.fog.density : 0,
+    logDepth: !!(shell.renderer.capabilities && shell.renderer.capabilities.logarithmicDepthBuffer),
+    offset,
+    distance: shell.controls ? shell.camera.position.distanceTo(shell.controls.target) : 0,
+  };
+}
+
+export function debugShiftView(dx, dy, dz) {
+  const shell = session;
+  if (!shell || !shell.camera) return null;
+  shell.camera.position.x += dx;
+  shell.camera.position.y += dy;
+  shell.camera.position.z += dz;
+  if (shell.controls) shell.controls.update();
+  return debugGroundProbe();
+}
+
 export function close() {
   bootGen += 1;
   const shell = session;
@@ -1985,11 +2475,21 @@ export async function open(opts) {
     if (event.key !== "Escape" || !session || session.root !== shell.root) return;
     event.preventDefault();
     event.stopPropagation();
+    if (session.morePanel && session.morePanel.classList.contains("is-open")) {
+      session.morePanel.classList.remove("is-open");
+      if (session.moreBtn) session.moreBtn.setAttribute("aria-expanded", "false");
+      return;
+    }
     if (session.license && !session.license.hidden) {
       session.license.hidden = true;
       const notice = session.attribBar && session.attribBar.querySelector(".map-notice-btn");
       if (notice) notice.setAttribute("aria-expanded", "false");
       layoutLabels();
+      return;
+    }
+    if (session.root.classList.contains("detail-open")) {
+      session.detailExpanded = false;
+      syncWalkChrome(session);
       return;
     }
     if (session.info && !session.info.hidden) {
@@ -2002,6 +2502,11 @@ export async function open(opts) {
     if (session && session.root === shell.root) onWalkKey(event, false);
   }, true);
   bind(shell, window, "resize", resize);
+  if (window.visualViewport) {
+    const onVv = () => { if (session === shell) syncWalkChrome(shell); };
+    bind(shell, window.visualViewport, "resize", onVv);
+    bind(shell, window.visualViewport, "scroll", onVv);
+  }
   bind(shell, document, "fullscreenchange", () => { if (session) paintChrome(session); });
   mountDirectory(shell);
   try {
