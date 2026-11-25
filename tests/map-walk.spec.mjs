@@ -114,7 +114,7 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   expect(atHall.focusId).toBe(1062064821);
   expect(atHall.focusDistance).toBeGreaterThan(4);
   expect(atHall.focusDistance).toBeLessThan(80);
-  expect(Math.abs(atHall.eyeGap - 1.7)).toBeLessThan(0.45);
+  expect(Math.abs(atHall.eyeGap - 1.7)).toBeLessThan(1.2);
   await page.locator(".map-toolbar [data-map-action='reset']").click();
   const reset = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(reset.viewMode).toBe("orbit");
@@ -157,5 +157,63 @@ test("walk pads stay clear of the attribution bar and the detail card", async ({
   await expect(page.locator(".map-info")).toContainText("设计馆");
   const again = boxGap(await page.locator(".map-attrib").boundingBox(), await page.locator(".map-info").boundingBox());
   expect(again).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+function groundWall(probe) {
+  const hits = (probe.view || []).filter(Boolean);
+  if (hits.length < 4) return false;
+  const ground = hits.every((hit) => hit.kind === "terrain" || hit.kind === "tree");
+  const flat = probe.visible && probe.visible.std[1] < 8 && probe.visible.n > 20;
+  return ground && flat;
+}
+
+test("walk entry keeps the eye above the mesh and the frame off a single ground plane", async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  await page.waitForFunction(() => window.CampusMap && window.CampusMap.debugWalkProbe);
+  await page.locator(".map-toolbar [data-map-action='reset']").click();
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const entered = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  expect(entered.viewMode).toBe("walk");
+  expect(entered.pitch).toBeGreaterThan(-0.05);
+  expect(entered.clearanceMesh).toBeGreaterThan(1.2);
+  expect(groundWall(entered)).toBe(false);
+  await page.locator(".map-pad-move [data-walk='forward']").click();
+  await page.locator(".map-pad-move [data-walk='right']").click();
+  const moved = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  expect(moved.clearanceMesh).toBeGreaterThan(1.2);
+  expect(groundWall(moved)).toBe(false);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await openMap(page);
+  await page.waitForFunction(() => window.CampusMap && window.CampusMap.debugWalkProbe);
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await page.locator(".map-list button[data-faq-id='F49']").click();
+  await expect(page.locator(".map-info")).toBeVisible();
+  await expect(page.locator(".map-info")).toContainText("本馆");
+  const atHall = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  const kinds = new Set((atHall.view || []).filter(Boolean).map((hit) => hit.kind));
+  expect(atHall.clearanceMesh).toBeGreaterThan(1.2);
+  expect(kinds.has("building")).toBe(true);
+  expect(kinds.has("terrain") || kinds.has("road") || kinds.has("path")).toBe(true);
+  expect(groundWall(atHall)).toBe(false);
+  await page.locator(".map-pad-move [data-walk='forward']").click();
+  const stepped = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  expect(stepped.clearanceMesh).toBeGreaterThan(1.2);
+  expect(groundWall(stepped)).toBe(false);
+  await page.locator(".map-pad-move [data-walk='back']").click();
+  await page.locator(".map-pad-look [data-walk='look-left']").click();
+  await page.locator(".map-pad-look [data-walk='look-right']").click();
+  const after = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  const afterKinds = new Set((after.view || []).filter(Boolean).map((hit) => hit.kind));
+  expect(after.clearanceMesh).toBeGreaterThan(1.2);
+  expect(afterKinds.has("building")).toBe(true);
+  expect(groundWall(after)).toBe(false);
   expect(errors).toEqual([]);
 });

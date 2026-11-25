@@ -59,4 +59,8 @@ test("a building start stands outside the footprint, facing it", () => {
   assert.ok(dot > 0);
   applyWalkAction(state, "look-right", LOOK_TAP, blocked);
   assert.notEqual(state.yaw, yawFromDirection(aimX, aimZ));
+  const backed = outsideStand(centroid, 5, 40, blocked, 10);
+  assert.equal(blocked(backed.x, backed.z), false);
+  assert.ok(Math.hypot(backed.x - stand.x, backed.z - stand.z) > 8);
+  assert.ok(Math.hypot(backed.x - stand.x, backed.z - stand.z) < 12);
 });

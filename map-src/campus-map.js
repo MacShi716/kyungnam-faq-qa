@@ -1250,19 +1250,32 @@ function toggleWalk() {
   const spot = shell.controls.target;
   const yaw = yawFromDirection(dir.x, dir.z);
   const pitched = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
-  startWalk(shell, spot.x, spot.z, yaw, Math.max(-0.35, Math.min(0.2, pitched)), null);
+  const level = pitched > 0 ? Math.min(0.12, pitched) : 0;
+  startWalk(shell, spot.x, spot.z, yaw, level, null);
 }
 
 function walkToBuilding(record) {
   const shell = session;
   if (!shell || !record || !shell.terrain) return;
+  const narrow = shell.root.classList.contains("is-narrow");
   const prefer = shell.camera ? shell.camera.position : { x: record.centroid.x, z: record.centroid.z + 24 };
-  const stand = outsideStand(record.centroid, prefer.x, prefer.z, (x, z) => walkBlocked(shell, x, z));
+  const stand = outsideStand(
+    record.centroid,
+    prefer.x,
+    prefer.z,
+    (x, z) => walkBlocked(shell, x, z),
+    narrow ? 18 : 14,
+  );
   const yaw = yawFromDirection(record.centroid.x - stand.x, record.centroid.z - stand.z);
   const eyeY = renderedSurfaceY(shell, stand.x, stand.z) + EYE_M;
-  const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.45;
+  const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.55;
   const horiz = Math.max(1, Math.hypot(record.centroid.x - stand.x, record.centroid.z - stand.z));
-  const pitch = Math.max(-0.55, Math.min(0.45, Math.atan2(aimY - eyeY, horiz)));
+  let pitch = Math.atan2(aimY - eyeY, horiz);
+  if (narrow && shell.camera) {
+    const half = THREE.MathUtils.degToRad(shell.camera.fov) * 0.5;
+    pitch = -Math.atan(Math.tan(half) * 0.48);
+  }
+  pitch = Math.max(-0.55, Math.min(0.45, pitch));
   startWalk(shell, stand.x, stand.z, yaw, pitch, record.osmId);
 }
 
@@ -2120,6 +2133,131 @@ export function debugReadWorld(points) {
       luma: +(0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]).toFixed(1),
     };
   });
+}
+
+function hitKind(shell, object) {
+  if (!object) return "none";
+  if (object === shell.terrainMesh) return "terrain";
+  if (shell.trees && shell.trees.includes(object)) return "tree";
+  if (object.userData && object.userData.layer) return object.userData.layer;
+  let node = object;
+  while (node) {
+    if (node.userData && node.userData.osmId) return "building";
+    if (node.children && node.children.some((child) => child.userData && child.userData.osmId)) return "building";
+    node = node.parent;
+  }
+  if (object === shell.sky) return "sky";
+  return "other";
+}
+
+function describeHit(shell, hit) {
+  if (!hit) return null;
+  let normalY = null;
+  if (hit.face && hit.face.normal) {
+    const normal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+    normalY = +normal.y.toFixed(2);
+  }
+  return {
+    kind: hitKind(shell, hit.object),
+    dist: +hit.distance.toFixed(2),
+    y: +hit.point.y.toFixed(2),
+    ny: normalY,
+  };
+}
+
+function firstSolidHit(shell, hits) {
+  for (const hit of hits) {
+    if (hit.object === shell.sky) continue;
+    return hit;
+  }
+  return null;
+}
+
+export function debugWalkProbe() {
+  const shell = session;
+  if (!shell || !shell.camera || !shell.renderer) return null;
+  const eye = shell.camera.position.clone();
+  const look = new THREE.Vector3();
+  shell.camera.getWorldDirection(look);
+  const rendered = shell.sampleHeight ? shell.sampleHeight(eye.x, eye.z) : null;
+  const linear = shell.terrain ? sampleTerrainY(shell.terrain, eye.x, eye.z) : null;
+  const down = new THREE.Raycaster(
+    new THREE.Vector3(eye.x, eye.y + 40, eye.z),
+    new THREE.Vector3(0, -1, 0),
+    0,
+    120,
+  );
+  const meshHit = shell.terrainMesh ? firstSolidHit(shell, down.intersectObject(shell.terrainMesh, false)) : null;
+  const meshY = meshHit ? meshHit.point.y : null;
+  const ahead = new THREE.Raycaster(eye, look.clone().normalize(), 0, 80);
+  const lookHit = firstSolidHit(shell, ahead.intersectObjects(shell.scene.children, true));
+  const ndc = [[-0.7, 0.7], [0, 0.7], [0.7, 0.7], [0, 0], [0, -0.55]];
+  const view = [];
+  const caster = new THREE.Raycaster();
+  for (const [nx, ny] of ndc) {
+    caster.setFromCamera(new THREE.Vector2(nx, ny), shell.camera);
+    caster.near = 0;
+    caster.far = 80;
+    view.push(describeHit(shell, firstSolidHit(shell, caster.intersectObjects(shell.scene.children, true))));
+  }
+  shell.renderer.render(shell.scene, shell.camera);
+  const gl = shell.renderer.getContext();
+  const canvas = shell.canvas;
+  const rect = canvas.getBoundingClientRect();
+  const bw = canvas.width;
+  const bh = canvas.height;
+  const px = new Uint8Array(4);
+  let n = 0;
+  let sr = 0;
+  let sg = 0;
+  let sb = 0;
+  let sr2 = 0;
+  let sg2 = 0;
+  let sb2 = 0;
+  const step = 16;
+  for (let y = rect.top + 4; y < rect.bottom - 4; y += step) {
+    for (let x = rect.left + 4; x < rect.right - 4; x += step) {
+      if (document.elementFromPoint(x, y) !== canvas) continue;
+      const sx = Math.min(bw - 1, Math.max(0, Math.floor(((x - rect.left) / rect.width) * bw)));
+      const sy = Math.min(bh - 1, Math.max(0, Math.floor((1 - (y - rect.top) / rect.height) * bh)));
+      gl.readPixels(sx, sy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      sr += px[0];
+      sg += px[1];
+      sb += px[2];
+      sr2 += px[0] * px[0];
+      sg2 += px[1] * px[1];
+      sb2 += px[2] * px[2];
+      n += 1;
+    }
+  }
+  const mean = n ? [sr / n, sg / n, sb / n] : [0, 0, 0];
+  const std = n ? [
+    Math.sqrt(Math.max(0, sr2 / n - mean[0] * mean[0])),
+    Math.sqrt(Math.max(0, sg2 / n - mean[1] * mean[1])),
+    Math.sqrt(Math.max(0, sb2 / n - mean[2] * mean[2])),
+  ] : [0, 0, 0];
+  const clearanceMesh = meshY == null ? null : eye.y - meshY;
+  return {
+    viewMode: shell.walk && shell.walk.active ? "walk" : "orbit",
+    x: +eye.x.toFixed(2),
+    y: +eye.y.toFixed(2),
+    z: +eye.z.toFixed(2),
+    yaw: shell.walk ? +shell.walk.yaw.toFixed(3) : null,
+    pitch: shell.walk ? +shell.walk.pitch.toFixed(3) : +Math.asin(THREE.MathUtils.clamp(look.y, -1, 1)).toFixed(3),
+    rendered: rendered == null ? null : +rendered.toFixed(2),
+    linear: linear == null ? null : +linear.toFixed(2),
+    clearanceSmooth: rendered == null ? null : +(eye.y - rendered).toFixed(2),
+    clearanceMesh: clearanceMesh == null ? null : +clearanceMesh.toFixed(2),
+    near: shell.camera.near,
+    fov: shell.camera.fov,
+    look: describeHit(shell, lookHit),
+    view,
+    visible: {
+      n,
+      rgb: mean.map((v) => +v.toFixed(1)),
+      std: std.map((v) => +v.toFixed(1)),
+    },
+  };
 }
 
 export function debugPlaceWalk(x, z) {

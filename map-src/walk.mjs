@@ -78,7 +78,8 @@ export function slideMove(x, z, yaw, action, distance, blocked) {
   return { x: cx, z: cz };
 }
 
-export function outsideStand(centroid, preferX, preferZ, blocked) {
+export function outsideStand(centroid, preferX, preferZ, blocked, beyond = 0) {
+  const extra = Math.max(0, beyond || 0);
   const seeds = [];
   const dx = preferX - centroid.x;
   const dz = preferZ - centroid.z;
@@ -88,7 +89,16 @@ export function outsideStand(centroid, preferX, preferZ, blocked) {
     const len = Math.hypot(rx, rz) || 1;
     const ux = rx / len;
     const uz = rz / len;
+    let first = 0;
     for (let d = 4; d <= 96; d += 1.25) {
+      const x = centroid.x + ux * d;
+      const z = centroid.z + uz * d;
+      if (blocked(x, z)) continue;
+      first = d;
+      break;
+    }
+    if (!first) continue;
+    for (let d = Math.min(96, first + extra); d >= first - 0.01; d -= 1.25) {
       const x = centroid.x + ux * d;
       const z = centroid.z + uz * d;
       if (!blocked(x, z)) return { x, z };
