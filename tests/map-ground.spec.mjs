@@ -104,7 +104,9 @@ test.describe("ground color and roads stay stable while the camera moves", () =>
       const walking = await page.evaluate(() => window.CampusMap.debugSnapshot());
       expect(walking.viewMode).toBe("walk");
       expect(walking.logDepth).toBe(true);
-      await page.locator(".map-toolbar [data-map-action='reset']").click();
+      const resetBtn = page.locator(".map-toolbar [data-map-action='reset']");
+      if (!(await resetBtn.isVisible())) await page.locator(".map-more-btn").click();
+      await resetBtn.click();
       const reset = await page.evaluate(() => window.CampusMap.debugSnapshot());
       expect(reset.viewMode).toBe("orbit");
       await page.screenshot({ path: `/opt/cursor/artifacts/ground-${name}-reset.png` });

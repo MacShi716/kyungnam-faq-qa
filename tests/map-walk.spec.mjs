@@ -151,6 +151,7 @@ test("walk pads stay clear of the attribution bar and the detail card", async ({
   expect(openGap).toBeGreaterThan(0);
   const detailGap = boxGap(await page.locator(".map-walk").boundingBox(), await page.locator(".map-info").boundingBox());
   expect(detailGap).toBeGreaterThan(0);
+  await page.locator(".map-detail-summary").click();
   await page.locator(".map-detail-close").click();
   await page.locator(".map-toolbar [data-map-action='directory']").click();
   await page.locator(".map-list button[data-faq-id='F76']").click();
@@ -215,5 +216,71 @@ test("walk entry keeps the eye above the mesh and the frame off a single ground 
   expect(after.clearanceMesh).toBeGreaterThan(1.2);
   expect(afterKinds.has("building")).toBe(true);
   expect(groundWall(after)).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("phone walk separates the map from the controls", async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await page.locator(".map-list button[data-faq-id='F49']").click();
+  await expect(page.locator(".map-detail-summary")).toContainText("本馆");
+  await expect(page.locator(".map-detail-summary")).toContainText("展开详情");
+  await expect(page.locator(".map-toolbar .map-intl-pill")).toBeHidden();
+  const layout = await page.evaluate(() => {
+    const box = (sel) => {
+      const el = document.querySelector(sel);
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const overlap = (a, b) => {
+      const x = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+      const y = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+      return x * y;
+    };
+    const canvas = box(".map-canvas");
+    const pad = box(".map-pad-btn");
+    const usable = window.visualViewport.height;
+    return {
+      canvasH: canvas.h,
+      share: canvas.h / usable,
+      pad: [pad.w, pad.h],
+      overlaps: overlap(canvas, box(".map-walk")) + overlap(canvas, box(".map-toolbar")) + overlap(canvas, box(".map-attrib")) + overlap(canvas, box(".map-info")),
+    };
+  });
+  expect(layout.canvasH).toBeGreaterThanOrEqual(350);
+  expect(layout.share).toBeGreaterThanOrEqual(0.5);
+  expect(layout.pad[0]).toBeGreaterThanOrEqual(44);
+  expect(layout.pad[1]).toBeGreaterThanOrEqual(44);
+  expect(layout.overlaps).toBe(0);
+  await page.locator(".map-pad-move [data-walk='forward']").click();
+  await page.locator(".map-pad-look [data-walk='look-left']").click();
+  await page.locator(".map-pad-move [data-walk='forward']").click();
+  const after = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  const kinds = new Set((after.view || []).filter(Boolean).map((hit) => hit.kind));
+  expect(kinds.has("building")).toBe(true);
+  expect(kinds.has("terrain") || kinds.has("road") || kinds.has("path")).toBe(true);
+  expect(after.clearanceMesh).toBeGreaterThan(1.2);
+  await page.locator(".map-detail-summary").click();
+  await expect(page.locator(".map-detail-summary")).toContainText("收起详情");
+  await expect(page.locator(".map-info")).toContainText("各楼层教室与用途");
+  await expect(page.locator(".map-modal")).toHaveClass(/walk-active/);
+  await page.locator(".map-detail-summary").click();
+  await expect(page.locator(".map-detail-summary")).toContainText("展开详情");
+  await page.locator(".map-more-btn").click();
+  await expect(page.locator(".map-more [data-map-action='reset']")).toBeVisible();
+  await page.locator(".map-more [data-map-action='reset']").click();
+  const reset = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(reset.viewMode).toBe("orbit");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const walked = await page.evaluate(() => window.CampusMap.debugWalkProbe());
+  expect(walked.viewMode).toBe("walk");
+  expect(walked.pitch).toBeGreaterThan(-0.05);
+  const top = (walked.view || []).slice(0, 3).some((hit) => !hit || hit.kind !== "terrain");
+  expect(top).toBe(true);
   expect(errors).toEqual([]);
 });

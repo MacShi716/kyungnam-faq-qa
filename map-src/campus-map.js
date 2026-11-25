@@ -29,6 +29,7 @@ import {
   WALK_TAP_M,
   applyWalkAction,
   footprintBlocked,
+  chooseFacadeStand,
   outsideStand,
   poseFrom,
   yawFromDirection,
@@ -60,7 +61,8 @@ const TEXT = {
     summary: "地形高程使用 Copernicus WorldDEM-30 公开数据，只用于这张校园示意图。欧盟、ESA、DLR 与 Airbus 不对使用该数据承担责任，也不表示认可本页面。",
     officialMap: "庆南大学 2026 校园地图", ext: "外部官方链接", empty: "没有匹配的地点", phone: "电话",
     dialog: "庆南大学 3D 校园示意图",
-    labels: "标注", floorTitle: "各楼层教室与用途", facilities: "设施", hours: "时间",
+    labels: "标注", more: "更多", expandDetail: "展开详情", collapseDetail: "收起详情",
+    floorTitle: "各楼层教室与用途", facilities: "设施", hours: "时间",
     roleBadge: "国际服务重点", noMesh: "暂无3D轮廓",
     designLabel: "设计馆 · 留学生服务中心",
     intlTitle: "国际处 · 创造馆 1F",
@@ -86,7 +88,8 @@ const TEXT = {
     summary: "지형 고도는 Copernicus WorldDEM-30 공개 자료를 사용하며 이 캠퍼스 모식도에만 씁니다. EU, ESA, DLR, Airbus는 이 자료의 사용에 책임을 지지 않으며 이 페이지를 보증하거나 승인하지 않습니다.",
     officialMap: "경남대 2026 캠퍼스맵", ext: "외부 공식 링크", empty: "일치하는 장소가 없습니다", phone: "전화",
     dialog: "경남대학교 3D 캠퍼스 모식도",
-    labels: "라벨", floorTitle: "층별 강의실·시설 안내", facilities: "시설", hours: "시간",
+    labels: "라벨", more: "더보기", expandDetail: "상세 열기", collapseDetail: "상세 접기",
+    floorTitle: "층별 강의실·시설 안내", facilities: "시설", hours: "시간",
     roleBadge: "유학생 핵심", noMesh: "3D 외곽선 없음",
     designLabel: "디자인관 · 유학생서비스센터",
     intlTitle: "국제처 · 창조관 1층",
@@ -119,6 +122,8 @@ const MAP_CSS = `
 .map-modal.is-narrow:not(.dir-collapsed) .map-walk{bottom:calc(48% + 50px)}
 .map-modal.is-narrow.info-open .map-walk{bottom:calc(min(62vh, 560px) + 52px)}
 .map-modal:not(.is-narrow):not(.dir-collapsed) .map-pad-look{margin-right:324px}
+.map-modal:not(.is-narrow).info-open:not(.dir-collapsed) .map-pad-look{margin-right:calc(336px + min(400px,100vw - 360px))}
+.map-modal:not(.is-narrow).info-open.dir-collapsed .map-pad-look{margin-right:calc(min(420px,100vw - 24px) + 20px)}
 .map-btn{min-height:44px;padding:0 11px;border-radius:8px;border:1px solid var(--map-line);background:var(--map-panel);color:var(--ink);font:inherit;font-weight:600;font-size:.82rem;letter-spacing:.01em;cursor:pointer;backdrop-filter:blur(18px) saturate(1.2);box-shadow:none}
 .map-btn[aria-pressed="true"]{background:var(--pressed-bg);box-shadow:inset 0 0 0 1px var(--map-line)}
 .map-btn:focus-visible,.map-search:focus-visible,.map-ext-link:focus-visible,.map-osm-link:focus-visible,.map-pill:focus-visible,.map-odbl-link:focus-visible{outline:2px solid var(--rim);outline-offset:2px}
@@ -173,12 +178,53 @@ const MAP_CSS = `
 .map-osm-link,.map-odbl-link,.map-ext-link{color:var(--ink);font-weight:700}
 .map-license .map-osm-link,.map-license .map-odbl-link{display:inline-block;margin:0 0 6px;font-size:12px}
 .map-ext-tag{margin-left:6px;color:var(--muted);font-size:.75rem;font-weight:500}
-.map-modal.is-narrow .map-directory{top:auto;left:0;right:0;width:100%;max-height:48%;border-left:0;border-top:1px solid var(--map-line);padding:10px;transform:none}
+.map-modal.is-narrow .map-directory{top:auto;left:0;right:0;width:100%;max-height:48%;border-left:0;border-top:1px solid var(--map-line);padding:10px;transform:none;overflow:auto}
+.map-modal.is-narrow .map-list{flex:0 0 auto;overflow:visible}
 .map-modal.is-narrow.dir-collapsed .map-directory{display:none}
 .map-modal.is-narrow .map-info{z-index:18;left:0;right:0;top:auto;bottom:0;width:100%;max-height:min(62vh,560px);border-radius:12px 12px 0 0}
 .map-modal.is-narrow:not(.dir-collapsed) .map-attrib{bottom:calc(48% + 10px)}
 .map-modal.is-narrow.info-open .map-attrib{bottom:calc(min(62vh, 560px) + 12px);z-index:12}
 html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
+.map-more{display:contents}
+.map-more-btn{display:none}
+.map-toolbar [data-map-action="close"]{order:1}
+.map-more [data-map-action="zoom-in"]{order:2}
+.map-more [data-map-action="zoom-out"]{order:3}
+.map-more [data-map-action="reset"]{order:4}
+.map-more [data-map-action="north"]{order:5}
+.map-toolbar [data-map-action="walk"]{order:6}
+.map-more [data-map-action="full"]{order:7}
+.map-toolbar [data-map-action="directory"]{order:8}
+.map-more [data-map-action="labels"]{order:9}
+.map-intl-pill{order:10}
+.map-detail-summary{display:none}
+.map-modal.is-narrow.walk-active{top:var(--map-vv-off,0px);height:var(--map-vvh,100dvh);bottom:auto}
+.map-modal.is-narrow.walk-active .map-canvas,.map-modal.is-narrow.walk-active .map-labels{top:44px;right:0;bottom:auto;left:0;width:100%;height:calc(100% - 44px - var(--walk-dock,220px))}
+.map-modal.is-narrow.walk-active .map-toolbar{top:0;left:0;right:0;height:44px;max-width:none;flex-wrap:nowrap;align-items:stretch;gap:4px;padding:0 6px;z-index:24}
+.map-modal.is-narrow.walk-active .map-toolbar > .map-btn:not(.map-intl-pill),.map-modal.is-narrow.walk-active .map-more-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;min-width:44px;padding:0 10px}
+.map-modal.is-narrow.walk-active .map-toolbar [data-map-action="close"]{order:1}
+.map-modal.is-narrow.walk-active .map-toolbar [data-map-action="directory"]{order:2}
+.map-modal.is-narrow.walk-active .map-toolbar [data-map-action="walk"]{order:3}
+.map-modal.is-narrow.walk-active .map-more-btn{order:4}
+.map-modal.is-narrow.walk-active .map-toolbar > .map-intl-pill{display:none}
+.map-modal.is-narrow.walk-active .map-more{display:none;position:absolute;top:48px;right:6px;z-index:25;min-width:168px;padding:6px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
+.map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px}
+.map-modal.is-narrow.walk-active .map-more .map-btn{width:100%;min-height:44px;height:44px;order:0}
+.map-modal.is-narrow.walk-active{--walk-pad:140px;--walk-attrib:32px;--walk-summary:0px;--walk-dock:calc(var(--walk-pad) + var(--walk-attrib) + var(--walk-summary) + 12px)}
+.map-modal.is-narrow.walk-active.detail-collapsed{--walk-summary:44px}
+.map-modal.is-narrow.walk-active.detail-open{--walk-summary:180px}
+.map-modal.is-narrow.walk-active .map-walk{left:0;right:0;bottom:0;height:var(--walk-pad);margin:0;padding:0 8px;align-items:center;justify-content:space-between;z-index:12}
+.map-modal.is-narrow.walk-active .map-pad-look{margin-right:0}
+.map-modal.is-narrow.walk-active .map-attrib{left:6px;right:6px;bottom:calc(var(--walk-pad) + 4px);max-width:none;z-index:14}
+.map-modal.is-narrow.walk-active .map-attrib-bar{width:100%;height:32px}
+.map-modal.is-narrow.walk-active .map-license{left:0;width:min(100%,440px);bottom:40px;max-height:min(46vh,calc(var(--map-vvh,100dvh) * 0.4))}
+.map-modal.is-narrow.walk-active .map-directory{z-index:26}
+.map-modal.is-narrow.walk-active.detail-collapsed .map-info,.map-modal.is-narrow.walk-active.detail-open .map-info{top:auto;left:6px;right:6px;bottom:calc(var(--walk-pad) + var(--walk-attrib) + 8px);width:auto;height:var(--walk-summary);max-height:var(--walk-summary);padding:0;overflow:auto;border-radius:8px;z-index:15}
+.map-modal.is-narrow.walk-active.detail-collapsed .map-info > :not(.map-detail-summary){display:none}
+.map-modal.is-narrow.walk-active .map-detail-summary{display:flex;width:100%;height:44px;min-height:44px;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;position:sticky;top:0;z-index:2}
+.map-summary-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-summary-action{flex:0 0 auto;font-size:.75rem}
+.map-modal.is-narrow.walk-active.detail-open .map-info{padding:0 0 8px}
 `;
 
 let session = null;
@@ -352,7 +398,7 @@ function createShell(opts) {
     favorites: readFavs(), category: "all", query: "", labelsOn: true,
     unbinds: [], buildings: [], pickables: [], webgl: false, glDisposed: false,
     raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
-    detailEntries: null, detailFocus: null, detailBuilding: null,
+    detailEntries: null, detailFocus: null, detailBuilding: null, detailExpanded: false,
     renderer: null, controls: null, scene: null, camera: null,
     walk: { active: false, x: 0, z: 0, yaw: 0, pitch: -0.2, held: new Set(), heldAt: 0, t: 0, focusId: null, drag: null, eyeY: 0 },
   };
@@ -456,14 +502,25 @@ function paintChrome(shell) {
     ["labels", copy.labels],
   ];
   if (!shell.toolbar.childElementCount) {
+    const morePanel = document.createElement("div");
+    morePanel.className = "map-more";
+    const moreBtn = button(copy.more, "map-btn map-more-btn");
+    moreBtn.dataset.mapAction = "more";
+    moreBtn.setAttribute("aria-expanded", "false");
+    moreBtn.setAttribute("aria-haspopup", "true");
+    const inRow = new Set(["close", "directory", "walk"]);
     for (const [key, label] of specs) {
       const node = button(label, "map-btn");
       node.dataset.mapAction = key;
       if (key === "zoom-in") node.title = copy.zoomIn;
       if (key === "zoom-out") node.title = copy.zoomOut;
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
-      shell.toolbar.appendChild(node);
+      if (inRow.has(key)) shell.toolbar.appendChild(node);
+      else morePanel.appendChild(node);
     }
+    shell.moreBtn = moreBtn;
+    shell.morePanel = morePanel;
+    shell.toolbar.append(moreBtn, morePanel);
     shell.intlPill = makeIntlButton("map-btn map-intl-pill");
     shell.toolbar.appendChild(shell.intlPill);
     shell.intlPill.addEventListener("click", () => openInternational());
@@ -471,6 +528,15 @@ function paintChrome(shell) {
       const node = event.target.closest("button");
       if (!node || !session || node.classList.contains("map-intl-pill")) return;
       const action = node.dataset.mapAction;
+      if (action === "more") {
+        const open = shell.morePanel.classList.toggle("is-open");
+        shell.moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        return;
+      }
+      if (shell.morePanel) {
+        shell.morePanel.classList.remove("is-open");
+        shell.moreBtn.setAttribute("aria-expanded", "false");
+      }
       if (action === "close") close();
       else if (action === "zoom-in") zoomBy(0.82);
       else if (action === "zoom-out") zoomBy(1.22);
@@ -497,6 +563,7 @@ function paintChrome(shell) {
       else node.textContent = found[1];
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
     }
+    if (shell.moreBtn) shell.moreBtn.textContent = copy.more;
   }
   paintIntl(shell);
   if (shell.search) {
@@ -693,11 +760,60 @@ function cites6382(entry) {
 function hideDetail() {
   if (!session) return;
   session.info.hidden = true;
+  session.detailExpanded = false;
   session.root.classList.remove("info-open");
   session.detailEntries = null;
   session.detailFocus = null;
   session.detailBuilding = null;
+  syncWalkChrome(session);
   layoutLabels();
+}
+
+function appendDetailSummary(shell, title, noMesh) {
+  const btn = button("", "map-btn map-detail-summary");
+  const name = document.createElement("span");
+  name.className = "map-summary-name";
+  name.textContent = title;
+  const action = document.createElement("span");
+  action.className = "map-summary-action";
+  btn.append(name, action);
+  if (noMesh) {
+    const badge = document.createElement("span");
+    badge.className = "map-badge";
+    badge.textContent = t().noMesh;
+    btn.append(badge);
+  }
+  btn.addEventListener("click", () => {
+    if (!session) return;
+    session.detailExpanded = !session.detailExpanded;
+    syncWalkChrome(session);
+  });
+  shell.info.appendChild(btn);
+}
+
+function syncWalkChrome(shell) {
+  if (!shell || !shell.root) return;
+  const active = !!(shell.walk && shell.walk.active);
+  const narrow = shell.root.classList.contains("is-narrow");
+  const phoneWalk = active && narrow;
+  const hasDetail = !!(shell.info && !shell.info.hidden);
+  shell.root.classList.toggle("walk-active", phoneWalk);
+  shell.root.classList.toggle("detail-collapsed", phoneWalk && hasDetail && !shell.detailExpanded);
+  shell.root.classList.toggle("detail-open", phoneWalk && hasDetail && !!shell.detailExpanded);
+  const summary = shell.info && shell.info.querySelector(".map-detail-summary");
+  if (summary) {
+    const action = summary.querySelector(".map-summary-action");
+    if (action) action.textContent = " · " + (shell.detailExpanded ? t().collapseDetail : t().expandDetail);
+    summary.setAttribute("aria-expanded", shell.detailExpanded ? "true" : "false");
+  }
+  const vv = window.visualViewport;
+  const height = vv && vv.height ? Math.round(vv.height) : (shell.root.clientHeight || window.innerHeight);
+  const off = vv && Number.isFinite(vv.offsetTop) ? Math.round(vv.offsetTop) : 0;
+  shell.root.style.setProperty("--map-vvh", height + "px");
+  shell.root.style.setProperty("--map-vv-off", off + "px");
+  requestAnimationFrame(() => {
+    if (session === shell) resize();
+  });
 }
 
 function revealDetail(shell) {
@@ -752,6 +868,8 @@ function showUnlinked(building) {
   missing.className = "map-no-faq";
   missing.textContent = copy.noFaq + " · OSM " + building.osmId;
   shell.info.append(missing, favButton("osm:" + building.osmId));
+  appendDetailSummary(shell, name, false);
+  syncWalkChrome(shell);
 }
 
 function showDetail(entries, focus, building) {
@@ -927,7 +1045,10 @@ function showDetail(entries, focus, building) {
     shell.info.appendChild(faq);
   }
   shell.info.appendChild(favButton(favId(focusEntry)));
+  const intl = list.some((entry) => entry.faqId === "F86" || entry.faqId === "F83");
+  appendDetailSummary(shell, title, !mapped && intl);
   layoutLabels();
+  syncWalkChrome(shell);
 }
 
 function refreshDetail() {
@@ -1058,6 +1179,7 @@ function selectBuilding(osmId, faqId) {
   if (!shell) return;
   const record = shell.buildings.find((item) => item.osmId === osmId);
   if (!record) return;
+  shell.detailExpanded = false;
   shell.selectedId = osmId;
   paintBuildings();
   const focus = (faqId && record.entries.find((entry) => entry.faqId === faqId)) || record.entries[0] || null;
@@ -1158,9 +1280,12 @@ function paintWalkUi(shell) {
   }
   const walkBtn = shell.toolbar && shell.toolbar.querySelector("[data-map-action='walk']");
   if (walkBtn) {
-    walkBtn.setAttribute("aria-pressed", shell.walk && shell.walk.active ? "true" : "false");
-    walkBtn.title = shell.walk && shell.walk.active ? copy.walkStop : copy.walkHint;
+    const on = !!(shell.walk && shell.walk.active);
+    walkBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    walkBtn.title = on ? copy.walkStop : copy.walkHint;
+    if (shell.root.classList.contains("is-narrow") && on) walkBtn.textContent = copy.walkStop;
   }
+  syncWalkChrome(shell);
 }
 
 function buildingRings(shell) {
@@ -1257,26 +1382,16 @@ function toggleWalk() {
 function walkToBuilding(record) {
   const shell = session;
   if (!shell || !record || !shell.terrain) return;
-  const narrow = shell.root.classList.contains("is-narrow");
-  const prefer = shell.camera ? shell.camera.position : { x: record.centroid.x, z: record.centroid.z + 24 };
-  const stand = outsideStand(
-    record.centroid,
-    prefer.x,
-    prefer.z,
-    (x, z) => walkBlocked(shell, x, z),
-    narrow ? 18 : 14,
-  );
-  const yaw = yawFromDirection(record.centroid.x - stand.x, record.centroid.z - stand.z);
-  const eyeY = renderedSurfaceY(shell, stand.x, stand.z) + EYE_M;
-  const aimY = record.seat.baseY + SCHEMATIC_HEIGHT_M * 0.55;
-  const horiz = Math.max(1, Math.hypot(record.centroid.x - stand.x, record.centroid.z - stand.z));
-  let pitch = Math.atan2(aimY - eyeY, horiz);
-  if (narrow && shell.camera) {
-    const half = THREE.MathUtils.degToRad(shell.camera.fov) * 0.5;
-    pitch = -Math.atan(Math.tan(half) * 0.48);
+  const ring = record.ring || record.building.footprintXZ;
+  const picked = chooseFacadeStand(ring, (x, z) => walkBlocked(shell, x, z));
+  if (picked) {
+    startWalk(shell, picked.x, picked.z, picked.yaw, picked.pitch, record.osmId);
+    return;
   }
-  pitch = Math.max(-0.55, Math.min(0.45, pitch));
-  startWalk(shell, stand.x, stand.z, yaw, pitch, record.osmId);
+  const prefer = shell.camera ? shell.camera.position : { x: record.centroid.x, z: record.centroid.z + 24 };
+  const stand = outsideStand(record.centroid, prefer.x, prefer.z, (x, z) => walkBlocked(shell, x, z), 22);
+  const yaw = yawFromDirection(record.centroid.x - stand.x, record.centroid.z - stand.z);
+  startWalk(shell, stand.x, stand.z, yaw, -0.04, record.osmId);
 }
 
 function holdWalk(action, down) {
@@ -1506,13 +1621,15 @@ function tick() {
 function resize() {
   const shell = session;
   if (!shell || !shell.renderer) return;
-  const w = Math.max(1, shell.stage.clientWidth);
-  const h = Math.max(1, shell.stage.clientHeight);
+  const box = shell.canvas.getBoundingClientRect();
+  const w = Math.max(1, Math.round(box.width) || shell.stage.clientWidth);
+  const h = Math.max(1, Math.round(box.height) || shell.stage.clientHeight);
   shell.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   shell.renderer.setSize(w, h, false);
   shell.camera.aspect = w / h;
   shell.camera.updateProjectionMatrix();
-  shell.root.classList.toggle("is-narrow", w < 800);
+  const modalWidth = shell.root.clientWidth;
+  if (modalWidth > 0) shell.root.classList.toggle("is-narrow", modalWidth < 800);
   poke();
 }
 
@@ -2343,11 +2460,21 @@ export async function open(opts) {
     if (event.key !== "Escape" || !session || session.root !== shell.root) return;
     event.preventDefault();
     event.stopPropagation();
+    if (session.morePanel && session.morePanel.classList.contains("is-open")) {
+      session.morePanel.classList.remove("is-open");
+      if (session.moreBtn) session.moreBtn.setAttribute("aria-expanded", "false");
+      return;
+    }
     if (session.license && !session.license.hidden) {
       session.license.hidden = true;
       const notice = session.attribBar && session.attribBar.querySelector(".map-notice-btn");
       if (notice) notice.setAttribute("aria-expanded", "false");
       layoutLabels();
+      return;
+    }
+    if (session.root.classList.contains("detail-open")) {
+      session.detailExpanded = false;
+      syncWalkChrome(session);
       return;
     }
     if (session.info && !session.info.hidden) {
@@ -2360,6 +2487,11 @@ export async function open(opts) {
     if (session && session.root === shell.root) onWalkKey(event, false);
   }, true);
   bind(shell, window, "resize", resize);
+  if (window.visualViewport) {
+    const onVv = () => { if (session === shell) syncWalkChrome(shell); };
+    bind(shell, window.visualViewport, "resize", onVv);
+    bind(shell, window.visualViewport, "scroll", onVv);
+  }
   bind(shell, document, "fullscreenchange", () => { if (session) paintChrome(session); });
   mountDirectory(shell);
   try {

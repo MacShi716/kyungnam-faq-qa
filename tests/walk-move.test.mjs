@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { pointInRing } from "../map-src/placement.mjs";
+import { readFileSync } from "node:fs";
 import {
   EYE_M,
   LOOK_TAP,
   WALK_TAP_M,
   applyWalkAction,
+  chooseFacadeStand,
   footprintBlocked,
   lookVector,
   outsideStand,
@@ -63,4 +65,20 @@ test("a building start stands outside the footprint, facing it", () => {
   assert.equal(blocked(backed.x, backed.z), false);
   assert.ok(Math.hypot(backed.x - stand.x, backed.z - stand.z) > 8);
   assert.ok(Math.hypot(backed.x - stand.x, backed.z - stand.z) < 12);
+});
+
+test("본관 stand still sees the facade after forward, left, forward", () => {
+  const osm = JSON.parse(readFileSync(new URL("../assets/map/osm-buildings.json", import.meta.url), "utf8"));
+  const hall = osm.buildings.find((item) => item.osmId === 1062064821);
+  const ring = hall.footprintXZ;
+  const blocked = (x, z) => footprintBlocked(x, z, [ring], 1.15);
+  const stand = chooseFacadeStand(ring, blocked);
+  assert.ok(stand, "a vantage exists");
+  assert.equal(blocked(stand.x, stand.z), false);
+  const state = { x: stand.x, z: stand.z, yaw: stand.yaw, pitch: stand.pitch };
+  for (const [action, amount] of [["forward", WALK_TAP_M], ["look-left", LOOK_TAP], ["forward", WALK_TAP_M]]) {
+    applyWalkAction(state, action, amount, blocked);
+    assert.equal(blocked(state.x, state.z), false);
+  }
+  assert.ok(Math.hypot(state.x - stand.x, state.z - stand.z) > 8);
 });
