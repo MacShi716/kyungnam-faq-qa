@@ -109,12 +109,17 @@ test("a guest can still wipe every local key, including leftovers and tint", () 
   assert.equal(store.getItem("faq_theme"), "dark");
   store.setItem("faq_local_state_orphan", "{\"mapFavorites\":[\"faq:F9\"]}");
   store.setItem("faq_local_profiles", "{\"v\":1,\"activeId\":null,\"profiles\":[]}");
+  store.setItem("korean-site-progress", "keep");
+  store.setItem("gomoku-save", "keep");
   clearSiteData(store);
   assert.equal(store.getItem("campus_map_tint"), null);
   assert.equal(store.getItem("faq_local_state_orphan"), null);
+  assert.equal(store.getItem("faq_local_profiles"), null);
   assert.equal(store.getItem("faq_theme"), null);
   assert.equal(store.getItem("faq_ui_lang"), null);
-  assert.equal(store.keys().length, 0);
+  assert.equal(store.getItem("korean-site-progress"), "keep");
+  assert.equal(store.getItem("gomoku-save"), "keep");
+  assert.deepEqual(store.keys().slice().sort(), ["gomoku-save", "korean-site-progress"]);
 });
 
 test("clearing accounts keeps theme and clearing the site removes it", () => {
@@ -150,6 +155,14 @@ test("the ask request does not carry a local profile", () => {
   const chatClear = html.slice(html.indexOf('$("btn-clear").addEventListener'), html.indexOf("attachMagnet"));
   assert.equal(chatClear.includes("faq_local"), false);
   assert.equal(chatClear.includes("clearAllSiteData"), false);
+  assert.equal(html.includes("localStorage.clear("), false);
+  const wipe = html.slice(html.indexOf("function isFaqSiteKey"), html.indexOf("function paintLocalData"));
+  assert.match(wipe, /faq_local_/);
+  assert.match(wipe, /campus_map_tint/);
+  assert.match(wipe, /faq_theme/);
+  assert.match(wipe, /faq_ui_lang/);
+  assert.match(wipe, /campus_map_favorites/);
+  assert.equal(wipe.includes(".clear()"), false);
   assert.match(html, /id="local-data-accounts"/);
   assert.match(html, /id="local-data-site"/);
   assert.match(html, /清空本机账号与记录/);

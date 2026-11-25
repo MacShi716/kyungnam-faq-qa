@@ -180,9 +180,16 @@ export function clearAccounts(storage) {
   return { ok: true };
 }
 
+/** Keys this FAQ owns. Other projects on the same GitHub Pages origin must stay. */
+export function isSiteLocalKey(key) {
+  if (typeof key !== "string" || !key) return false;
+  if (key.startsWith("faq_local_")) return true;
+  return key === GUEST_FAV_KEY || key === TINT_KEY || key === THEME_KEY || key === LANG_KEY;
+}
+
 export function clearSiteData(storage) {
-  const scanned = storageKeys(storage);
-  dropKeys(storage, scanned);
+  const matched = storageKeys(storage).filter(isSiteLocalKey);
+  dropKeys(storage, matched);
   dropKeys(storage, [PROFILES_KEY, GUEST_FAV_KEY, THEME_KEY, LANG_KEY, TINT_KEY]);
   const leftover = storageKeys(storage).filter((key) => key.startsWith("faq_local_"));
   dropKeys(storage, leftover);

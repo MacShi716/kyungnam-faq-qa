@@ -2604,9 +2604,16 @@ function suggestedFaqs(query, lang, limit) {
       }
     } catch (e) { /* private mode */ }
   }
+  function isFaqSiteKey(key) {
+    if (!key) return false;
+    if (key.indexOf("faq_local_") === 0) return true;
+    return key === "campus_map_favorites" || key === "campus_map_tint" || key === "faq_theme" || key === "faq_ui_lang";
+  }
   function clearAllSiteData() {
     try {
-      for (const key of localStorageKeys()) localStorage.removeItem(key);
+      for (const key of localStorageKeys()) {
+        if (isFaqSiteKey(key)) localStorage.removeItem(key);
+      }
     } catch (e) { /* private mode */ }
   }
   function paintLocalData() {
