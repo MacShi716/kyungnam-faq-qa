@@ -62,11 +62,12 @@ import {
   createProfile,
   deleteProfile,
   exitProfile,
+  favoriteOwner,
   loadBook,
   readMapFavorites,
+  toggleFavorite,
   selectProfile,
   setGender,
-  writeMapFavorites,
 } from "./local-profile.mjs";
 
 const FAV_KEY = "campus_map_favorites";
@@ -384,8 +385,10 @@ function readFavs() {
   return readMapFavorites(browserStore);
 }
 
-function writeFavs(set) {
-  writeMapFavorites(browserStore, set);
+function bindFavs(shell) {
+  if (!shell) return;
+  shell.favorites = readFavs();
+  shell.favOwner = favoriteOwner(browserStore);
 }
 
 function readTint() {
@@ -580,7 +583,7 @@ function createShell(opts) {
     root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, stick, knob, lookHint, touchHint, lockHint, crosshair, jumpBtn, attrib, attribBar, license,
     lang, theme: opts.theme === "dark" ? "dark" : "light", tint: readTint(),
     onOpenFaq: opts.onOpenFaq, faqId: opts.faqId || "",
-    favorites: readFavs(), category: "all", query: "", labelsOn: true,
+    favorites: readFavs(), favOwner: favoriteOwner(browserStore), category: "all", query: "", labelsOn: true,
     unbinds: [], buildings: [], pickables: [], webgl: false, glDisposed: false,
     raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
     detailEntries: null, detailFocus: null, detailBuilding: null, detailExpanded: false,
@@ -763,7 +766,7 @@ function mountAccount(shell) {
     shell.accountMessage = result.ok ? "" : result.error;
     if (result.ok) {
       nick.value = "";
-      shell.favorites = readFavs();
+      bindFavs(shell);
       renderDirectory();
       refreshAvatar(shell);
     }
@@ -772,7 +775,7 @@ function mountAccount(shell) {
   useBtn.addEventListener("click", () => {
     const result = selectProfile(browserStore, pick.value);
     if (result.ok) {
-      shell.favorites = readFavs();
+      bindFavs(shell);
       renderDirectory();
       refreshAvatar(shell);
     }
@@ -805,7 +808,7 @@ function mountAccount(shell) {
     }
     pending = "";
     confirmBox.hidden = true;
-    shell.favorites = readFavs();
+    bindFavs(shell);
     if (shell.list) renderDirectory();
     refreshAvatar(shell);
     paintAccount(shell);
@@ -1580,9 +1583,7 @@ function favButton(key) {
   paintFav(node, session.favorites.has(key));
   node.addEventListener("click", () => {
     if (!session) return;
-    if (session.favorites.has(key)) session.favorites.delete(key);
-    else session.favorites.add(key);
-    writeFavs(session.favorites);
+    toggleFavorite(session, browserStore, key);
     paintFav(node, session.favorites.has(key));
     renderDirectory();
   });
@@ -2659,6 +2660,22 @@ function lockPage(on) {
 
 export function isOpen() {
   return !!session;
+}
+
+/** Homepage clears storage without rebuilding the map. Drop the loaded profile set first. */
+export function syncLocalProfile() {
+  if (!session) return;
+  bindFavs(session);
+  const storedTint = readTint();
+  if (session.tint !== storedTint) {
+    session.tint = storedTint;
+    if (session.tintInput) session.tintInput.value = String(storedTint);
+    applyCast(session);
+  }
+  if (session.list) renderDirectory();
+  refreshDetail();
+  refreshAvatar(session);
+  paintAccount(session);
 }
 
 export function setLang(lang) {

@@ -262,6 +262,39 @@ export function noteFrequent(storage, id) {
   return { ok: true };
 }
 
+/** null is the guest. A set loaded for one owner must not be written as another. */
+export function favoriteOwner(storage) {
+  const profile = activeProfile(storage);
+  return profile ? profile.id : null;
+}
+
+/**
+ * The open map keeps one Set. After a homepage clear, exit, delete, or switch,
+ * that Set still holds the previous owner's ids until the next click.
+ * Drop it and start from the store for whoever is active now.
+ */
+export function adoptFavoriteContext(memory, storage) {
+  const owner = favoriteOwner(storage);
+  const current = memory && memory.favorites instanceof Set ? memory.favorites : null;
+  if (memory && memory.favOwner === owner && current) return current;
+  const fresh = readMapFavorites(storage);
+  if (memory) {
+    memory.favorites = fresh;
+    memory.favOwner = owner;
+  }
+  return fresh;
+}
+
+/** Star click used by an already-open detail card. */
+export function toggleFavorite(memory, storage, key) {
+  const id = String(key);
+  const set = adoptFavoriteContext(memory, storage);
+  if (set.has(id)) set.delete(id);
+  else set.add(id);
+  writeMapFavorites(storage, set);
+  return set;
+}
+
 export function readMapFavorites(storage) {
   const profile = activeProfile(storage);
   if (profile) return new Set(loadState(storage, profile.id).mapFavorites);

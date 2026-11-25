@@ -2644,9 +2644,17 @@ function suggestedFaqs(query, lang, limit) {
     pendingLocalClear = "";
     $("local-data-confirm").hidden = true;
   });
+  function syncOpenMap() {
+    try {
+      if (window.CampusMap && typeof window.CampusMap.syncLocalProfile === "function") {
+        window.CampusMap.syncLocalProfile();
+      }
+    } catch (e) { /* map is closed or storage is blocked */ }
+  }
   $("local-data-yes").addEventListener("click", () => {
     if (pendingLocalClear === "accounts") clearLocalAccounts();
     else if (pendingLocalClear === "site") clearAllSiteData();
+    syncOpenMap();
     pendingLocalClear = "";
     $("local-data-confirm").hidden = true;
   });
