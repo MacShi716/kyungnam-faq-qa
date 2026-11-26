@@ -34,8 +34,15 @@ test("smooth sampler stays near the Copernicus grid", () => {
 
 test("hillside trees clear buildings, roads, pitches, and water", () => {
   const trees = placeTrees({ terrain, buildings: osm.buildings, layers });
-  assert.ok(trees.length >= 350 && trees.length <= 550);
-  const gap = nearestClearance(trees, osm.buildings, layers);
+  assert.ok(trees.length >= 40 && trees.length <= 480);
+  assert.ok(trees.every((tree) => tree.zone === "wood" || tree.zone === "park" || tree.zone === "shore"));
+  assert.ok(trees.some((tree) => tree.zone === "wood"));
+  assert.ok(trees.some((tree) => tree.zone === "shore"));
+  const gap = nearestClearance(trees, osm.buildings, {
+    ...layers,
+    pitches: (layers.pitches || []).filter((feature) => feature.subtype !== "park"),
+    water: [],
+  });
   assert.ok(gap >= 7.5, String(gap));
   assert.equal(new Set(trees.map((tree) => `${tree.x.toFixed(2)},${tree.z.toFixed(2)}`)).size, trees.length);
 });

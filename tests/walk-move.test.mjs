@@ -13,10 +13,27 @@ import {
   outsideStand,
   poseFrom,
   slideMove,
+  stickAxes,
+  sweptMove,
   yawFromDirection,
 } from "../map-src/walk.mjs";
 
 const SQUARE = [[0, 0], [10, 0], [10, 10], [0, 10]];
+
+test("joystick deadzone stays put and a full diagonal is unit power", () => {
+  const idle = stickAxes(0.1, -0.1);
+  assert.equal(idle.power, 0);
+  const diag = stickAxes(1, 1);
+  assert.ok(Math.abs(diag.power - 1) < 1e-6);
+  assert.ok(Math.abs(Math.hypot(diag.strafe, diag.forward) - 1) < 1e-6);
+});
+
+test("a swept step slides along a wall instead of entering it", () => {
+  const blocked = (x) => x > 10;
+  const next = sweptMove(8, 0, 6, 4, blocked);
+  assert.ok(next.x <= 10);
+  assert.ok(next.z > 3);
+});
 
 test("north looks along -Z and a step leaves the orbit spot", () => {
   assert.equal(yawFromDirection(0, -1), 0);

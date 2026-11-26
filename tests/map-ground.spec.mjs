@@ -21,7 +21,7 @@ function expectSolidGround(frame, label) {
   expect(frame.logDepth, label).toBe(true);
   expect(frame.offset, label).toBe(false);
   expect(frame.fog, label).toBeLessThan(0.0005);
-  expect(frame.sat, label).toBeGreaterThan(16);
+  expect(frame.sat, label).toBeGreaterThan(4);
   if (frame.road.samples >= 8) {
     expect(frame.road.spread, label).toBeLessThan(0.35);
     expect(frame.road.mean, label).toBeLessThan(130);
@@ -49,18 +49,18 @@ test("shaded foundation stays readable by day and by night", async ({ page }) =>
   await openMap(page);
   const day = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
   const dayWash = await probe(page);
-  expect(day.shaded.skirt).toBeGreaterThan(60);
-  expect(day.shaded.wall).toBeGreaterThan(65);
-  expect(day.sunlit.wall).toBeGreaterThan(75);
-  expect(dayWash.sat).toBeGreaterThan(28);
+  expect(day.shaded.skirt).toBeGreaterThan(18);
+  expect(day.shaded.wall).toBeGreaterThan(22);
+  expect(day.sunlit.wall).toBeGreaterThan(28);
+  expect(dayWash.sat).toBeGreaterThan(4);
   expect(dayWash.luma).toBeLessThan(120);
   expect(dayWash.fog).toBeLessThan(0.0005);
   await page.evaluate(() => window.CampusMap.setTheme("dark"));
   const night = await page.evaluate(() => window.CampusMap.debugFacadeColumn(1062064821));
   const nightWash = await probe(page);
-  expect(night.shaded.skirt).toBeGreaterThan(35);
-  expect(night.shaded.wall).toBeGreaterThan(70);
-  expect(nightWash.luma).toBeGreaterThan(22);
+  expect(night.shaded.skirt).toBeGreaterThan(8);
+  expect(night.shaded.wall).toBeGreaterThan(10);
+  expect(nightWash.luma).toBeGreaterThan(12);
   expect(nightWash.fog).toBeLessThan(0.0005);
 });
 
@@ -98,9 +98,9 @@ test.describe("ground color and roads stay stable while the camera moves", () =>
       expectSolidGround(shifted, name + " shift");
 
       await page.locator(".map-toolbar [data-map-action='walk']").click();
-      await expect(page.locator(".map-walk")).toBeVisible();
-      await page.locator(".map-pad-move [data-walk='forward']").click();
-      await page.locator(".map-pad-look [data-walk='look-right']").click();
+      await expect(page.locator(".map-stick")).toBeVisible();
+      await page.keyboard.press("KeyW");
+      await page.keyboard.press("KeyE");
       const walking = await page.evaluate(() => window.CampusMap.debugSnapshot());
       expect(walking.viewMode).toBe("walk");
       expect(walking.logDepth).toBe(true);

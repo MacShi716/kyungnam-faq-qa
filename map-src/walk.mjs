@@ -4,9 +4,12 @@ import { pointInRing } from "./placement.mjs";
 
 export const EYE_M = 1.7;
 export const WALK_TAP_M = 7;
-export const WALK_HOLD_MPS = 22;
+export const WALK_HOLD_MPS = 4.2;
 export const LOOK_TAP = 0.42;
 export const LOOK_HOLD_RPS = 1.35;
+export const STICK_DEAD = 0.18;
+export const SWEEP_STEP_M = 0.2;
+export const STEP_UP_M = 0.5;
 
 export function wrapYaw(yaw) {
   const turn = Math.PI * 2;
@@ -48,6 +51,44 @@ export function moveVector(yaw, action) {
   if (action === "right") return { x: rx, z: rz };
   if (action === "left") return { x: -rx, z: -rz };
   return { x: 0, z: 0 };
+}
+
+/** nx right, ny up in stick space. Diagonal full-deflection stays at power 1. */
+export function stickAxes(nx, ny) {
+  const mag = Math.hypot(nx, ny);
+  if (mag < STICK_DEAD) return { strafe: 0, forward: 0, power: 0 };
+  const power = Math.min(1, (mag - STICK_DEAD) / (1 - STICK_DEAD));
+  const scale = power / mag;
+  return { strafe: nx * scale, forward: ny * scale, power };
+}
+
+export function sweptMove(x, z, dx, dz, blocked) {
+  const dist = Math.hypot(dx, dz);
+  if (dist < 1e-6) return { x, z };
+  const steps = Math.max(1, Math.ceil(dist / SWEEP_STEP_M));
+  const sx = dx / steps;
+  const sz = dz / steps;
+  let cx = x;
+  let cz = z;
+  for (let i = 0; i < steps; i++) {
+    const nx = cx + sx;
+    const nz = cz + sz;
+    if (!blocked(nx, nz, cx, cz)) {
+      cx = nx;
+      cz = nz;
+      continue;
+    }
+    if (!blocked(nx, cz, cx, cz)) {
+      cx = nx;
+      continue;
+    }
+    if (!blocked(cx, nz, cx, cz)) {
+      cz = nz;
+      continue;
+    }
+    break;
+  }
+  return { x: cx, z: cz };
 }
 
 export function slideMove(x, z, yaw, action, distance, blocked) {
@@ -238,7 +279,8 @@ export function outsideStand(centroid, preferX, preferZ, blocked, beyond = 0) {
 
 export function applyWalkAction(state, action, amount, blocked) {
   if (action === "forward" || action === "back" || action === "left" || action === "right") {
-    const next = slideMove(state.x, state.z, state.yaw, action, amount, blocked);
+    const v = moveVector(state.yaw, action);
+    const next = sweptMove(state.x, state.z, v.x * amount, v.z * amount, blocked);
     const moved = next.x !== state.x || next.z !== state.z;
     state.x = next.x;
     state.z = next.z;

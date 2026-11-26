@@ -2,7 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   RED_OSM_ID,
+  clampTint,
   lightRig,
+  materialSet,
+  settleTint,
 } from "./colors.mjs";
 import { layoutLabelBoxes, measureLabel } from "./labels.mjs";
 import { displayTitle, directoryRank, faqButtonLabel, officialLinkLabel } from "./present.mjs";
@@ -23,19 +26,52 @@ import {
 } from "./placement.mjs";
 import {
   EYE_M,
-  LOOK_HOLD_RPS,
-  LOOK_TAP,
-  WALK_HOLD_MPS,
   WALK_TAP_M,
   applyWalkAction,
   footprintBlocked,
   chooseFacadeStand,
   outsideStand,
+  stickAxes,
+  sweptMove,
   poseFrom,
+  lookVector,
+  wrapYaw,
   yawFromDirection,
 } from "./walk.mjs";
+import {
+  LOOK_KEY_RPS,
+  MOUSE_SENSITIVITY,
+  STEP_UP_M,
+  THIRD_DISTANCE_M,
+  VIEW_FIRST,
+  VIEW_THIRD,
+  eyePoint,
+  keyboardAxes,
+  nextView,
+  stepPlayer,
+  thirdPersonRig,
+  turnPlayer,
+} from "./player.mjs";
+import { applyAvatarLook, buildAvatar, poseAvatar } from "./avatar.mjs";
+import {
+  avatarKind,
+  accountActionVisibility,
+  clearAccounts,
+  clearMapFavorites,
+  clearSiteData,
+  createProfile,
+  deleteProfile,
+  exitProfile,
+  favoriteOwner,
+  loadBook,
+  readMapFavorites,
+  toggleFavorite,
+  selectProfile,
+  setGender,
+} from "./local-profile.mjs";
 
 const FAV_KEY = "campus_map_favorites";
+const TINT_KEY = "campus_map_tint";
 const OFFICIAL_MAP = "https://inews.kyungnam.ac.kr/bbs/view.html?idxno=39517";
 const OSM_COPYRIGHT = "https://www.openstreetmap.org/copyright";
 const ODBL_LICENSE = "https://opendatacommons.org/licenses/odbl/1-0/";
@@ -48,11 +84,30 @@ const TEXT = {
   zh: {
     close: "关闭", zoomIn: "放大", zoomOut: "缩小", reset: "回到全校", north: "正北复位",
     walk: "步行", walkHint: "地面行走", walkStop: "结束行走",
+    account: "本机资料", nick: "本地昵称", male: "男", female: "女",
+    createProfile: "建立本机资料", useProfile: "选用本机资料",
+    localOnly: "只存在这台浏览器，不是网上账号，换设备不会同步，清除网站数据后无法恢复。",
+    avatarOnly: "仅用于本机地图小人，不会上传。",
+    exitProfile: "退出本机资料", deleteProfile: "注销本机资料",
+    clearAccounts: "清空本机账号与记录", clearSite: "清空本站全部本机数据",
+    clearSiteNote: "浏览器「清除网站数据」也会全部丢掉、无法找回。",
+    publicDevice: "公共设备上请用完后退出或清空，以免下一个人看到这份资料。",
+    confirm: "确认", cancel: "取消",
+    nickLength: "昵称需要 1 到 20 个字。",
+    nickDigits: "请换一个昵称，不要使用手机号或学号这样的长数字。",
+    nickDuplicate: "这个昵称在本机已经有了。",
+    pickGender: "请选择男或女。这只保存在本机。",
     move: "移动", look: "环顾",
+    lookHint: "WASD 移动 · 空格跳跃 · Shift 疾跑 · V 视角 · Esc 退出",
+    lockHint: "点击画面锁定鼠标，移动鼠标环顾",
+    lockDrag: "此环境无法锁定鼠标。按住画面拖动即可环顾。",
+    touchHint: "左侧摇杆移动 · 右侧拖动环顾 · 按钮跳跃",
+    jump: "跳跃", view: "视角", viewFirst: "第一人称", viewThird: "第三人称",
     forward: "前进", back: "后退", left: "向左", right: "向右",
     lookUp: "抬头", lookDown: "低头", lookLeft: "向左转", lookRight: "向右转",
     full: "全屏", fullExit: "退出全屏", directory: "目录", search: "搜索地点",
     privacy: "请勿输入学号、手机号等个人信息", clearFav: "清空收藏",
+    clearFavAsk: "确认清空收藏？取消则保留当前收藏。",
     storage: "仅保存在本机浏览器，公用设备请清空", fav: "收藏", favOn: "已收藏",
     viewFaq: "查看相关 FAQ", noFaq: "暂无对应 FAQ", textOnly: "文字地点",
     notice: "Copernicus · 数据来源与许可", licenseTitle: "数据来源与许可", loading: "正在加载校园地图…",
@@ -61,7 +116,8 @@ const TEXT = {
     summary: "地形高程使用 Copernicus WorldDEM-30 公开数据，只用于这张校园示意图。欧盟、ESA、DLR 与 Airbus 不对使用该数据承担责任，也不表示认可本页面。",
     officialMap: "庆南大学 2026 校园地图", ext: "外部官方链接", empty: "没有匹配的地点", phone: "电话",
     dialog: "庆南大学 3D 校园示意图",
-    labels: "标注", more: "更多", expandDetail: "展开详情", collapseDetail: "收起详情",
+    labels: "标注", more: "更多", tint: "色调", cool: "冷", neutral: "默认", warm: "暖",
+    expandDetail: "展开详情", collapseDetail: "收起详情",
     floorTitle: "各楼层教室与用途", facilities: "设施", hours: "时间",
     roleBadge: "国际服务重点", noMesh: "暂无3D轮廓",
     designLabel: "设计馆 · 留学生服务中心",
@@ -75,11 +131,30 @@ const TEXT = {
   ko: {
     close: "닫기", zoomIn: "확대", zoomOut: "축소", reset: "전체 보기", north: "정북",
     walk: "걷기", walkHint: "지면 걷기", walkStop: "걷기 종료",
+    account: "로컬 자료", nick: "로컬 별명", male: "남", female: "여",
+    createProfile: "로컬 자료 만들기", useProfile: "로컬 자료 선택",
+    localOnly: "이 기기의 브라우저에만 저장되며, 온라인 계정이 아닙니다. 다른 기기와 동기화되지 않고, 사이트 데이터를 지우면 복구할 수 없습니다.",
+    avatarOnly: "본기기 지도 캐릭터에만 쓰이며, 업로드되지 않습니다.",
+    exitProfile: "로컬 자료에서 나가기", deleteProfile: "이 로컬 자료 삭제",
+    clearAccounts: "로컬 계정과 기록 모두 삭제", clearSite: "이 사이트의 모든 로컬 데이터 삭제",
+    clearSiteNote: "브라우저에서 사이트 데이터를 지워도 모두 사라지며, 다시 찾을 수 없습니다.",
+    publicDevice: "공용 기기에서는 사용한 뒤 나가거나 삭제하세요. 다음 사용자가 이 자료를 볼 수 있습니다.",
+    confirm: "확인", cancel: "취소",
+    nickLength: "별명은 1자에서 20자까지입니다.",
+    nickDigits: "전화번호나 학번처럼 긴 숫자는 별명으로 쓸 수 없습니다.",
+    nickDuplicate: "이 별명은 이 기기에 이미 있습니다.",
+    pickGender: "남 또는 여를 고르세요. 이 기기에만 저장됩니다.",
     move: "이동", look: "둘러보기",
+    lookHint: "WASD 이동 · Space 점프 · Shift 달리기 · V 시점 · Esc 나가기",
+    lockHint: "화면을 클릭해 마우스를 잠그고 움직여 둘러보세요",
+    lockDrag: "이 환경에서는 마우스를 잠글 수 없습니다. 화면을 누른 채 드래그해 둘러보세요.",
+    touchHint: "왼쪽 스틱 이동 · 오른쪽 드래그 둘러보기 · 버튼 점프",
+    jump: "점프", view: "시점", viewFirst: "1인칭", viewThird: "3인칭",
     forward: "앞으로", back: "뒤로", left: "왼쪽", right: "오른쪽",
     lookUp: "위로", lookDown: "아래로", lookLeft: "왼쪽으로", lookRight: "오른쪽으로",
     full: "전체 화면", fullExit: "전체 화면 종료", directory: "목록", search: "장소 검색",
     privacy: "학번·전화번호 등 개인정보는 입력하지 마세요", clearFav: "즐겨찾기 비우기",
+    clearFavAsk: "즐겨찾기를 비울까요? 취소하면 그대로 둡니다.",
     storage: "이 브라우저에만 저장됩니다. 공용 기기에서는 비워 주세요", fav: "즐겨찾기", favOn: "즐겨찾기됨",
     viewFaq: "관련 FAQ 보기", noFaq: "연결된 FAQ 없음", textOnly: "텍스트 안내",
     notice: "Copernicus · 출처·라이선스", licenseTitle: "데이터 출처 및 라이선스", loading: "캠퍼스맵을 불러오는 중…",
@@ -88,7 +163,8 @@ const TEXT = {
     summary: "지형 고도는 Copernicus WorldDEM-30 공개 자료를 사용하며 이 캠퍼스 모식도에만 씁니다. EU, ESA, DLR, Airbus는 이 자료의 사용에 책임을 지지 않으며 이 페이지를 보증하거나 승인하지 않습니다.",
     officialMap: "경남대 2026 캠퍼스맵", ext: "외부 공식 링크", empty: "일치하는 장소가 없습니다", phone: "전화",
     dialog: "경남대학교 3D 캠퍼스 모식도",
-    labels: "라벨", more: "더보기", expandDetail: "상세 열기", collapseDetail: "상세 접기",
+    labels: "라벨", more: "더보기", tint: "색조", cool: "차가움", neutral: "기본", warm: "따뜻함",
+    expandDetail: "상세 열기", collapseDetail: "상세 접기",
     floorTitle: "층별 강의실·시설 안내", facilities: "시설", hours: "시간",
     roleBadge: "유학생 핵심", noMesh: "3D 외곽선 없음",
     designLabel: "디자인관 · 유학생서비스센터",
@@ -186,7 +262,22 @@ const MAP_CSS = `
 .map-modal.is-narrow.info-open .map-attrib{bottom:calc(min(62vh, 560px) + 12px);z-index:12}
 html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-more{display:contents}
-.map-more-btn{display:none}
+.map-more-actions{display:contents}
+.map-more-btn{display:inline-flex}
+.map-tint{display:none;flex-direction:column;gap:2px;min-width:180px;padding:8px 10px;box-sizing:border-box;color:var(--ink);background:var(--map-panel);border:1px solid var(--map-line);border-radius:12px}
+.map-tint-label{font-size:.78rem;font-weight:650}
+.map-tint-slider{display:flex;align-items:center;min-height:44px}
+.map-tint input{width:100%;height:28px;min-height:0;margin:0;accent-color:#39b9c5}
+.map-tint-marks{position:relative;display:block;height:32px}
+.map-tint-marks button{position:absolute;top:0;width:auto;min-width:0;height:auto;min-height:32px;padding:0 4px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.72rem;cursor:pointer;transform:translateX(-50%)}
+.map-tint-marks button[data-tint-key="cool"]{left:0;transform:none}
+.map-tint-marks button[data-tint-key="neutral"]{left:50%}
+.map-tint-marks button[data-tint-key="warm"]{left:100%;transform:translateX(-100%)}
+.map-fav-confirm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.map-fav-confirm[hidden]{display:none !important}
+.map-fav-confirm p{margin:0;flex:1 0 100%;font-size:.75rem}
+.map-toolbar:has(.map-more.is-open){z-index:20}
+.map-more.is-open .map-tint{display:flex;position:absolute;top:48px;left:8px;z-index:30}
 .map-toolbar [data-map-action="close"]{order:1}
 .map-more [data-map-action="zoom-in"]{order:2}
 .map-more [data-map-action="zoom-out"]{order:3}
@@ -200,26 +291,65 @@ html.map-lock,html.map-lock body{overflow:hidden!important;height:100%}
 .map-detail-summary{display:none}
 .map-modal.is-narrow.walk-active{top:var(--map-vv-off,0px);height:var(--map-vvh,100dvh);bottom:auto}
 .map-modal.is-narrow.walk-active .map-canvas,.map-modal.is-narrow.walk-active .map-labels{top:44px;right:0;bottom:auto;left:0;width:100%;height:calc(100% - 44px - var(--walk-dock,220px))}
-.map-modal.is-narrow.walk-active .map-toolbar{top:0;left:0;right:0;height:44px;max-width:none;flex-wrap:nowrap;align-items:stretch;gap:4px;padding:0 6px;z-index:24}
-.map-modal.is-narrow.walk-active .map-toolbar > .map-btn:not(.map-intl-pill),.map-modal.is-narrow.walk-active .map-more-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;min-width:44px;padding:0 10px}
+.map-modal.is-narrow .map-toolbar{overflow:visible}
+.map-modal.is-narrow.walk-active .map-toolbar{top:0;left:0;right:0;height:44px;max-width:none;flex-wrap:nowrap;align-items:stretch;gap:4px;padding:0 6px;z-index:24;overflow:visible}
+.map-modal.is-narrow.walk-active .map-toolbar > .map-btn:not(.map-intl-pill),.map-modal.is-narrow.walk-active .map-more-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;min-width:0;flex:1 1 0;padding:0 6px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .map-modal.is-narrow.walk-active .map-toolbar [data-map-action="close"]{order:1}
 .map-modal.is-narrow.walk-active .map-toolbar [data-map-action="directory"]{order:2}
 .map-modal.is-narrow.walk-active .map-toolbar [data-map-action="walk"]{order:3}
 .map-modal.is-narrow.walk-active .map-more-btn{order:4}
 .map-modal.is-narrow.walk-active .map-toolbar > .map-intl-pill{display:none}
 .map-modal.is-narrow.walk-active .map-more{display:none;position:absolute;top:48px;right:6px;z-index:25;min-width:168px;padding:6px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
-.map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px}
-.map-modal.is-narrow.walk-active .map-more .map-btn{width:100%;min-height:44px;height:44px;order:0}
-.map-modal.is-narrow.walk-active{--walk-pad:140px;--walk-attrib:32px;--walk-summary:0px;--walk-dock:calc(var(--walk-pad) + var(--walk-attrib) + var(--walk-summary) + 12px)}
+.map-modal.is-narrow.walk-active .map-more.is-open{display:flex;flex-direction:column;gap:4px;max-height:min(220px,34vh);overflow:auto;width:min(240px,calc(100% - 16px))}
+.map-modal.is-narrow:not(.walk-active) .map-more.is-open{display:flex;flex-direction:column;gap:4px;position:absolute;top:calc(100% + 4px);right:0;left:auto;z-index:30;width:min(240px,calc(100% - 12px));max-height:min(220px,36vh);overflow:auto;padding:8px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);box-sizing:border-box}
+.map-modal.is-narrow .map-more.is-open .map-tint{position:static;width:100%;min-width:0;border:0;background:transparent;padding:4px 2px 8px}
+.map-modal.is-narrow.walk-active .map-more-actions,.map-modal.is-narrow:not(.walk-active) .map-more.is-open .map-more-actions{display:flex;flex-direction:column;gap:4px}
+.map-modal.is-narrow.walk-active .map-more .map-btn:not(.map-tint-mark){width:100%;min-height:44px;height:44px;order:0}
+.map-stick{position:absolute;z-index:12;left:calc(12px + env(safe-area-inset-left));bottom:calc(44px + env(safe-area-inset-bottom));width:104px;height:104px;touch-action:none;pointer-events:auto}
+.map-stick[hidden]{display:none !important}
+.map-stick-base{position:relative;width:104px;height:104px;border-radius:50%;background:rgba(18,24,30,.28);border:1px solid rgba(57,185,197,.5)}
+.map-stick-knob{position:absolute;left:30px;top:30px;width:44px;height:44px;border-radius:50%;background:rgba(57,185,197,.8)}
+.map-look-hint{position:absolute;z-index:6;top:56px;left:50%;transform:translateX(-50%);margin:0;padding:4px 10px;border-radius:8px;background:rgba(18,24,30,.5);color:#f4f7fb;font-size:12px;line-height:1.3;pointer-events:none;white-space:nowrap}
+.map-modal.is-narrow .map-look-hint{display:none}
+.map-crosshair{position:absolute;left:50%;top:50%;z-index:13;width:22px;height:22px;margin:-11px 0 0 -11px;pointer-events:none;opacity:.92}
+.map-crosshair[hidden]{display:none !important}
+.map-crosshair::before,.map-crosshair::after{content:"";position:absolute;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.55)}
+.map-crosshair::before{left:10px;top:0;width:2px;height:22px}
+.map-crosshair::after{top:10px;left:0;height:2px;width:22px}
+.map-lock-hint{position:absolute;z-index:13;left:50%;top:84px;transform:translateX(-50%);margin:0;padding:6px 12px;border-radius:8px;background:rgba(18,24,30,.62);color:#f4f7fb;font-size:12px;line-height:1.3;pointer-events:none;white-space:nowrap}
+.map-lock-hint[hidden]{display:none !important}
+.map-modal.is-narrow .map-lock-hint{display:none !important}
+.map-touch-hint{position:absolute;z-index:13;left:50%;top:48px;transform:translateX(-50%);margin:0;padding:4px 8px;border-radius:8px;background:rgba(18,24,30,.55);color:#f4f7fb;font-size:11px;line-height:1.3;pointer-events:none;white-space:normal;text-align:center;display:none;max-width:min(240px,calc(100% - 136px));box-sizing:border-box}
+.map-touch-hint[hidden]{display:none !important}
+.map-modal.is-narrow.walk-active .map-touch-hint{display:block}
+.map-jump{position:absolute;z-index:13;right:calc(16px + env(safe-area-inset-right));bottom:calc(44px + 32px + 18px + env(safe-area-inset-bottom));width:64px;height:64px;border-radius:50%;border:1px solid rgba(57,185,197,.55);background:rgba(18,24,30,.55);color:#f4f7fb;font:600 12px/1.1 inherit;display:none;align-items:center;justify-content:center;padding:0;touch-action:none;pointer-events:auto;backdrop-filter:blur(6px);box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.map-jump[hidden]{display:none !important}
+.map-modal.is-narrow.walk-active .map-jump{display:flex;bottom:calc(var(--walk-summary) + 32px + 18px + env(safe-area-inset-bottom))}
+.map-modal.is-locked .map-canvas{cursor:none}
+.map-account-btn{display:inline-flex}
+.map-modal.is-narrow .map-account-btn,.map-modal.is-narrow.walk-active .map-toolbar > .map-btn.map-account-btn{display:none !important}
+.map-account-pop{display:none;position:absolute;z-index:28;top:52px;left:8px;width:240px;max-height:min(46vh,320px);overflow:auto;padding:10px;box-sizing:border-box;background:var(--map-panel);border:1px solid var(--map-line);border-radius:12px;color:var(--ink)}
+.map-account-pop.is-open{display:block}
+.map-modal.is-narrow .map-account-pop{display:none !important}
+.map-account-form{display:flex;flex-direction:column;gap:6px;font-size:.78rem}
+.map-modal.is-narrow .map-account-slot .map-account-form{display:none}
+.map-modal.is-narrow .map-more.is-open .map-account-slot .map-account-form{display:flex}
+.map-account-form input,.map-account-form select{min-height:44px;width:100%;box-sizing:border-box;font:inherit}
+.map-account-form p{margin:0}
+.map-account-row{display:flex;gap:6px}
+.map-account-row button{flex:1}
+.map-account-confirm{display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid var(--map-line);border-radius:8px}
+.map-account-confirm[hidden]{display:none !important}
+.map-modal.is-narrow.walk-active{--walk-summary:0px;--walk-dock:var(--walk-summary)}
 .map-modal.is-narrow.walk-active.detail-collapsed{--walk-summary:44px}
-.map-modal.is-narrow.walk-active.detail-open{--walk-summary:180px}
-.map-modal.is-narrow.walk-active .map-walk{left:0;right:0;bottom:0;height:var(--walk-pad);margin:0;padding:0 8px;align-items:center;justify-content:space-between;z-index:12}
-.map-modal.is-narrow.walk-active .map-pad-look{margin-right:0}
-.map-modal.is-narrow.walk-active .map-attrib{left:6px;right:6px;bottom:calc(var(--walk-pad) + 4px);max-width:none;z-index:14}
+.map-modal.is-narrow.walk-active.detail-open{--walk-summary:min(180px,30vh)}
+.map-modal.is-narrow.walk-active .map-walk{display:none !important}
+.map-modal.is-narrow.walk-active .map-attrib{left:6px;right:6px;bottom:calc(var(--walk-summary) + 6px);max-width:none;z-index:14}
 .map-modal.is-narrow.walk-active .map-attrib-bar{width:100%;height:32px}
+.map-modal.is-narrow.walk-active .map-stick{bottom:calc(var(--walk-summary) + 32px + 18px)}
 .map-modal.is-narrow.walk-active .map-license{left:0;width:min(100%,440px);bottom:40px;max-height:min(46vh,calc(var(--map-vvh,100dvh) * 0.4))}
 .map-modal.is-narrow.walk-active .map-directory{z-index:26}
-.map-modal.is-narrow.walk-active.detail-collapsed .map-info,.map-modal.is-narrow.walk-active.detail-open .map-info{top:auto;left:6px;right:6px;bottom:calc(var(--walk-pad) + var(--walk-attrib) + 8px);width:auto;height:var(--walk-summary);max-height:var(--walk-summary);padding:0;overflow:auto;border-radius:8px;z-index:15}
+.map-modal.is-narrow.walk-active.detail-collapsed .map-info,.map-modal.is-narrow.walk-active.detail-open .map-info{top:auto;left:0;right:0;bottom:0;width:100%;height:var(--walk-summary);max-height:var(--walk-summary);padding:0;overflow:auto;border-radius:8px 8px 0 0;z-index:15}
 .map-modal.is-narrow.walk-active.detail-collapsed .map-info > :not(.map-detail-summary){display:none}
 .map-modal.is-narrow.walk-active .map-detail-summary{display:flex;width:100%;height:44px;min-height:44px;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;position:sticky;top:0;z-index:2}
 .map-summary-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -235,31 +365,62 @@ function t() {
   return TEXT[session && session.lang === "ko" ? "ko" : "zh"];
 }
 
+const browserStore = {
+  getItem(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  },
+  setItem(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* private mode */ }
+  },
+  removeItem(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* private mode */ }
+  },
+  get length() {
+    try { return localStorage.length; } catch (e) { return 0; }
+  },
+  key(index) {
+    try { return localStorage.key(index); } catch (e) { return null; }
+  },
+};
+
 function readFavs() {
+  return readMapFavorites(browserStore);
+}
+
+function bindFavs(shell) {
+  if (!shell) return;
+  shell.favorites = readFavs();
+  shell.favOwner = favoriteOwner(browserStore);
+}
+
+function readTint() {
   try {
-    const raw = localStorage.getItem(FAV_KEY);
-    const arr = JSON.parse(raw || "[]");
-    if (!Array.isArray(arr)) return new Set();
-    return new Set(arr.filter((item) => typeof item === "string"));
+    const raw = localStorage.getItem(TINT_KEY);
+    if (raw == null || raw === "") return 0;
+    return clampTint(raw);
   } catch (e) {
-    return new Set();
+    return 0;
   }
 }
 
-function writeFavs(set) {
+function writeTint(value) {
   try {
-    localStorage.setItem(FAV_KEY, JSON.stringify([...set]));
+    localStorage.setItem(TINT_KEY, String(value));
   } catch (e) {
-    /* incognito or blocked storage */
+    /* on-device only */
   }
+}
+
+function applyCast(shell) {
+  if (!shell) return;
+  applyAtmosphereTheme(shell);
+  paintBuildings();
+  repaintTerrainColors(shell);
+  poke();
 }
 
 function clearFavStorage() {
-  try {
-    localStorage.removeItem(FAV_KEY);
-  } catch (e) {
-    /* incognito or blocked storage */
-  }
+  clearMapFavorites(browserStore);
 }
 
 function dataUrl(name) {
@@ -380,7 +541,36 @@ function createShell(opts) {
   const walkUi = document.createElement("div");
   walkUi.className = "map-walk";
   walkUi.hidden = true;
-  walkUi.append(makePad("move", MOVE_SLOTS), makePad("look", LOOK_SLOTS));
+  const stick = document.createElement("div");
+  stick.className = "map-stick";
+  stick.hidden = true;
+  stick.setAttribute("role", "application");
+  const stickBase = document.createElement("div");
+  stickBase.className = "map-stick-base";
+  const knob = document.createElement("div");
+  knob.className = "map-stick-knob";
+  stickBase.appendChild(knob);
+  stick.appendChild(stickBase);
+  const lookHint = document.createElement("p");
+  lookHint.className = "map-look-hint";
+  lookHint.hidden = true;
+  const touchHint = document.createElement("p");
+  touchHint.className = "map-touch-hint";
+  touchHint.hidden = true;
+  const lockHint = document.createElement("p");
+  lockHint.className = "map-lock-hint";
+  lockHint.hidden = true;
+  const crosshair = document.createElement("div");
+  crosshair.className = "map-crosshair";
+  crosshair.hidden = true;
+  const jumpBtn = document.createElement("button");
+  jumpBtn.type = "button";
+  jumpBtn.className = "map-jump";
+  jumpBtn.hidden = true;
+  const jumpGlyph = document.createElement("span");
+  jumpGlyph.setAttribute("aria-hidden", "true");
+  jumpGlyph.textContent = "▲";
+  jumpBtn.appendChild(jumpGlyph);
   const attrib = document.createElement("div");
   attrib.className = "map-attrib";
   const attribBar = document.createElement("div");
@@ -389,18 +579,26 @@ function createShell(opts) {
   license.className = "map-license";
   license.hidden = true;
   attrib.append(attribBar, license);
-  stage.append(canvas, status, fallback, labelLayer, walkUi, toolbar, directory, info);
+  stage.append(canvas, status, fallback, labelLayer, walkUi, stick, lookHint, touchHint, lockHint, crosshair, jumpBtn, toolbar, directory, info);
   root.append(stage, attrib);
   const shell = {
-    root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, attrib, attribBar, license,
-    lang, theme: opts.theme === "dark" ? "dark" : "light",
+    root, stage, canvas, status, fallback, toolbar, directory, info, labelLayer, walkUi, stick, knob, lookHint, touchHint, lockHint, crosshair, jumpBtn, attrib, attribBar, license,
+    lang, theme: opts.theme === "dark" ? "dark" : "light", tint: readTint(),
     onOpenFaq: opts.onOpenFaq, faqId: opts.faqId || "",
-    favorites: readFavs(), category: "all", query: "", labelsOn: true,
+    favorites: readFavs(), favOwner: favoriteOwner(browserStore), category: "all", query: "", labelsOn: true,
     unbinds: [], buildings: [], pickables: [], webgl: false, glDisposed: false,
     raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
     detailEntries: null, detailFocus: null, detailBuilding: null, detailExpanded: false,
-    renderer: null, controls: null, scene: null, camera: null,
-    walk: { active: false, x: 0, z: 0, yaw: 0, pitch: -0.2, held: new Set(), heldAt: 0, t: 0, focusId: null, drag: null, eyeY: 0 },
+    renderer: null, controls: null, scene: null, camera: null, avatar: null,
+    touch: window.matchMedia ? window.matchMedia("(pointer: coarse)").matches : false,
+    locked: false,
+    walk: {
+      active: false, x: 0, z: 0, y: 0, vy: 0, grounded: true, groundY: 0,
+      yaw: 0, pitch: -0.2, view: VIEW_THIRD, eye: EYE_M,
+      held: new Set(), heldAt: 0, t: 0, phase: 0, speed: 0,
+      focusId: null, drag: null, lookId: null, stick: null, eyeY: 0,
+      sprint: false, jumpQueued: false,
+    },
   };
   paintChrome(shell);
   paintAttribution(shell);
@@ -485,6 +683,216 @@ function paintIntl(shell) {
   }
 }
 
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text) node.textContent = text;
+  return node;
+}
+
+function mountAccount(shell) {
+  const pop = el("div", "map-account-pop");
+  const form = el("div", "map-account-form");
+  form.addEventListener("click", (event) => event.stopPropagation());
+  form.addEventListener("pointerdown", (event) => event.stopPropagation());
+  const notice = el("p", "map-account-notice");
+  const avatarNote = el("p", "map-account-avatar");
+  const nickLabel = el("label", "map-account-label");
+  const nick = document.createElement("input");
+  nick.type = "text";
+  nick.maxLength = 20;
+  nick.autocomplete = "off";
+  nick.className = "map-account-nick";
+  const genders = el("div", "map-account-row");
+  const male = button("", "map-btn");
+  const female = button("", "map-btn");
+  male.dataset.gender = "male";
+  female.dataset.gender = "female";
+  genders.append(male, female);
+  const message = el("p", "map-account-message");
+  const createBtn = button("", "map-btn");
+  const pick = document.createElement("select");
+  pick.className = "map-account-pick";
+  const useBtn = button("", "map-btn");
+  const who = el("p", "map-account-who");
+  const genderLive = el("div", "map-account-row");
+  const maleLive = button("", "map-btn");
+  const femaleLive = button("", "map-btn");
+  maleLive.dataset.gender = "male";
+  femaleLive.dataset.gender = "female";
+  genderLive.append(maleLive, femaleLive);
+  const actions = el("div", "map-account-actions");
+  const exitBtn = button("", "map-btn");
+  const deleteBtn = button("", "map-btn");
+  const clearBtn = button("", "map-btn");
+  const wipeBtn = button("", "map-btn");
+  actions.append(exitBtn, deleteBtn, clearBtn, wipeBtn);
+  const warn = el("p", "map-account-public");
+  const confirmBox = el("div", "map-account-confirm");
+  confirmBox.hidden = true;
+  const confirmText = el("p", "");
+  const confirmRow = el("div", "map-account-row");
+  const confirmYes = button("", "map-btn");
+  const confirmNo = button("", "map-btn");
+  confirmRow.append(confirmYes, confirmNo);
+  confirmBox.append(confirmText, confirmRow);
+  form.append(notice, avatarNote, nickLabel, nick, genders, message, createBtn, pick, useBtn, who, genderLive, warn, actions, confirmBox);
+  pop.appendChild(form);
+  shell.stage.appendChild(pop);
+  shell.accountPop = pop;
+  shell.accountForm = form;
+  shell.accountNodes = {
+    notice, avatarNote, nickLabel, nick, male, female, message, createBtn, pick, useBtn, who,
+    maleLive, femaleLive, exitBtn, deleteBtn, clearBtn, wipeBtn, warn, confirmBox, confirmText, confirmYes, confirmNo,
+  };
+  let pending = "";
+  const refresh = () => paintAccount(shell);
+  const choose = (gender) => {
+    shell.accountGender = gender;
+    paintAccount(shell);
+  };
+  male.addEventListener("click", () => choose("male"));
+  female.addEventListener("click", () => choose("female"));
+  maleLive.addEventListener("click", () => {
+    setGender(browserStore, "male");
+    refreshAvatar(shell);
+    paintAccount(shell);
+  });
+  femaleLive.addEventListener("click", () => {
+    setGender(browserStore, "female");
+    refreshAvatar(shell);
+    paintAccount(shell);
+  });
+  createBtn.addEventListener("click", () => {
+    const result = createProfile(browserStore, { nickname: nick.value, gender: shell.accountGender || "" });
+    shell.accountMessage = result.ok ? "" : result.error;
+    if (result.ok) {
+      nick.value = "";
+      bindFavs(shell);
+      renderDirectory();
+      refreshAvatar(shell);
+    }
+    paintAccount(shell);
+  });
+  useBtn.addEventListener("click", () => {
+    const result = selectProfile(browserStore, pick.value);
+    if (result.ok) {
+      bindFavs(shell);
+      renderDirectory();
+      refreshAvatar(shell);
+    }
+    paintAccount(shell);
+  });
+  const ask = (action, text) => {
+    pending = action;
+    confirmText.textContent = text;
+    confirmBox.hidden = false;
+  };
+  exitBtn.addEventListener("click", () => ask("exit", shell.accountNodes.exitBtn.textContent));
+  deleteBtn.addEventListener("click", () => ask("delete", shell.accountNodes.deleteBtn.textContent));
+  clearBtn.addEventListener("click", () => ask("clear", shell.accountNodes.clearBtn.textContent));
+  wipeBtn.addEventListener("click", () => ask("wipe", shell.accountNodes.wipeBtn.textContent + " " + (TEXT[shell.lang].clearSiteNote || "")));
+  confirmNo.addEventListener("click", () => {
+    pending = "";
+    confirmBox.hidden = true;
+  });
+  confirmYes.addEventListener("click", () => {
+    if (pending === "exit") exitProfile(browserStore);
+    else if (pending === "delete") deleteProfile(browserStore);
+    else if (pending === "clear") clearAccounts(browserStore);
+    else if (pending === "wipe") {
+      clearSiteData(browserStore);
+      shell.tint = 0;
+      if (shell.tintInput) shell.tintInput.value = "0";
+      applyCast(shell);
+      document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+    pending = "";
+    confirmBox.hidden = true;
+    bindFavs(shell);
+    if (shell.list) renderDirectory();
+    refreshAvatar(shell);
+    paintAccount(shell);
+  });
+  syncAccountPlace(shell);
+  paintAccount(shell);
+}
+
+function syncAccountPlace(shell) {
+  if (!shell || !shell.accountForm || !shell.accountSlot || !shell.accountPop) return;
+  const narrow = shell.root.classList.contains("is-narrow");
+  const parent = narrow ? shell.accountSlot : shell.accountPop;
+  if (shell.accountForm.parentElement !== parent) parent.appendChild(shell.accountForm);
+}
+
+function paintAccount(shell) {
+  const copy = TEXT[shell.lang];
+  const nodes = shell.accountNodes;
+  if (!nodes) return;
+  if (shell.accountBtn) shell.accountBtn.textContent = copy.account;
+  nodes.notice.textContent = copy.localOnly;
+  nodes.avatarNote.textContent = copy.avatarOnly;
+  nodes.nickLabel.textContent = copy.nick;
+  nodes.nick.setAttribute("aria-label", copy.nick);
+  nodes.male.textContent = copy.male;
+  nodes.female.textContent = copy.female;
+  nodes.male.setAttribute("aria-pressed", shell.accountGender === "male" ? "true" : "false");
+  nodes.female.setAttribute("aria-pressed", shell.accountGender === "female" ? "true" : "false");
+  nodes.createBtn.textContent = copy.createProfile;
+  nodes.useBtn.textContent = copy.useProfile;
+  nodes.maleLive.textContent = copy.male;
+  nodes.femaleLive.textContent = copy.female;
+  nodes.exitBtn.textContent = copy.exitProfile;
+  nodes.deleteBtn.textContent = copy.deleteProfile;
+  nodes.clearBtn.textContent = copy.clearAccounts;
+  nodes.wipeBtn.textContent = copy.clearSite;
+  nodes.warn.textContent = copy.publicDevice;
+  nodes.confirmYes.textContent = copy.confirm;
+  nodes.confirmNo.textContent = copy.cancel;
+  const book = loadBook(browserStore);
+  const active = book.profiles.find((item) => item.id === book.activeId) || null;
+  const guest = !active;
+  nodes.nick.hidden = !guest;
+  nodes.nickLabel.hidden = !guest;
+  nodes.male.parentElement.hidden = !guest;
+  nodes.createBtn.hidden = !guest;
+  nodes.pick.hidden = !guest || book.profiles.length === 0;
+  nodes.useBtn.hidden = !guest || book.profiles.length === 0;
+  nodes.who.hidden = guest;
+  nodes.maleLive.parentElement.hidden = guest;
+  const shown = accountActionVisibility(!guest);
+  nodes.exitBtn.hidden = !shown.exit;
+  nodes.deleteBtn.hidden = !shown.deleteProfile;
+  nodes.clearBtn.hidden = !shown.clearAccounts;
+  nodes.wipeBtn.hidden = !shown.clearSite;
+  nodes.who.textContent = active ? active.nickname : "";
+  nodes.maleLive.setAttribute("aria-pressed", active && active.gender === "male" ? "true" : "false");
+  nodes.femaleLive.setAttribute("aria-pressed", active && active.gender === "female" ? "true" : "false");
+  nodes.pick.replaceChildren();
+  for (const profile of book.profiles) {
+    const option = document.createElement("option");
+    option.value = profile.id;
+    option.textContent = profile.nickname;
+    nodes.pick.appendChild(option);
+  }
+  const errors = {
+    length: copy.nickLength,
+    digits: copy.nickDigits,
+    duplicate: copy.nickDuplicate,
+    gender: copy.pickGender,
+  };
+  nodes.message.textContent = errors[shell.accountMessage] || "";
+  if (!nodes.confirmBox.hidden && nodes.confirmText.textContent === "") nodes.confirmBox.hidden = true;
+}
+
+function refreshAvatar(shell) {
+  if (!shell || !shell.avatar) return;
+  applyAvatarLook(shell.avatar, avatarKind(browserStore));
+  paintAvatar(shell);
+  poke();
+}
+
 function paintChrome(shell) {
   const copy = TEXT[shell.lang];
   shell.root.setAttribute("aria-label", copy.dialog);
@@ -500,6 +908,7 @@ function paintChrome(shell) {
     ["full", full ? copy.fullExit : copy.full],
     ["directory", copy.directory],
     ["labels", copy.labels],
+    ["view", copy.view],
   ];
   if (!shell.toolbar.childElementCount) {
     const morePanel = document.createElement("div");
@@ -508,6 +917,55 @@ function paintChrome(shell) {
     moreBtn.dataset.mapAction = "more";
     moreBtn.setAttribute("aria-expanded", "false");
     moreBtn.setAttribute("aria-haspopup", "true");
+    const tint = document.createElement("div");
+    tint.className = "map-tint";
+    const tintLabel = document.createElement("span");
+    tintLabel.className = "map-tint-label";
+    tintLabel.textContent = copy.tint;
+    const tintInput = document.createElement("input");
+    tintInput.type = "range";
+    tintInput.min = "-1";
+    tintInput.max = "1";
+    tintInput.step = "0.01";
+    tintInput.value = String(shell.tint || 0);
+    tintInput.setAttribute("aria-label", copy.tint);
+    const tintSlider = document.createElement("div");
+    tintSlider.className = "map-tint-slider";
+    tintSlider.appendChild(tintInput);
+    const marks = document.createElement("div");
+    marks.className = "map-tint-marks";
+    for (const key of ["cool", "neutral", "warm"]) {
+      const mark = button(copy[key], "map-tint-mark");
+      mark.dataset.mapAction = "tint";
+      mark.dataset.tint = key === "cool" ? "-1" : key === "warm" ? "1" : "0";
+      mark.dataset.tintKey = key;
+      marks.appendChild(mark);
+    }
+    tint.append(tintLabel, tintSlider, marks);
+    const previewCast = () => {
+      if (!session) return;
+      session.tint = clampTint(tintInput.value);
+      applyCast(session);
+    };
+    tintInput.addEventListener("input", previewCast);
+    tintInput.addEventListener("change", () => {
+      if (!session) return;
+      const next = settleTint(tintInput.value);
+      session.tint = next;
+      tintInput.value = String(next);
+      writeTint(next);
+      applyCast(session);
+    });
+    tintInput.addEventListener("pointerdown", (event) => event.stopPropagation());
+    const actions = document.createElement("div");
+    actions.className = "map-more-actions";
+    const accountSlot = document.createElement("div");
+    accountSlot.className = "map-account-slot";
+    shell.accountSlot = accountSlot;
+    morePanel.append(tint, accountSlot, actions);
+    shell.tintLabel = tintLabel;
+    shell.tintInput = tintInput;
+    shell.tintMarks = marks;
     const inRow = new Set(["close", "directory", "walk"]);
     for (const [key, label] of specs) {
       const node = button(label, "map-btn");
@@ -516,21 +974,41 @@ function paintChrome(shell) {
       if (key === "zoom-out") node.title = copy.zoomOut;
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
       if (inRow.has(key)) shell.toolbar.appendChild(node);
-      else morePanel.appendChild(node);
+      else actions.appendChild(node);
     }
     shell.moreBtn = moreBtn;
     shell.morePanel = morePanel;
     shell.toolbar.append(moreBtn, morePanel);
+    const accountBtn = button(copy.account, "map-btn map-account-btn");
+    accountBtn.dataset.mapAction = "account";
+    accountBtn.setAttribute("aria-expanded", "false");
+    shell.accountBtn = accountBtn;
+    shell.toolbar.appendChild(accountBtn);
+    mountAccount(shell);
     shell.intlPill = makeIntlButton("map-btn map-intl-pill");
     shell.toolbar.appendChild(shell.intlPill);
     shell.intlPill.addEventListener("click", () => openInternational());
     shell.toolbar.addEventListener("click", (event) => {
       const node = event.target.closest("button");
       if (!node || !session || node.classList.contains("map-intl-pill")) return;
+      if (node.closest(".map-account-form")) return;
       const action = node.dataset.mapAction;
+      if (action === "account") {
+        if (shell.accountPop) shell.accountPop.classList.toggle("is-open");
+        accountBtn.setAttribute("aria-expanded", shell.accountPop && shell.accountPop.classList.contains("is-open") ? "true" : "false");
+        return;
+      }
       if (action === "more") {
         const open = shell.morePanel.classList.toggle("is-open");
         shell.moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        return;
+      }
+      if (action === "tint") {
+        const next = settleTint(node.dataset.tint);
+        session.tint = next;
+        if (shell.tintInput) shell.tintInput.value = String(next);
+        writeTint(next);
+        applyCast(session);
         return;
       }
       if (shell.morePanel) {
@@ -552,6 +1030,8 @@ function paintChrome(shell) {
         node.setAttribute("aria-pressed", session.labelsOn ? "true" : "false");
         layoutLabels();
         poke();
+      } else if (action === "view") {
+        toggleView();
       }
     });
   } else {
@@ -564,6 +1044,14 @@ function paintChrome(shell) {
       if (key === "labels") node.setAttribute("aria-pressed", shell.labelsOn ? "true" : "false");
     }
     if (shell.moreBtn) shell.moreBtn.textContent = copy.more;
+    if (shell.tintLabel) shell.tintLabel.textContent = copy.tint;
+    if (shell.tintInput) shell.tintInput.setAttribute("aria-label", copy.tint);
+    if (shell.tintMarks) {
+      for (const mark of shell.tintMarks.querySelectorAll("button")) {
+        const key = mark.dataset.tintKey;
+        if (key && copy[key]) mark.textContent = copy[key];
+      }
+    }
   }
   paintIntl(shell);
   if (shell.search) {
@@ -571,6 +1059,9 @@ function paintChrome(shell) {
     shell.search.setAttribute("aria-label", copy.search);
     shell.privacy.textContent = copy.privacy;
     shell.clearFav.textContent = copy.clearFav;
+    if (shell.favConfirmText) shell.favConfirmText.textContent = copy.clearFavAsk;
+    if (shell.favYes) shell.favYes.textContent = copy.confirm;
+    if (shell.favNo) shell.favNo.textContent = copy.cancel;
     shell.storage.textContent = copy.storage;
     for (const node of shell.filters.querySelectorAll("button")) {
       node.textContent = copy.cats[node.dataset.cat];
@@ -578,6 +1069,8 @@ function paintChrome(shell) {
   }
   shell.status.textContent = copy.loading;
   if (!shell.fallback.hidden) shell.fallback.textContent = copy.fallback;
+  syncAccountPlace(shell);
+  paintAccount(shell);
   paintWalkUi(shell);
 }
 
@@ -605,10 +1098,22 @@ function mountDirectory(shell) {
   const list = document.createElement("ul");
   list.className = "map-list";
   const clearFav = button(copy.clearFav, "map-btn map-clear");
+  const favConfirm = document.createElement("div");
+  favConfirm.className = "map-fav-confirm";
+  favConfirm.hidden = true;
+  const favConfirmText = document.createElement("p");
+  favConfirmText.textContent = copy.clearFavAsk;
+  const favYes = button(copy.confirm, "map-btn");
+  const favNo = button(copy.cancel, "map-btn");
+  favConfirm.append(favConfirmText, favYes, favNo);
+  shell.favConfirm = favConfirm;
+  shell.favConfirmText = favConfirmText;
+  shell.favYes = favYes;
+  shell.favNo = favNo;
   const storage = document.createElement("p");
   storage.className = "map-storage";
   storage.textContent = copy.storage;
-  shell.directory.replaceChildren(banner, search, privacy, filters, list, clearFav, storage);
+  shell.directory.replaceChildren(banner, search, privacy, filters, list, clearFav, favConfirm, storage);
   shell.intlBanner = banner;
   shell.search = search;
   shell.privacy = privacy;
@@ -631,12 +1136,21 @@ function mountDirectory(shell) {
     }
     renderDirectory();
   });
-  clearFav.addEventListener("click", () => {
-    if (!session) return;
+  favNo.addEventListener("click", () => {
+    favConfirm.hidden = true;
+  });
+  favYes.addEventListener("click", () => {
+    if (!session || favConfirm.hidden) return;
+    favConfirm.hidden = true;
     session.favorites = new Set();
     clearFavStorage();
     renderDirectory();
     refreshDetail();
+  });
+  clearFav.addEventListener("click", () => {
+    if (!session) return;
+    const confirm = session.directory.querySelector(".map-fav-confirm");
+    if (confirm) confirm.hidden = false;
   });
 }
 
@@ -811,6 +1325,7 @@ function syncWalkChrome(shell) {
   const off = vv && Number.isFinite(vv.offsetTop) ? Math.round(vv.offsetTop) : 0;
   shell.root.style.setProperty("--map-vvh", height + "px");
   shell.root.style.setProperty("--map-vv-off", off + "px");
+  syncJumpButton(shell);
   requestAnimationFrame(() => {
     if (session === shell) resize();
   });
@@ -1071,9 +1586,7 @@ function favButton(key) {
   paintFav(node, session.favorites.has(key));
   node.addEventListener("click", () => {
     if (!session) return;
-    if (session.favorites.has(key)) session.favorites.delete(key);
-    else session.favorites.add(key);
-    writeFavs(session.favorites);
+    toggleFavorite(session, browserStore, key);
     paintFav(node, session.favorites.has(key));
     renderDirectory();
   });
@@ -1258,7 +1771,34 @@ function makePad(kind, slots) {
 function paintWalkUi(shell) {
   if (!shell || !shell.walkUi) return;
   const copy = TEXT[shell.lang];
-  shell.walkUi.hidden = !(shell.walk && shell.walk.active);
+  const on = !!(shell.walk && shell.walk.active);
+  const narrow = shell.root.classList.contains("is-narrow");
+  const walk = shell.walk || {};
+  const third = walk.view === VIEW_THIRD;
+  shell.walkUi.hidden = true;
+  if (shell.stick) {
+    shell.stick.hidden = !on;
+    shell.stick.setAttribute("aria-label", copy.move);
+  }
+  if (shell.lookHint) {
+    shell.lookHint.hidden = !on;
+    shell.lookHint.textContent = copy.lookHint;
+  }
+  if (shell.touchHint) {
+    shell.touchHint.hidden = !on;
+    shell.touchHint.textContent = copy.touchHint;
+  }
+  if (shell.lockHint) {
+    const touch = narrow || isTouchControl(shell);
+    shell.lockHint.hidden = !on || touch || shell.locked;
+    shell.lockHint.textContent = shell.lockFailed ? copy.lockDrag : copy.lockHint;
+  }
+  if (shell.crosshair) shell.crosshair.hidden = !on;
+  if (shell.jumpBtn) {
+    syncJumpButton(shell);
+    shell.jumpBtn.setAttribute("aria-label", copy.jump);
+    shell.jumpBtn.title = copy.jump;
+  }
   const move = shell.walkUi.querySelector(".map-pad-move");
   const look = shell.walkUi.querySelector(".map-pad-look");
   if (move) move.setAttribute("aria-label", copy.move);
@@ -1280,10 +1820,15 @@ function paintWalkUi(shell) {
   }
   const walkBtn = shell.toolbar && shell.toolbar.querySelector("[data-map-action='walk']");
   if (walkBtn) {
-    const on = !!(shell.walk && shell.walk.active);
     walkBtn.setAttribute("aria-pressed", on ? "true" : "false");
     walkBtn.title = on ? copy.walkStop : copy.walkHint;
-    if (shell.root.classList.contains("is-narrow")) walkBtn.textContent = on ? copy.walkStop : copy.walk;
+    walkBtn.textContent = on ? copy.walkStop : copy.walk;
+  }
+  const viewBtn = shell.toolbar && shell.toolbar.querySelector("[data-map-action='view']");
+  if (viewBtn) {
+    viewBtn.textContent = on ? (third ? copy.viewFirst : copy.viewThird) : copy.view;
+    viewBtn.title = viewBtn.textContent;
+    viewBtn.setAttribute("aria-pressed", third ? "true" : "false");
   }
   syncWalkChrome(shell);
 }
@@ -1292,7 +1837,39 @@ function buildingRings(shell) {
   return shell.buildings.map((record) => record.building.footprintXZ);
 }
 
-function walkBlocked(shell, x, z) {
+const BODY_RADIUS_M = 0.42;
+let groundRay = null;
+
+function surfaceY(shell, x, z) {
+  const smooth = shell && typeof shell.sampleHeight === "function"
+    ? shell.sampleHeight(x, z)
+    : sampleTerrainY(shell.terrain, x, z);
+  if (!shell || !shell.terrainMesh) return smooth;
+  if (!groundRay) groundRay = new THREE.Raycaster();
+  groundRay.set(new THREE.Vector3(x, smooth + 80, z), new THREE.Vector3(0, -1, 0));
+  groundRay.near = 0;
+  groundRay.far = 200;
+  const hits = groundRay.intersectObject(shell.terrainMesh, false);
+  if (!hits.length) return smooth;
+  return Math.max(smooth, hits[0].point.y);
+}
+
+function roofY(record) {
+  const base = record && record.seat && Number.isFinite(record.seat.baseY) ? record.seat.baseY : 0;
+  return base + SCHEMATIC_HEIGHT_M;
+}
+
+function insideBuilding(shell, x, z, y) {
+  for (const record of shell.buildings) {
+    if (y > roofY(record) + 0.25) continue;
+    const ring = record.ring || (record.building && record.building.footprintXZ);
+    if (ring && pointInRing(x, z, ring)) return true;
+  }
+  return false;
+}
+
+/** Feet height is compared with the target ground so jumping can clear a step. */
+function walkBlocked(shell, x, z, fromX, fromZ, feetY) {
   const terrain = shell.terrain;
   if (!terrain) return true;
   const x0 = terrain.xM[0] + 2;
@@ -1300,21 +1877,74 @@ function walkBlocked(shell, x, z) {
   const z0 = terrain.zM[0] + 2;
   const z1 = terrain.zM[terrain.zM.length - 1] - 2;
   if (x < x0 || x > x1 || z < z0 || z > z1) return true;
-  return footprintBlocked(x, z, buildingRings(shell), 1.15);
+  if (footprintBlocked(x, z, buildingRings(shell), BODY_RADIUS_M)) return true;
+  const feet = feetY != null ? feetY : surfaceY(shell, fromX == null ? x : fromX, fromZ == null ? z : fromZ);
+  if (surfaceY(shell, x, z) - feet > STEP_UP_M) return true;
+  return false;
 }
 
 function renderedSurfaceY(shell, x, z) {
-  if (shell && typeof shell.sampleHeight === "function") return shell.sampleHeight(x, z);
-  return sampleTerrainY(shell.terrain, x, z);
+  return surfaceY(shell, x, z);
+}
+
+function thirdPersonCamera(shell) {
+  const walk = shell.walk;
+  const look = lookVector(walk.yaw, walk.pitch);
+  const reach = isTouchControl(shell) ? 5.2 : THIRD_DISTANCE_M;
+  const eyeY = walk.y + EYE_M + 0.55;
+  for (let d = reach; d >= 1.2; d -= 0.25) {
+    const x = walk.x - look.x * d;
+    const y = eyeY - look.y * d;
+    const z = walk.z - look.z * d;
+    if (y < surfaceY(shell, x, z) + 0.45) continue;
+    if (insideBuilding(shell, x, z, y)) continue;
+    return {
+      x,
+      y,
+      z,
+      tx: x + look.x * 30,
+      ty: y + look.y * 30,
+      tz: z + look.z * 30,
+    };
+  }
+  const x = walk.x - look.x * 1.2;
+  const y = eyeY;
+  const z = walk.z - look.z * 1.2;
+  return { x, y, z, tx: x + look.x * 30, ty: y + look.y * 30, tz: z + look.z * 30 };
+}
+
+function paintAvatar(shell) {
+  if (!shell || !shell.avatar || !shell.walk) return;
+  const walk = shell.walk;
+  poseAvatar(shell.avatar, {
+    visible: !!(walk.active && walk.view === VIEW_THIRD),
+    x: walk.x,
+    y: walk.y,
+    z: walk.z,
+    yaw: walk.yaw,
+    pitch: walk.pitch,
+    phase: walk.phase,
+    speed: walk.speed,
+    grounded: walk.grounded,
+  });
 }
 
 function syncWalkCamera(shell) {
-  const eyeY = renderedSurfaceY(shell, shell.walk.x, shell.walk.z) + EYE_M;
-  const pose = poseFrom(shell.walk, eyeY);
-  shell.walk.eyeY = eyeY;
-  shell.camera.position.set(pose.x, pose.y, pose.z);
-  shell.controls.target.set(pose.lookX, pose.lookY, pose.lookZ);
-  shell.camera.lookAt(pose.lookX, pose.lookY, pose.lookZ);
+  const walk = shell.walk;
+  walk.eyeY = walk.y + EYE_M;
+  if (walk.view === VIEW_THIRD) {
+    const rig = thirdPersonCamera(shell);
+    shell.camera.position.set(rig.x, rig.y, rig.z);
+    shell.controls.target.set(rig.tx, rig.ty, rig.tz);
+    shell.camera.lookAt(rig.tx, rig.ty, rig.tz);
+  } else {
+    const eye = eyePoint(walk);
+    const pose = poseFrom(walk, eye.y);
+    shell.camera.position.set(pose.x, pose.y, pose.z);
+    shell.controls.target.set(pose.lookX, pose.lookY, pose.lookZ);
+    shell.camera.lookAt(pose.lookX, pose.lookY, pose.lookZ);
+  }
+  paintAvatar(shell);
   poke();
 }
 
@@ -1325,19 +1955,36 @@ function startWalk(shell, x, z, yaw, pitch, focusId) {
     x = cleared.x;
     z = cleared.z;
   }
-  shell.walk.active = true;
-  shell.walk.focusId = focusId || null;
-  shell.walk.x = x;
-  shell.walk.z = z;
-  shell.walk.yaw = yaw;
-  shell.walk.pitch = Math.max(-1.05, Math.min(0.85, pitch));
-  shell.walk.held.clear();
-  shell.walk.drag = null;
+  const walk = shell.walk;
+  walk.active = true;
+  walk.focusId = focusId || null;
+  walk.x = x;
+  walk.z = z;
+  walk.y = surfaceY(shell, x, z);
+  walk.vy = 0;
+  walk.grounded = true;
+  walk.groundY = walk.y;
+  walk.yaw = yaw;
+  walk.pitch = Math.max(-1.05, Math.min(0.85, pitch));
+  walk.held.clear();
+  walk.drag = null;
+  walk.lookId = null;
+  walk.stick = null;
+  walk.phase = 0;
+  walk.speed = 0;
+  walk.sprint = false;
+  walk.jumpQueued = false;
+  walk.t = performance.now();
+  shell.lockFailed = false;
+  if (shell.knob) shell.knob.style.transform = "translate(0px, 0px)";
   shell.controls.enabled = false;
+  shell.camera.fov = walk.view === VIEW_THIRD ? 62 : 70;
+  shell.camera.updateProjectionMatrix();
   shell.tween = null;
   syncWalkCamera(shell);
   paintWalkUi(shell);
   layoutLabels();
+  poke();
 }
 
 function exitWalk(shell) {
@@ -1359,8 +2006,23 @@ function exitWalk(shell) {
   shell.walk.held.clear();
   shell.walk.focusId = null;
   shell.walk.drag = null;
+  shell.walk.lookId = null;
+  shell.walk.stick = null;
+  shell.walk.sprint = false;
+  shell.walk.jumpQueued = false;
+  shell.walk.speed = 0;
+  if (shell.knob) shell.knob.style.transform = "translate(0px, 0px)";
+  if (shell.camera) {
+    shell.camera.fov = 42;
+    shell.camera.updateProjectionMatrix();
+  }
+  if (document.pointerLockElement === shell.canvas) document.exitPointerLock?.();
+  shell.locked = false;
+  shell.root.classList.remove("is-locked");
+  paintAvatar(shell);
   paintWalkUi(shell);
   layoutLabels();
+  poke();
 }
 
 function toggleWalk() {
@@ -1412,47 +2074,141 @@ function walkToBuilding(record) {
 function holdWalk(action, down) {
   const shell = session;
   if (!shell || !shell.walk || !shell.walk.active) return;
-  if (down) {
-    if (!shell.walk.held.has(action)) {
-      if (!shell.walk.held.size) shell.walk.heldAt = performance.now();
-      shell.walk.held.add(action);
-      const move = action === "forward" || action === "back" || action === "left" || action === "right";
-      applyWalkAction(shell.walk, action, move ? WALK_TAP_M : LOOK_TAP, (x, z) => walkBlocked(shell, x, z));
-      syncWalkCamera(shell);
-    }
-  } else {
-    shell.walk.held.delete(action);
+  if (down) shell.walk.held.add(action);
+  else shell.walk.held.delete(action);
+  poke();
+}
+
+function toggleView() {
+  const shell = session;
+  if (!shell || !shell.walk) return;
+  shell.walk.view = nextView(shell.walk.view);
+  if (shell.walk.active && shell.camera) {
+    shell.camera.fov = shell.walk.view === VIEW_THIRD ? 62 : 70;
+    shell.camera.updateProjectionMatrix();
+    syncWalkCamera(shell);
   }
+  paintWalkUi(shell);
   poke();
 }
 
 function stepWalk(shell) {
-  if (!shell.walk || !shell.walk.active || !shell.walk.held.size) return false;
+  const walk = shell.walk;
+  if (!walk || !walk.active) return false;
   const now = performance.now();
-  const prev = shell.walk.t || now;
-  shell.walk.t = now;
-  if (now - shell.walk.heldAt < 180) return true;
-  const dt = Math.min(0.05, (now - prev) / 1000);
-  const blocked = (x, z) => walkBlocked(shell, x, z);
-  let moved = false;
-  for (const action of shell.walk.held) {
-    const move = action === "forward" || action === "back" || action === "left" || action === "right";
-    const amount = move ? WALK_HOLD_MPS * dt : LOOK_HOLD_RPS * dt;
-    if (applyWalkAction(shell.walk, action, amount, blocked)) moved = true;
-  }
-  if (moved) syncWalkCamera(shell);
-  return true;
+  const prev = walk.t || now;
+  walk.t = now;
+  const dt = Math.min(0.25, Math.max(0, (now - prev) / 1000));
+  const stick = walk.stick;
+  const stickAxis = stick ? stickAxes(stick.nx, stick.ny) : null;
+  const axes = stickAxis && stickAxis.power > 0 ? stickAxis : keyboardAxes(walk.held);
+  const beforeX = walk.x;
+  const beforeZ = walk.z;
+  stepPlayer(walk, dt, {
+    axes,
+    sprint: walk.sprint,
+    jump: walk.jumpQueued,
+  }, {
+    ground: (x, z) => surfaceY(shell, x, z),
+    blocked: (x, z, px, pz) => walkBlocked(shell, x, z, px, pz, walk.y),
+  });
+  walk.jumpQueued = false;
+  const keyLook = LOOK_KEY_RPS * dt;
+  if (walk.held.has("look-left")) walk.yaw = wrapYaw(walk.yaw - keyLook);
+  if (walk.held.has("look-right")) walk.yaw = wrapYaw(walk.yaw + keyLook);
+  if (walk.held.has("look-up")) walk.pitch = Math.min(1.05, walk.pitch + keyLook);
+  if (walk.held.has("look-down")) walk.pitch = Math.max(-1.05, walk.pitch - keyLook);
+  const travelled = Math.hypot(walk.x - beforeX, walk.z - beforeZ);
+  walk.speed = dt > 0 ? travelled / dt : 0;
+  if (travelled > 0) walk.phase = (walk.phase + travelled * 2.4) % (Math.PI * 2);
+  syncWalkCamera(shell);
+  return travelled > 0 || walk.held.size > 0 || !!(stickAxis && stickAxis.power > 0) || !walk.grounded;
+}
+
+function queueJump(walk) {
+  if (!walk || !walk.active) return;
+  walk.jumpQueued = true;
+  walk.t = performance.now();
+  poke();
+}
+
+function uiOwnsKey(event) {
+  const el = event.target;
+  if (!el || !el.tagName) return false;
+  const tag = el.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") return true;
+  return !!el.isContentEditable;
 }
 
 function onWalkKey(event, down) {
-  if (!session || !session.walk || !session.walk.active) return;
-  const tag = event.target && event.target.tagName;
-  if (tag === "INPUT" || tag === "TEXTAREA" || (event.target && event.target.isContentEditable)) return;
+  if (!session || !session.walk) return;
+  if (uiOwnsKey(event)) return;
+  const walk = session.walk;
+  if (event.code === "Space") {
+    if (!walk.active) return;
+    event.preventDefault();
+    if (down && !event.repeat) queueJump(walk);
+    return;
+  }
+  if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
+    if (!walk.active) return;
+    walk.sprint = down;
+    return;
+  }
+  if (event.code === "KeyV" || event.code === "F5") {
+    if (!walk.active) return;
+    event.preventDefault();
+    if (down && !event.repeat) toggleView();
+    return;
+  }
+  if (!walk.active) return;
   const action = WALK_KEYS[event.code];
   if (!action) return;
   event.preventDefault();
   if (down && event.repeat) return;
   holdWalk(action, down);
+}
+
+function pointerIsCoarse() {
+  try {
+    return !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  } catch (e) {
+    return false;
+  }
+}
+
+function isTouchControl(shell) {
+  if (!shell) return false;
+  const coarse = pointerIsCoarse();
+  shell.touch = coarse;
+  const narrow = !!(shell.root && shell.root.classList.contains("is-narrow"));
+  return coarse || narrow;
+}
+
+function denyPointerLock(shell) {
+  if (!shell || shell.locked) return;
+  shell.lockFailed = true;
+  paintWalkUi(shell);
+}
+
+function requestMouseLook(shell) {
+  if (!shell || !shell.canvas || typeof shell.canvas.requestPointerLock !== "function") {
+    denyPointerLock(shell);
+    return;
+  }
+  shell.lockAt = performance.now();
+  try {
+    const result = shell.canvas.requestPointerLock();
+    if (result && typeof result.catch === "function") result.catch(() => denyPointerLock(shell));
+  } catch (e) {
+    denyPointerLock(shell);
+  }
+}
+
+function pickCenter(shell) {
+  if (!shell || !shell.canvas) return;
+  const rect = shell.canvas.getBoundingClientRect();
+  pickAt({ clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 });
 }
 
 function frameCampus() {
@@ -1495,7 +2251,10 @@ function zoomBy(scale) {
   const shell = session;
   if (!shell || !shell.controls) return;
   if (shell.walk && shell.walk.active) {
-    applyWalkAction(shell.walk, scale < 1 ? "forward" : "back", WALK_TAP_M, (x, z) => walkBlocked(shell, x, z));
+    applyWalkAction(shell.walk, scale < 1 ? "forward" : "back", WALK_TAP_M, (x, z) => walkBlocked(shell, x, z, null, null, shell.walk.y));
+    shell.walk.y = surfaceY(shell, shell.walk.x, shell.walk.z);
+    shell.walk.grounded = true;
+    shell.walk.vy = 0;
     syncWalkCamera(shell);
     return;
   }
@@ -1645,7 +2404,16 @@ function resize() {
   shell.camera.updateProjectionMatrix();
   const modalWidth = shell.root.clientWidth;
   if (modalWidth > 0) shell.root.classList.toggle("is-narrow", modalWidth < 800);
+  syncJumpButton(shell);
+  syncAccountPlace(shell);
   poke();
+}
+
+function syncJumpButton(shell) {
+  if (!shell || !shell.jumpBtn) return;
+  const on = !!(shell.walk && shell.walk.active);
+  const narrow = !!(shell.root && shell.root.classList.contains("is-narrow"));
+  shell.jumpBtn.hidden = !on || !narrow;
 }
 
 function pickAt(event) {
@@ -1663,36 +2431,118 @@ function pickAt(event) {
   selectBuilding(hits[0].object.userData.osmId, "");
 }
 
+function releaseWalkPointers() {
+  if (!session || !session.walk) return;
+  session.walk.stick = null;
+  session.walk.lookId = null;
+  session.walk.drag = null;
+  session.walk.held.clear();
+  session.walk.sprint = false;
+  session.walk.jumpQueued = false;
+  if (session.knob) session.knob.style.transform = "translate(0px, 0px)";
+}
+
+function bindStick(shell) {
+  const node = shell.stick;
+  const knob = shell.knob;
+  if (!node || !knob) return;
+  const end = (event) => {
+    const stick = session && session.walk && session.walk.stick;
+    if (!stick || (event && stick.id !== event.pointerId)) return;
+    session.walk.stick = null;
+    knob.style.transform = "translate(0px, 0px)";
+  };
+  node.addEventListener("pointerdown", (event) => {
+    if (!session || !session.walk || !session.walk.active || session.walk.stick) return;
+    if (event.cancelable) event.preventDefault();
+    event.stopPropagation();
+    try { node.setPointerCapture(event.pointerId); } catch (e) { /* already gone */ }
+    const rect = node.getBoundingClientRect();
+    session.walk.stick = {
+      id: event.pointerId,
+      cx: rect.left + rect.width / 2,
+      cy: rect.top + rect.height / 2,
+      nx: 0,
+      ny: 0,
+    };
+    poke();
+  });
+  node.addEventListener("pointermove", (event) => {
+    const stick = session && session.walk && session.walk.stick;
+    if (!stick || stick.id !== event.pointerId) return;
+    if (event.cancelable) event.preventDefault();
+    const dx = (event.clientX - stick.cx) / 46;
+    const dy = (stick.cy - event.clientY) / 46;
+    const mag = Math.hypot(dx, dy) || 1;
+    const lim = mag > 1 ? 1 / mag : 1;
+    stick.nx = dx * lim;
+    stick.ny = dy * lim;
+    knob.style.transform = `translate(${stick.nx * 30}px, ${-stick.ny * 30}px)`;
+    poke();
+  });
+  node.addEventListener("pointerup", end);
+  node.addEventListener("pointercancel", end);
+}
+
 function bindPointer(shell) {
-  let down = null;
+  bindStick(shell);
+  if (shell.jumpBtn) {
+    bind(shell, shell.jumpBtn, "pointerdown", (event) => {
+      if (!session || !session.walk || !session.walk.active) return;
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+      queueJump(session.walk);
+    });
+  }
   bind(shell, shell.canvas, "pointerdown", (event) => {
-    down = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    if (session && session.walk && session.walk.active) session.walk.drag = { x: event.clientX, y: event.clientY };
+    if (!session || !session.walk || !session.walk.active) return;
+    if (event.target !== shell.canvas) return;
+    const active = document.activeElement;
+    if (active && active !== shell.canvas && typeof active.blur === "function") active.blur();
+    if (session.walk.stick && session.walk.stick.id === event.pointerId) return;
+    if (event.pointerType === "mouse" && !isTouchControl(shell)) {
+      if (session.locked) {
+        event.preventDefault();
+        return;
+      }
+      if (!session.lockFailed) {
+        event.preventDefault();
+        requestMouseLook(session);
+        return;
+      }
+    }
+    if (session.walk.lookId != null) return;
+    if (event.cancelable) event.preventDefault();
+    session.walk.lookId = event.pointerId;
+    session.walk.drag = { x: event.clientX, y: event.clientY, moved: 0 };
   });
   bind(shell, shell.canvas, "pointerup", (event) => {
-    if (!down || down.id !== event.pointerId) return;
-    const moved = Math.hypot(event.clientX - down.x, event.clientY - down.y);
-    down = null;
-    if (session && session.walk) session.walk.drag = null;
+    if (!session || !session.walk || session.walk.lookId !== event.pointerId) return;
+    const moved = session.walk.drag ? session.walk.drag.moved : 0;
+    session.walk.lookId = null;
+    session.walk.drag = null;
     if (moved < 6) pickAt(event);
   });
-  bind(shell, shell.canvas, "pointercancel", () => {
-    down = null;
-    if (session && session.walk) session.walk.drag = null;
+  bind(shell, shell.canvas, "pointercancel", (event) => {
+    if (!session || !session.walk || session.walk.lookId !== event.pointerId) return;
+    session.walk.lookId = null;
+    session.walk.drag = null;
   });
   bind(shell, shell.canvas, "pointermove", (event) => {
-    if (session && session.walk && session.walk.active && session.walk.drag && down && down.id === event.pointerId) {
+    if (session && session.walk && session.walk.active && session.walk.lookId === event.pointerId && session.walk.drag) {
       const dx = event.clientX - session.walk.drag.x;
       const dy = event.clientY - session.walk.drag.y;
       session.walk.drag.x = event.clientX;
       session.walk.drag.y = event.clientY;
+      session.walk.drag.moved += Math.hypot(dx, dy);
+      if (event.cancelable) event.preventDefault();
       if (dx || dy) {
-        applyWalkAction(session.walk, "look-right", dx * 0.005, () => false);
-        applyWalkAction(session.walk, "look-up", -dy * 0.004, () => false);
+        turnPlayer(session.walk, dx * MOUSE_SENSITIVITY, -dy * MOUSE_SENSITIVITY);
         syncWalkCamera(session);
       }
     }
-    if (!session || !session.camera || (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) >= 6)) return;
+    const dragging = session && session.walk && session.walk.drag && session.walk.drag.moved >= 6;
+    if (!session || !session.camera || dragging) return;
     const rect = session.canvas.getBoundingClientRect();
     const ndc = new THREE.Vector2(
       ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -1708,6 +2558,29 @@ function bindPointer(shell) {
       layoutLabels();
       poke();
     }
+  });
+  bind(shell, shell.canvas, "click", () => {
+    if (!session || !session.locked || !session.walk || !session.walk.active) return;
+    if (performance.now() - (session.lockAt || 0) < 450) return;
+    pickCenter(session);
+  });
+  bind(shell, document, "pointerlockchange", () => {
+    if (session !== shell) return;
+    const now = document.pointerLockElement === shell.canvas;
+    shell.locked = now;
+    shell.root.classList.toggle("is-locked", shell.locked);
+    if (!now) releaseWalkPointers();
+    paintWalkUi(shell);
+    poke();
+  });
+  bind(shell, document, "pointerlockerror", () => {
+    if (session !== shell) return;
+    denyPointerLock(shell);
+  });
+  bind(shell, document, "mousemove", (event) => {
+    if (session !== shell || !shell.locked || !shell.walk || !shell.walk.active) return;
+    turnPlayer(shell.walk, (event.movementX || 0) * MOUSE_SENSITIVITY, -(event.movementY || 0) * MOUSE_SENSITIVITY);
+    syncWalkCamera(shell);
   });
 }
 
@@ -1731,15 +2604,31 @@ function applyThemeMaterials() {
   poke();
 }
 
-function buildScene(shell) {
-  const renderer = new THREE.WebGLRenderer({
+function makeRenderer(shell) {
+  const narrow = (shell.stage.clientWidth || window.innerWidth || 1280) < 420;
+  const options = {
     canvas: shell.canvas,
-    antialias: true,
+    antialias: !narrow,
     alpha: false,
-    powerPreference: "high-performance",
+    powerPreference: narrow ? "default" : "high-performance",
     preserveDrawingBuffer: true,
     logarithmicDepthBuffer: true,
-  });
+  };
+  try {
+    return new THREE.WebGLRenderer(options);
+  } catch (err) {
+    return new THREE.WebGLRenderer({
+      canvas: shell.canvas,
+      antialias: false,
+      alpha: false,
+      preserveDrawingBuffer: true,
+      logarithmicDepthBuffer: false,
+    });
+  }
+}
+
+function buildScene(shell) {
+  const renderer = makeRenderer(shell);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -1787,6 +2676,9 @@ function buildScene(shell) {
   buildTerrain(shell);
   buildCampusLayers(shell);
   buildBuildings(shell);
+  shell.avatar = buildAvatar();
+  applyAvatarLook(shell.avatar, avatarKind(browserStore));
+  scene.add(shell.avatar.group);
   applyThemeMaterials();
   bind(shell, controls, "start", () => { if (session) session.interacting = true; poke(); });
   bind(shell, controls, "end", () => { if (session) session.interacting = false; poke(); });
@@ -1814,6 +2706,22 @@ function lockPage(on) {
 
 export function isOpen() {
   return !!session;
+}
+
+/** Homepage clears storage without rebuilding the map. Drop the loaded profile set first. */
+export function syncLocalProfile() {
+  if (!session) return;
+  bindFavs(session);
+  const storedTint = readTint();
+  if (session.tint !== storedTint) {
+    session.tint = storedTint;
+    if (session.tintInput) session.tintInput.value = String(storedTint);
+    applyCast(session);
+  }
+  if (session.list) renderDirectory();
+  refreshDetail();
+  refreshAvatar(session);
+  paintAccount(session);
 }
 
 export function setLang(lang) {
@@ -1844,6 +2752,31 @@ export function projectBuilding(osmId) {
     x: rect.left + (v.x * 0.5 + 0.5) * rect.width,
     y: rect.top + (-v.y * 0.5 + 0.5) * rect.height,
     behind: v.z > 1,
+  };
+}
+
+export function debugCast() {
+  if (!session) return null;
+  const cast = materialSet(session.tint || 0, session.theme);
+  const hex = (n) => n.toString(16).padStart(6, "0");
+  const live = (mesh) => (mesh && mesh.material && mesh.material.color ? mesh.material.color.getHexString() : "");
+  const plain = session.buildings.find((record) => record.archetype !== "crimson" && record.osmId !== 1062064821);
+  const red = session.buildings.find((record) => record.archetype === "crimson");
+  return {
+    tint: session.tint || 0,
+    theme: session.theme,
+    terrain: hex(cast.terrain),
+    building: hex(cast.building),
+    foundation: hex(cast.foundation),
+    road: hex(cast.road),
+    shoulder: hex(cast.shoulder),
+    roadLive: live(session.layerMeshes && session.layerMeshes.road),
+    shoulderLive: live(session.layerMeshes && session.layerMeshes.curb),
+    terrainLive: live(session.terrainMesh),
+    buildingLive: plain ? live(plain.mass) : "",
+    foundationLive: plain ? live(plain.skirt) : "",
+    redMass: red ? live(red.mass) : "",
+    redRoof: red ? live(red.roof) : "",
   };
 }
 
@@ -1888,6 +2821,10 @@ export function debugSnapshot() {
     })),
     labelTexts: [...session.labelLayer.querySelectorAll(".map-pill")].map((node) => node.textContent),
     viewMode: session.walk && session.walk.active ? "walk" : "orbit",
+    view: session.walk ? session.walk.view : VIEW_FIRST,
+    avatarVisible: !!(session.avatar && session.avatar.group.visible),
+    grounded: session.walk ? !!session.walk.grounded : null,
+    playerY: session.walk ? +session.walk.y.toFixed(2) : null,
     yaw: session.walk ? session.walk.yaw : 0,
     focusId: session.walk ? session.walk.focusId : null,
     camera: session.camera ? {
@@ -2300,6 +3237,7 @@ function describeHit(shell, hit) {
 function firstSolidHit(shell, hits) {
   for (const hit of hits) {
     if (hit.object === shell.sky) continue;
+    if (hit.object.userData && hit.object.userData.avatar) continue;
     return hit;
   }
   return null;
@@ -2392,16 +3330,63 @@ export function debugWalkProbe() {
   };
 }
 
+export function debugWalkState() {
+  const shell = session;
+  if (!shell || !shell.walk) return null;
+  return {
+    active: !!shell.walk.active,
+    view: shell.walk.view,
+    avatar: typeof shell.avatar,
+    sceneKids: shell.scene ? shell.scene.children.length : -1,
+    third: shell.walk.view === VIEW_THIRD,
+    avatarParent: shell.avatar && shell.avatar.group.parent ? shell.avatar.group.parent.type : null,
+    avatarY: shell.avatar ? +shell.avatar.group.position.y.toFixed(2) : null,
+    avatarVisible: !!(shell.avatar && shell.avatar.group && shell.avatar.group.visible),
+    raf: !!shell.raf,
+    grounded: !!shell.walk.grounded,
+    y: +shell.walk.y.toFixed(3),
+    vy: +shell.walk.vy.toFixed(3),
+    jumpQueued: !!shell.walk.jumpQueued,
+    sprint: !!shell.walk.sprint,
+    held: [...shell.walk.held],
+    stickId: shell.walk.stick ? shell.walk.stick.id : null,
+    lookId: shell.walk.lookId,
+    locked: !!shell.locked,
+    touch: !!shell.touch,
+  };
+}
+
+export function debugAvatarProbe() {
+  const shell = session;
+  if (!shell || !shell.avatar) return null;
+  const inScene = shell.scene ? shell.scene.getObjectByName("campus-avatar") : null;
+  return {
+    same: inScene === shell.avatar.group,
+    parent: shell.avatar.group.parent ? shell.avatar.group.parent.type : null,
+    found: !!inScene,
+    pos: [shell.avatar.group.position.x, shell.avatar.group.position.y, shell.avatar.group.position.z],
+    visible: shell.avatar.group.visible,
+  };
+}
+
 export function debugPlaceWalk(x, z) {
   const shell = session;
   if (!shell || !shell.sampleHeight) return null;
   shell.walk.active = true;
+  shell.walk.view = VIEW_FIRST;
   shell.walk.x = x;
   shell.walk.z = z;
+  shell.walk.y = surfaceY(shell, x, z);
+  shell.walk.vy = 0;
+  shell.walk.grounded = true;
   shell.walk.yaw = 0;
   shell.walk.pitch = -0.15;
   shell.walk.focusId = null;
   if (shell.controls) shell.controls.enabled = false;
+  if (shell.camera) {
+    shell.camera.fov = 70;
+    shell.camera.updateProjectionMatrix();
+  }
   syncWalkCamera(shell);
   const rendered = shell.sampleHeight(x, z);
   const linear = sampleTerrainY(shell.terrain, x, z);
@@ -2447,6 +3432,7 @@ export function close() {
   const shell = session;
   if (!shell) return;
   session = null;
+  if (document.pointerLockElement === shell.canvas) document.exitPointerLock?.();
   if (document.fullscreenElement === shell.root) {
     document.exitFullscreen?.().catch(() => {});
   }
@@ -2475,6 +3461,14 @@ export async function open(opts) {
     if (event.key !== "Escape" || !session || session.root !== shell.root) return;
     event.preventDefault();
     event.stopPropagation();
+    if (document.pointerLockElement === session.canvas) {
+      document.exitPointerLock?.();
+      return;
+    }
+    if (session.walk && session.walk.active) {
+      exitWalk(session);
+      return;
+    }
     if (session.morePanel && session.morePanel.classList.contains("is-open")) {
       session.morePanel.classList.remove("is-open");
       if (session.moreBtn) session.moreBtn.setAttribute("aria-expanded", "false");
@@ -2502,6 +3496,10 @@ export async function open(opts) {
     if (session && session.root === shell.root) onWalkKey(event, false);
   }, true);
   bind(shell, window, "resize", resize);
+  bind(shell, window, "blur", releaseWalkPointers);
+  bind(shell, document, "visibilitychange", () => {
+    if (document.visibilityState !== "visible") releaseWalkPointers();
+  });
   if (window.visualViewport) {
     const onVv = () => { if (session === shell) syncWalkChrome(shell); };
     bind(shell, window.visualViewport, "resize", onVv);

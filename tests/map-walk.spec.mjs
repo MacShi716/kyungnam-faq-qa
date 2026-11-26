@@ -70,23 +70,25 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   await openMap(page);
   const before = await page.evaluate(() => window.CampusMap.debugSnapshot());
   await page.locator(".map-toolbar [data-map-action='walk']").click();
-  await expect(page.locator(".map-walk")).toBeVisible();
-  await expect(page.locator(".map-pad-move")).toBeVisible();
-  await expect(page.locator(".map-pad-look")).toBeVisible();
+  await expect(page.locator(".map-stick")).toBeVisible();
+  await expect(page.locator(".map-look-hint")).toBeVisible();
   await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  await expect(page.locator(".map-account-btn")).toHaveText("本机资料");
   const entered = await page.evaluate(() => window.CampusMap.debugSnapshot());
-  const forward = page.locator(".map-pad-move [data-walk='forward']");
-  await expect(forward).toHaveAttribute("aria-label", "前进");
-  await forward.click();
-  await forward.click();
+  await page.keyboard.down("KeyW");
+  await page.waitForTimeout(1100);
+  await page.keyboard.up("KeyW");
   const walked = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(walked.viewMode).toBe("walk");
   const moved = Math.hypot(walked.camera.x - entered.camera.x, walked.camera.z - entered.camera.z);
-  expect(moved).toBeGreaterThan(8);
+  expect(moved).toBeGreaterThan(2);
   const targetMoved = Math.hypot(walked.target.x - entered.target.x, walked.target.z - entered.target.z);
-  expect(targetMoved).toBeGreaterThan(8);
-  expect(Math.hypot(walked.camera.x - before.camera.x, walked.camera.z - before.camera.z)).toBeGreaterThan(8);
-  await page.keyboard.press("KeyE");
+  expect(targetMoved).toBeGreaterThan(2);
+  expect(Math.hypot(walked.camera.x - before.camera.x, walked.camera.z - before.camera.z)).toBeGreaterThan(2);
+  await page.keyboard.down("KeyE");
+  await page.waitForTimeout(260);
+  await page.keyboard.up("KeyE");
   const turned = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(Math.abs(turned.yaw - walked.yaw)).toBeGreaterThan(0.2);
   await page.locator(".map-toolbar [data-map-action='north']").click();
@@ -95,19 +97,21 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   expect(Math.abs(north.yaw)).toBeLessThan(0.05);
 
   await page.locator("#btn-ko").evaluate((el) => el.click());
-  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("걷기");
-  await expect(page.locator(".map-pad-move [data-walk='forward']")).toHaveAttribute("aria-label", "앞으로");
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("걷기 종료");
+  await expect(page.locator(".map-stick")).toHaveAttribute("aria-label", "이동");
   await page.locator("#theme-switch").evaluate((el) => el.click());
   await expect(page.locator(".map-modal")).toHaveAttribute("data-theme", "dark");
-  await expect(page.locator(".map-pad-look [data-walk='look-left']")).toBeVisible();
-  const darkInk = await page.locator(".map-pad-btn").first().evaluate((el) => {
+  await expect(page.locator(".map-stick")).toBeVisible();
+  const darkInk = await page.locator(".map-toolbar [data-map-action='walk']").evaluate((el) => {
     const style = getComputedStyle(el);
     return { color: style.color, background: style.backgroundColor };
   });
   expect(darkInk.color).not.toBe(darkInk.background);
 
   await page.locator("#btn-zh").evaluate((el) => el.click());
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   await page.locator(".map-list button[data-faq-id='F49']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   await expect(page.locator(".map-info")).toContainText("本馆");
   const atHall = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(atHall.viewMode).toBe("walk");
@@ -116,6 +120,8 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   expect(atHall.focusDistance).toBeLessThan(80);
   expect(Math.abs(atHall.eyeGap - 1.7)).toBeLessThan(1.2);
   await page.locator(".map-toolbar [data-map-action='reset']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveAttribute("aria-pressed", "false");
   const reset = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(reset.viewMode).toBe("orbit");
   expect(reset.focusId).toBe(null);
@@ -128,6 +134,44 @@ test("walk controls move the camera and a building becomes the start", async ({ 
   const intl = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(intl.viewMode).toBe("orbit");
   expect(intl.focusId).toBe(null);
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  expect(errors).toEqual([]);
+});
+
+test("first and third person share one walker and space jumps", async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = track(page);
+  await silenceAi(page);
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  await expect(page.locator(".map-crosshair")).toBeVisible();
+  const third = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(third.view).toBe("third");
+  expect(third.avatarVisible).toBe(true);
+  await expect(page.locator(".map-toolbar [data-map-action='view']")).toHaveText("第一人称");
+  await page.keyboard.press("KeyV");
+  const first = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(first.view).toBe("first");
+  expect(first.avatarVisible).toBe(false);
+  await expect(page.locator(".map-toolbar [data-map-action='view']")).toHaveText("第三人称");
+  await page.keyboard.press("KeyV");
+  expect((await page.evaluate(() => window.CampusMap.debugSnapshot())).avatarVisible).toBe(true);
+  const groundY = (await page.evaluate(() => window.CampusMap.debugSnapshot())).playerY;
+  await page.keyboard.press("Space");
+  await page.waitForFunction((base) => window.CampusMap.debugSnapshot().playerY > base + 0.2, groundY, { timeout: 4000 });
+  await page.waitForFunction(() => window.CampusMap.debugSnapshot().grounded === true, null, { timeout: 6000 });
+  const landed = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(Math.abs(landed.playerY - groundY)).toBeLessThan(0.8);
   expect(errors).toEqual([]);
 });
 
@@ -139,8 +183,10 @@ test("walk pads stay clear of the attribution bar and the detail card", async ({
   await page.goto("/");
   await openMap(page);
   await page.locator(".map-toolbar [data-map-action='walk']").click();
-  await expect(page.locator(".map-walk")).toBeVisible();
-  const padGap = boxGap(await page.locator(".map-walk").boundingBox(), await page.locator(".map-attrib").boundingBox());
+  await expect(page.locator(".map-stick")).toBeVisible();
+  await expect(page.locator(".map-jump")).toBeVisible();
+  await expect(page.locator(".map-crosshair")).toBeVisible();
+  const padGap = boxGap(await page.locator(".map-stick").boundingBox(), await page.locator(".map-attrib").boundingBox());
   expect(padGap).toBeGreaterThan(0);
   await page.locator(".map-toolbar [data-map-action='directory']").click();
   await expect(page.locator(".map-modal")).not.toHaveClass(/dir-collapsed/);
@@ -149,7 +195,7 @@ test("walk pads stay clear of the attribution bar and the detail card", async ({
   await expect(page.locator(".map-info")).toBeVisible();
   const openGap = boxGap(await page.locator(".map-attrib").boundingBox(), await page.locator(".map-info").boundingBox());
   expect(openGap).toBeGreaterThan(0);
-  const detailGap = boxGap(await page.locator(".map-walk").boundingBox(), await page.locator(".map-info").boundingBox());
+  const detailGap = boxGap(await page.locator(".map-stick").boundingBox(), await page.locator(".map-info").boundingBox());
   expect(detailGap).toBeGreaterThan(0);
   await page.locator(".map-detail-summary").click();
   await page.locator(".map-detail-close").click();
@@ -184,8 +230,8 @@ test("walk entry keeps the eye above the mesh and the frame off a single ground 
   expect(entered.pitch).toBeGreaterThan(-0.05);
   expect(entered.clearanceMesh).toBeGreaterThan(1.2);
   expect(groundWall(entered)).toBe(false);
-  await page.locator(".map-pad-move [data-walk='forward']").click();
-  await page.locator(".map-pad-move [data-walk='right']").click();
+  await page.keyboard.press("KeyW");
+  await page.keyboard.press("KeyD");
   const moved = await page.evaluate(() => window.CampusMap.debugWalkProbe());
   expect(moved.clearanceMesh).toBeGreaterThan(1.2);
   expect(groundWall(moved)).toBe(false);
@@ -204,13 +250,13 @@ test("walk entry keeps the eye above the mesh and the frame off a single ground 
   expect(kinds.has("building")).toBe(true);
   expect(kinds.has("terrain") || kinds.has("road") || kinds.has("path")).toBe(true);
   expect(groundWall(atHall)).toBe(false);
-  await page.locator(".map-pad-move [data-walk='forward']").click();
+  await page.keyboard.press("KeyW");
   const stepped = await page.evaluate(() => window.CampusMap.debugWalkProbe());
   expect(stepped.clearanceMesh).toBeGreaterThan(1.2);
   expect(groundWall(stepped)).toBe(false);
-  await page.locator(".map-pad-move [data-walk='back']").click();
-  await page.locator(".map-pad-look [data-walk='look-left']").click();
-  await page.locator(".map-pad-look [data-walk='look-right']").click();
+  await page.keyboard.press("KeyS");
+  await page.keyboard.press("KeyQ");
+  await page.keyboard.press("KeyE");
   const after = await page.evaluate(() => window.CampusMap.debugWalkProbe());
   const afterKinds = new Set((after.view || []).filter(Boolean).map((hit) => hit.kind));
   expect(after.clearanceMesh).toBeGreaterThan(1.2);
@@ -243,23 +289,32 @@ test("phone walk separates the map from the controls", async ({ page }) => {
       return x * y;
     };
     const canvas = box(".map-canvas");
-    const pad = box(".map-pad-btn");
+    const stick = box(".map-stick");
+    const knob = box(".map-stick-knob");
     const usable = window.visualViewport.height;
+    const cx = canvas.x + canvas.w / 2;
+    const cy = canvas.y + canvas.h / 2;
+    const clear = { x: cx - 110, y: cy - 125, w: 220, h: 250 };
+    const hit = document.elementFromPoint(cx, cy);
     return {
       canvasH: canvas.h,
       share: canvas.h / usable,
-      pad: [pad.w, pad.h],
-      overlaps: overlap(canvas, box(".map-walk")) + overlap(canvas, box(".map-toolbar")) + overlap(canvas, box(".map-attrib")) + overlap(canvas, box(".map-info")),
+      stick: [stick.w, stick.h],
+      knob: [knob.w, knob.h],
+      centerIsMap: hit === document.querySelector(".map-canvas"),
+      clearStick: overlap(clear, stick),
+      infoOverlap: overlap(canvas, box(".map-info")),
     };
   });
-  expect(layout.canvasH).toBeGreaterThanOrEqual(350);
-  expect(layout.share).toBeGreaterThanOrEqual(0.5);
-  expect(layout.pad[0]).toBeGreaterThanOrEqual(44);
-  expect(layout.pad[1]).toBeGreaterThanOrEqual(44);
-  expect(layout.overlaps).toBe(0);
-  await page.locator(".map-pad-move [data-walk='forward']").click();
-  await page.locator(".map-pad-look [data-walk='look-left']").click();
-  await page.locator(".map-pad-move [data-walk='forward']").click();
+  expect(layout.share).toBeGreaterThanOrEqual(0.6);
+  expect(layout.stick).toEqual([104, 104]);
+  expect(layout.knob).toEqual([44, 44]);
+  expect(layout.centerIsMap).toBe(true);
+  expect(layout.clearStick).toBe(0);
+  expect(layout.infoOverlap).toBe(0);
+  await page.keyboard.press("KeyW");
+  await page.keyboard.press("KeyQ");
+  await page.keyboard.press("KeyW");
   const after = await page.evaluate(() => window.CampusMap.debugWalkProbe());
   const kinds = new Set((after.view || []).filter(Boolean).map((hit) => hit.kind));
   expect(kinds.has("building")).toBe(true);
@@ -271,7 +326,15 @@ test("phone walk separates the map from the controls", async ({ page }) => {
   await expect(page.locator(".map-modal")).toHaveClass(/walk-active/);
   await page.locator(".map-detail-summary").click();
   await expect(page.locator(".map-detail-summary")).toContainText("展开详情");
+  const barFit = await page.evaluate(() => {
+    const bar = document.querySelector(".map-toolbar");
+    return bar.scrollWidth <= bar.clientWidth + 2;
+  });
+  expect(barFit).toBe(true);
   await page.locator(".map-more-btn").click();
+  await expect(page.locator(".map-account-form")).toContainText("建立本机资料");
+  await expect(page.locator(".map-account-form")).toContainText("只存在这台浏览器");
+  await expect(page.locator(".map-account-btn")).toBeHidden();
   await expect(page.locator(".map-more [data-map-action='reset']")).toBeVisible();
   await page.locator(".map-more [data-map-action='reset']").click();
   const reset = await page.evaluate(() => window.CampusMap.debugSnapshot());
@@ -292,9 +355,16 @@ test("360 walk reset and reentry keep the label and a campus view", async ({ pag
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto("/");
   await openMap(page);
+  await expect(page.locator(".map-fallback")).toBeHidden();
+  await expect(page.locator(".map-canvas")).toBeVisible();
   await page.locator(".map-toolbar [data-map-action='directory']").click();
   await page.locator(".map-list button[data-faq-id='F49']").click();
   const walk = page.locator(".map-toolbar [data-map-action='walk']");
+  const narrowFit = await page.evaluate(() => {
+    const bar = document.querySelector(".map-toolbar");
+    return bar.scrollWidth <= bar.clientWidth + 2;
+  });
+  expect(narrowFit).toBe(true);
   await expect(walk).toHaveText("结束行走");
   await page.locator(".map-more-btn").click();
   await page.locator(".map-more [data-map-action='reset']").click();
@@ -315,4 +385,144 @@ test("360 walk reset and reentry keep the label and a campus view", async ({ pag
   const upper = (again.view || []).slice(0, 3);
   expect(upper.every((hit) => hit && hit.kind === "terrain")).toBe(false);
   expect(errors).toEqual([]);
+});
+
+test("a desktop canvas click locks the mouse and Esc releases it without leaving walk", async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = track(page);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  const lockTarget = () => page.evaluate(() => {
+    const el = document.pointerLockElement;
+    return el ? el.className : "";
+  });
+  await page.locator(".map-canvas").click({ position: { x: 480, y: 420 } });
+  expect(await lockTarget()).toBe("");
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  const beforeToolbar = await page.evaluate(() => window.CampusMap.debugSnapshot().camera);
+  await page.locator(".map-toolbar [data-map-action='labels']").click({ force: true });
+  await page.locator(".map-stick").click();
+  await page.locator(".map-account-btn").click();
+  await page.locator(".map-account-btn").click();
+  await page.locator(".map-notice-btn").click();
+  await page.locator(".map-notice-btn").click();
+  expect(await lockTarget()).toBe("");
+  const afterToolbar = await page.evaluate(() => window.CampusMap.debugSnapshot().camera);
+  expect(Math.hypot(afterToolbar.x - beforeToolbar.x, afterToolbar.z - beforeToolbar.z)).toBeLessThan(2);
+  const canvas = page.locator(".map-canvas");
+  const box = await canvas.boundingBox();
+  await page.mouse.click(box.x + box.width * 0.45, box.y + box.height * 0.55);
+  await expect.poll(lockTarget).toBe("map-canvas");
+  const yaw = await page.evaluate(() => window.CampusMap.debugSnapshot().yaw);
+  await page.mouse.move(box.x + box.width * 0.45 + 90, box.y + box.height * 0.55);
+  const turned = await page.evaluate(() => window.CampusMap.debugSnapshot().yaw);
+  expect(Math.abs(turned - yaw)).toBeGreaterThan(0.01);
+  await page.keyboard.press("Escape");
+  await expect.poll(lockTarget).toBe("");
+  const afterEsc = await page.evaluate(() => window.CampusMap.debugWalkState());
+  expect(afterEsc.active).toBe(true);
+  expect(afterEsc.locked).toBe(false);
+  expect(afterEsc.held).toEqual([]);
+  await page.mouse.click(box.x + box.width * 0.45, box.y + box.height * 0.55);
+  await expect.poll(lockTarget).toBe("map-canvas");
+  await page.keyboard.press("KeyV");
+  const first = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(first.view).toBe("first");
+  expect(await lockTarget()).toBe("map-canvas");
+  const yawFirst = first.yaw;
+  await page.mouse.move(box.x + box.width * 0.45 + 140, box.y + box.height * 0.55 + 20);
+  const turnedFirst = await page.evaluate(() => window.CampusMap.debugSnapshot().yaw);
+  expect(Math.abs(turnedFirst - yawFirst)).toBeGreaterThan(0.01);
+  await page.keyboard.down("KeyW");
+  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  expect((await page.evaluate(() => window.CampusMap.debugWalkState())).held).toEqual([]);
+  await page.keyboard.up("KeyW");
+  await page.keyboard.press("Escape");
+  await expect.poll(lockTarget).toBe("");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.mouse.click(180, 500);
+  expect(await lockTarget()).toBe("");
+  await expect(page.locator(".map-lock-hint")).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test("a coarse pointer that becomes fine locks on the next canvas click", async ({ page }) => {
+  test.setTimeout(120000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const box = await page.locator(".map-canvas").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  const coarse = await page.evaluate(() => ({
+    media: window.matchMedia("(pointer: coarse)").matches,
+    locked: document.pointerLockElement && document.pointerLockElement.className,
+  }));
+  expect(coarse.media).toBe(true);
+  expect(coarse.locked || "").toBe("");
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: false });
+  await cdp.send("Emulation.clearDeviceMetricsOverride").catch(() => {});
+  const desktop = await page.evaluate(() => window.matchMedia("(pointer: coarse)").matches);
+  expect(desktop).toBe(false);
+  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  await expect.poll(() => page.evaluate(() => document.pointerLockElement && document.pointerLockElement.className)).toBe("map-canvas");
+});
+
+test("narrowing an open walk shows the jump button", async ({ page }) => {
+  test.setTimeout(120000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const desktop = await page.locator(".map-jump").evaluate((el) => ({ hidden: el.hidden, h: el.getBoundingClientRect().height }));
+  expect(desktop.hidden).toBe(true);
+  expect(desktop.h).toBe(0);
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.waitForTimeout(400);
+  const phone = await page.locator(".map-jump").evaluate((el) => ({
+    hidden: el.hidden,
+    display: getComputedStyle(el).display,
+    h: el.getBoundingClientRect().height,
+  }));
+  expect(phone.hidden).toBe(false);
+  expect(phone.display).not.toBe("none");
+  expect(phone.h).toBeGreaterThan(40);
+});
+
+test("a scene click takes Space for jump and a focused button keeps Space", async ({ page }) => {
+  test.setTimeout(120000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
+  const view = page.locator(".map-toolbar [data-map-action='view']");
+  const before = await view.innerText();
+  await view.click();
+  const focused = await view.innerText();
+  expect(focused).not.toBe(before);
+  const yFocused = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(150);
+  const afterFocusedSpace = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  expect(await view.innerText()).toBe(before);
+  expect(Math.abs(afterFocusedSpace - yFocused)).toBeLessThan(0.2);
+  const box = await page.locator(".map-canvas").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  const active = await page.evaluate(() => document.activeElement && document.activeElement.dataset.mapAction);
+  expect(active).not.toBe("view");
+  const y0 = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  const label = await view.innerText();
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(180);
+  const y1 = await page.evaluate(() => window.CampusMap.debugSnapshot().playerY);
+  expect(y1).toBeGreaterThan(y0 + 0.2);
+  expect(await view.innerText()).toBe(label);
 });

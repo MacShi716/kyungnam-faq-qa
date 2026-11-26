@@ -205,6 +205,32 @@ h1.blur-title {
   margin: 0 0 18px;
   max-width: 40em;
 }
+.local-data {
+  max-width: 40em;
+  margin: -8px 0 18px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.local-data summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.local-data-body { display: flex; flex-direction: column; gap: 8px; }
+.local-data-body p { margin: 0; }
+.local-data-actions, .local-data-confirm { display: flex; flex-wrap: wrap; gap: 8px; }
+.local-data-confirm[hidden] { display: none !important; }
+.local-data-actions button, .local-data-confirm button {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+}
 .lang {
   --lang-pos: 1;
   position: relative;
@@ -1140,6 +1166,24 @@ html[data-theme="dark"] .map-faq-btn {
       </div>
     </header>
     <p class="hint" id="hint"></p>
+    <details class="local-data" id="local-data">
+      <summary id="local-data-summary"></summary>
+      <div class="local-data-body">
+        <p id="local-data-only"></p>
+        <p id="local-data-avatar"></p>
+        <p id="local-data-public"></p>
+        <p id="local-data-site-note"></p>
+        <div class="local-data-confirm" id="local-data-confirm" hidden>
+          <p id="local-data-confirm-text"></p>
+          <button type="button" id="local-data-yes"></button>
+          <button type="button" id="local-data-no"></button>
+        </div>
+        <div class="local-data-actions">
+          <button type="button" id="local-data-accounts"></button>
+          <button type="button" id="local-data-site"></button>
+        </div>
+      </div>
+    </details>
     <main id="thread"></main>
   </div>
   <div class="dock">
@@ -1536,7 +1580,37 @@ function suggestedFaqs(query, lang, limit) {
       .trim();
     return { body, notes };
   }
+  function rememberLocalQuery(text, faqId) {
+    try {
+      const raw = localStorage.getItem("faq_local_profiles");
+      if (!raw) return;
+      const book = JSON.parse(raw);
+      if (!book || !book.activeId) return;
+      if (/\d{10,}/.test(text) || /^\d{8,}$/.test(String(text || "").trim())) return;
+      const key = "faq_local_state_" + book.activeId;
+      const state = JSON.parse(localStorage.getItem(key) || "{}");
+      const history = Array.isArray(state.searchHistory) ? state.searchHistory : [];
+      const q = String(text || "").trim().slice(0, 80);
+      if (!q) return;
+      state.searchHistory = [{ q: q, at: new Date().toISOString() }].concat(history.filter((item) => item && item.q !== q)).slice(0, 50);
+      const frequent = Array.isArray(state.frequent) ? state.frequent : [];
+      if (faqId) {
+        const found = frequent.find((item) => item && item.id === faqId);
+        if (found) found.n += 1;
+        else frequent.push({ id: faqId, n: 1 });
+        frequent.sort((a, b) => b.n - a.n);
+        state.frequent = frequent.slice(0, 20);
+      }
+      if (!Array.isArray(state.mapFavorites)) state.mapFavorites = [];
+      localStorage.setItem(key, JSON.stringify({
+        searchHistory: state.searchHistory,
+        frequent: state.frequent,
+        mapFavorites: state.mapFavorites,
+      }));
+    } catch (e) { /* private mode */ }
+  }
   function markSearched(text, faq) {
+    rememberLocalQuery(text, faq && faq.id);
     const add = (v) => { const n = normalize(v); if (n) searchedNorm.add(n); };
     add(text);
     if (faq) {
@@ -1695,13 +1769,14 @@ function suggestedFaqs(query, lang, limit) {
     void el.offsetWidth;
     el.classList.add("play");
   }
-  function setLang(lang) {
+  function setLang(lang, persist) {
     uiLang = lang === "ko" ? "ko" : "zh";
-    storageSet("faq_ui_lang", uiLang);
+    if (persist) storageSet("faq_ui_lang", uiLang);
     document.documentElement.lang = uiLang === "ko" ? "ko" : "zh-CN";
     paintTitle();
     $("hint").textContent = t("hint");
     $("btn-clear").textContent = t("clear");
+    paintLocalData();
     $("btn-map").textContent = t("map");
     if (window.CampusMap && window.CampusMap.isOpen && window.CampusMap.isOpen()) window.CampusMap.setLang(uiLang);
     $("input").setAttribute("aria-label", t("input"));
@@ -2250,7 +2325,7 @@ function suggestedFaqs(query, lang, limit) {
       armIgnoreClick();
       void lang.querySelector(".lang-thumb").offsetWidth;
       const next = flicked(startPos, pos, travel()) ? (startPos < 0.5 ? "zh" : "ko") : (startPos < 0.5 ? "ko" : "zh");
-      if (next !== uiLang) setLang(next);
+      if (next !== uiLang) setLang(next, true);
       else {
         lang.style.setProperty("--lang-pos", next === "ko" ? "0" : "1");
         paintLabels(next === "ko" ? 0 : 1);
@@ -2312,7 +2387,7 @@ function suggestedFaqs(query, lang, limit) {
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
         e.preventDefault();
         const next = e.key === "ArrowLeft" ? "ko" : "zh";
-        setLang(next);
+        setLang(next, true);
         $(next === "ko" ? "btn-ko" : "btn-zh").focus();
       } else if (e.key === "Escape" && drag) {
         e.preventDefault();
@@ -2476,8 +2551,8 @@ function suggestedFaqs(query, lang, limit) {
       current = null;
     });
   }
-  $("btn-ko").addEventListener("click", () => setLang("ko"));
-  $("btn-zh").addEventListener("click", () => setLang("zh"));
+  $("btn-ko").addEventListener("click", () => setLang("ko", true));
+  $("btn-zh").addEventListener("click", () => setLang("zh", true));
   $("btn-map").addEventListener("click", () => openCampusMap(""));
   $("btn-clear").addEventListener("click", () => {
     history = [];
@@ -2486,6 +2561,102 @@ function suggestedFaqs(query, lang, limit) {
     expandedAnswers.clear();
     render();
     renderGuess();
+  });
+  const LOCAL_COPY = {
+    zh: {
+      summary: "本机资料",
+      only: "只存在这台浏览器，不是网上账号，换设备不会同步，清除网站数据后无法恢复。",
+      avatar: "仅用于本机地图小人，不会上传。",
+      publicDevice: "公共设备上请用完后退出或清空，以免下一个人看到这份资料。",
+      accounts: "清空本机账号与记录",
+      site: "清空本站全部本机数据",
+      siteNote: "浏览器「清除网站数据」也会全部丢掉、无法找回。",
+      yes: "确认",
+      no: "取消",
+    },
+    ko: {
+      summary: "로컬 자료",
+      only: "이 기기의 브라우저에만 저장되며, 온라인 계정이 아닙니다. 다른 기기와 동기화되지 않고, 사이트 데이터를 지우면 복구할 수 없습니다.",
+      avatar: "본기기 지도 캐릭터에만 쓰이며, 업로드되지 않습니다.",
+      publicDevice: "공용 기기에서는 사용한 뒤 나가거나 삭제하세요. 다음 사용자가 이 자료를 볼 수 있습니다.",
+      accounts: "로컬 계정과 기록 모두 삭제",
+      site: "이 사이트의 모든 로컬 데이터 삭제",
+      siteNote: "브라우저에서 사이트 데이터를 지워도 모두 사라지며, 다시 찾을 수 없습니다.",
+      yes: "확인",
+      no: "취소",
+    },
+  };
+  function localStorageKeys() {
+    const keys = [];
+    try {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (key) keys.push(key);
+      }
+    } catch (e) { /* private mode */ }
+    return keys;
+  }
+  function clearLocalAccounts() {
+    try {
+      for (const key of localStorageKeys()) {
+        if (key === "faq_local_profiles" || key === "campus_map_favorites" || key.indexOf("faq_local_") === 0) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch (e) { /* private mode */ }
+  }
+  function isFaqSiteKey(key) {
+    if (!key) return false;
+    if (key.indexOf("faq_local_") === 0) return true;
+    return key === "campus_map_favorites" || key === "campus_map_tint" || key === "faq_theme" || key === "faq_ui_lang";
+  }
+  function clearAllSiteData() {
+    try {
+      for (const key of localStorageKeys()) {
+        if (isFaqSiteKey(key)) localStorage.removeItem(key);
+      }
+    } catch (e) { /* private mode */ }
+  }
+  function paintLocalData() {
+    const copy = LOCAL_COPY[uiLang === "ko" ? "ko" : "zh"];
+    $("local-data-summary").textContent = copy.summary;
+    $("local-data-only").textContent = copy.only;
+    $("local-data-avatar").textContent = copy.avatar;
+    $("local-data-public").textContent = copy.publicDevice;
+    $("local-data-site-note").textContent = copy.siteNote;
+    $("local-data-accounts").textContent = copy.accounts;
+    $("local-data-site").textContent = copy.site;
+    $("local-data-yes").textContent = copy.yes;
+    $("local-data-no").textContent = copy.no;
+  }
+  let pendingLocalClear = "";
+  function askLocalClear(action) {
+    const copy = LOCAL_COPY[uiLang === "ko" ? "ko" : "zh"];
+    pendingLocalClear = action;
+    $("local-data-confirm-text").textContent = action === "site"
+      ? copy.site + " " + copy.siteNote
+      : copy.accounts;
+    $("local-data-confirm").hidden = false;
+  }
+  $("local-data-accounts").addEventListener("click", () => askLocalClear("accounts"));
+  $("local-data-site").addEventListener("click", () => askLocalClear("site"));
+  $("local-data-no").addEventListener("click", () => {
+    pendingLocalClear = "";
+    $("local-data-confirm").hidden = true;
+  });
+  function syncOpenMap() {
+    try {
+      if (window.CampusMap && typeof window.CampusMap.syncLocalProfile === "function") {
+        window.CampusMap.syncLocalProfile();
+      }
+    } catch (e) { /* map is closed or storage is blocked */ }
+  }
+  $("local-data-yes").addEventListener("click", () => {
+    if (pendingLocalClear === "accounts") clearLocalAccounts();
+    else if (pendingLocalClear === "site") clearAllSiteData();
+    syncOpenMap();
+    pendingLocalClear = "";
+    $("local-data-confirm").hidden = true;
   });
   attachMagnet($("btn-clear"), 0.18);
   attachMagnet($("btn-ko"), 0.16);

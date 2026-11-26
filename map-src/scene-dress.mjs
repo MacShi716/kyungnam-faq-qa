@@ -1,7 +1,7 @@
 /** Photoreal campus meshes. Browser only: canvas textures, no network, no external HDR. */
 
 import * as THREE from "three";
-import { buildingKind, terrainColor } from "./colors.mjs";
+import { buildingKind, materialSet, skyStop, terrainColor, wallPaint } from "./colors.mjs";
 import {
   ARCHETYPE_COLOR,
   VISUAL_COLS,
@@ -79,10 +79,10 @@ function mix(a, b, t) {
   return a + (b - a) * t;
 }
 
-function paintHillAlbedo(sample, bounds, theme) {
+function paintHillAlbedo(sample, bounds, woods) {
   const size = 1024;
   const { x0, x1, z0, z1 } = bounds;
-  const dark = theme === "dark";
+  const rings = woods || [];
   return fillImage(size, (data) => {
     for (let py = 0; py < size; py++) {
       const v = 1 - (py + 0.5) / size;
@@ -93,28 +93,16 @@ function paintHillAlbedo(sample, bounds, theme) {
         const slope = slopeDegrees(sample, x, z);
         const n = noise(x * 0.045, z * 0.045);
         const grain = noise(x * 0.22, z * 0.22);
-        const rock = Math.min(1, Math.max(0, (slope - 16) / 22));
+        const rock = Math.min(1, Math.max(0, (slope - 18) / 24));
+        const inWood = rings.some((ring) => pointInRing(x, z, ring));
+        const base = inWood ? 188 : 248;
         let r;
         let g;
         let b;
-        if (dark) {
-          const lawn = [42 + n * 8, 62 + n * 8, 40 + grain * 5];
-          const forest = [28 + n * 6, 46 + n * 6, 32];
-          const stone = [48 + grain * 6, 50 + grain * 5, 46];
-          const veg = n > 0.55 ? forest : lawn;
-          r = mix(veg[0], stone[0], rock);
-          g = mix(veg[1], stone[1], rock);
-          b = mix(veg[2], stone[2], rock);
-        } else {
-          const lawn = [96 + n * 12, 142 + n * 10, 68 + grain * 6];
-          const forest = [58 + n * 8, 108 + n * 8, 54 + grain * 4];
-          const stone = [148 + grain * 8, 140 + grain * 6, 122];
-          const soil = [142, 118, 82];
-          const veg = n > 0.62 ? forest : n < 0.22 ? soil : lawn;
-          r = mix(veg[0], stone[0], rock);
-          g = mix(veg[1], stone[1], rock);
-          b = mix(veg[2], stone[2], rock);
-        }
+        const shade = Math.max(0, Math.min(255, base + (n - 0.5) * 10 - rock * 16 + (grain - 0.5) * 6));
+        r = shade;
+        g = shade;
+        b = shade;
         const o = (py * size + px) * 4;
         data[o] = r;
         data[o + 1] = g;
@@ -262,7 +250,7 @@ function paintAsphalt() {
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
         const n = noise(x * 0.8, y * 0.8);
-        const v = 70 + n * 28;
+        const v = 214 + n * 24;
         const o = (y * size + x) * 4;
         data[o] = v;
         data[o + 1] = v + 1;
@@ -322,16 +310,12 @@ function surfaceMat(shell, color, roughness, metalness, extra) {
 }
 
 function paintSky(sky, dark) {
-  const top = new THREE.Color(dark ? 0x070b14 : 0x8eb4dc);
-  const horizon = new THREE.Color(dark ? 0x1a2433 : 0xd5e2ee);
-  const ground = new THREE.Color(dark ? 0x0c1014 : 0xc3b8a4);
   const pos = sky.geometry.attributes.position;
   const col = sky.geometry.attributes.color;
   const c = new THREE.Color();
+  const theme = dark ? "dark" : "light";
   for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i) / 2200;
-    if (y > 0.02) c.copy(horizon).lerp(top, Math.min(1, (y - 0.02) / 0.7));
-    else c.copy(ground).lerp(horizon, Math.max(0, (y + 0.25) / 0.31));
+    c.setHex(skyStop(pos.getY(i) / 2200, theme));
     col.setXYZ(i, c.r, c.g, c.b);
   }
   col.needsUpdate = true;
@@ -346,7 +330,8 @@ export function installAtmosphere(shell) {
   const wide = (shell.stage.clientWidth || window.innerWidth || 1280) >= 800;
   const sun = shell.sun;
   sun.castShadow = true;
-  sun.shadow.mapSize.set(wide ? 2048 : 1024, wide ? 2048 : 1024);
+  const small = (shell.stage.clientWidth || window.innerWidth || 1280) < 420;
+  sun.shadow.mapSize.set(small ? 512 : wide ? 2048 : 1024, small ? 512 : wide ? 2048 : 1024);
   sun.shadow.bias = -0.00018;
   sun.shadow.normalBias = 0.035;
   sun.shadow.camera.near = 20;
@@ -386,12 +371,12 @@ export function applyAtmosphereTheme(shell) {
   const dark = shell.theme === "dark";
   if (shell.sky) paintSky(shell.sky, dark);
   if (shell.scene && shell.scene.fog) {
-    shell.scene.fog.color.set(dark ? 0x121820 : 0xc5d4e2);
+    shell.scene.fog.color.set(dark ? 0x1c2838 : 0xd7e6f0);
     shell.scene.fog.density = dark ? HAZE_DENSITY.dark : HAZE_DENSITY.light;
   }
   if (shell.renderer) {
     shell.renderer.toneMappingExposure = dark ? 1.12 : 1.0;
-    shell.renderer.setClearColor(dark ? 0x121820 : 0xd5e2ee, 1);
+    shell.renderer.setClearColor(dark ? 0x141c2c : 0x8ebfdf, 1);
   }
   if (shell.terrainMesh && shell.terrainMaps) {
     shell.terrainMesh.material.map = dark ? shell.terrainMaps.dark : shell.terrainMaps.light;
@@ -401,17 +386,78 @@ export function applyAtmosphereTheme(shell) {
     shell.boundary.material.color.set(dark ? 0xc8bba8 : 0x6a6156);
     shell.boundary.material.opacity = dark ? 0.45 : 0.55;
   }
+  const cast = materialSet(shell.tint || 0, shell.theme);
+  if (shell.terrainMesh && shell.terrainMesh.material) {
+    const terrainMat = shell.terrainMesh.material;
+    terrainMat.color.setHex(cast.terrain);
+    const coolNight = dark && (shell.tint || 0) <= -0.35;
+    if (terrainMat.emissive) {
+      terrainMat.emissive.setHex(dark ? cast.terrain : 0x000000);
+      terrainMat.emissiveIntensity = coolNight ? 1.05 : (dark ? 1.15 : 0);
+    }
+  }
   const road = shell.layerMeshes && shell.layerMeshes.road;
-  if (road && road.material && road.material.emissive) {
-    road.material.color.setHex(0x7a838c);
-    road.material.emissive.setHex(0x3e464e);
-    road.material.emissiveIntensity = dark ? 0.85 : 0.55;
+  if (road && road.material) {
+    road.material.color.setHex(cast.road);
+    if (road.material.emissive) {
+      road.material.emissive.setHex(cast.road);
+      const coolNight = dark && (shell.tint || 0) <= -0.35;
+      road.material.emissiveIntensity = dark ? (coolNight ? 1.55 : 1.25) : 0.82;
+    }
   }
+  const curb = shell.layerMeshes && shell.layerMeshes.curb;
+  if (curb && curb.material) curb.material.color.setHex(cast.shoulder);
   const path = shell.layerMeshes && shell.layerMeshes.path;
-  if (path && path.material && path.material.emissive) {
-    path.material.emissive.setHex(dark ? 0x9a8468 : 0x000000);
-    path.material.emissiveIntensity = dark ? 0.7 : 0;
+  if (path && path.material) {
+    path.material.color.setHex(cast.shoulder);
+    if (path.material.emissive) {
+      path.material.emissive.setHex(0x000000);
+      path.material.emissiveIntensity = 0;
+    }
   }
+  const turf = shell.layerMeshes && shell.layerMeshes.turf;
+  if (turf && turf.material) turf.material.color.setHex(dark ? 0x243628 : 0x5e8a4c);
+  const park = shell.layerMeshes && shell.layerMeshes.park;
+  if (park && park.material) park.material.color.setHex(dark ? 0x2a3a2c : 0x6f945c);
+  const track = shell.layerMeshes && shell.layerMeshes.track;
+  if (track && track.material) track.material.color.setHex(dark ? 0x6a5840 : 0xc4a07a);
+  const lot = shell.layerMeshes && shell.layerMeshes.lot;
+  if (lot && lot.material) lot.material.color.setHex(dark ? 0x3a3e44 : 0x8a8e93);
+  const water = shell.layerMeshes && shell.layerMeshes.water;
+  if (water && water.material) {
+    const base = dark ? 0x1c3a38 : 0x3e6e62;
+    water.material.color.setHex(lerpTint(base, cast.terrain, Math.abs(shell.tint || 0) * 0.16));
+    water.material.roughness = 0.34;
+    water.material.metalness = 0.08;
+  }
+  const shore = shell.layerMeshes && shell.layerMeshes.shore;
+  if (shore && shore.material) shore.material.color.setHex(dark ? 0x6a7068 : 0xc5c0b5);
+  paintTreeColors(shell);
+}
+
+function lerpTint(base, toward, amount) {
+  const t = Math.max(0, Math.min(1, amount));
+  const ch = (shift) => Math.round(((base >> shift) & 255) * (1 - t) + ((toward >> shift) & 255) * t);
+  return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+}
+
+function paintTreeColors(shell) {
+  const leaves = shell.trees && shell.trees[1];
+  if (!leaves || !shell.treePoints) return;
+  const dark = shell.theme === "dark";
+  const color = new THREE.Color();
+  for (let i = 0; i < shell.treePoints.length; i++) {
+    const tree = shell.treePoints[i];
+    color.setHex(dark ? 0x1a2e1f : (tree.kind === "pine" ? 0x2f5c38 : 0x4f8a3e));
+    leaves.setColorAt(i, color);
+  }
+  if (leaves.instanceColor) leaves.instanceColor.needsUpdate = true;
+  if (leaves.material && leaves.material.emissive) {
+    leaves.material.emissive.setHex(dark ? 0x1a2e1f : 0x000000);
+    leaves.material.emissiveIntensity = dark ? 2.6 : 0;
+  }
+  const trunks = shell.trees[0];
+  if (trunks && trunks.material) trunks.material.color.setHex(0x5c4638);
 }
 
 function pushTri(buf, ax, ay, az, bx, by, bz, cx, cy, cz, au, av, bu, bv, cu, cv) {
@@ -609,7 +655,7 @@ export function buildRealisticTerrain(shell) {
       const idx = j * VISUAL_COLS + i;
       uvs[idx * 2] = i / (VISUAL_COLS - 1);
       uvs[idx * 2 + 1] = j / (VISUAL_ROWS - 1);
-      const tone = terrainColor((grid.heights[idx] - minY) / span, shell.theme);
+      const tone = terrainColor((grid.heights[idx] - minY) / span, shell.theme, shell.tint || 0);
       colors[idx * 3] = tone[0];
       colors[idx * 3 + 1] = tone[1];
       colors[idx * 3 + 2] = tone[2];
@@ -619,8 +665,10 @@ export function buildRealisticTerrain(shell) {
   geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
   geo.computeVertexNormals();
   const bounds = { x0: grid.x0, x1: grid.x1, z0: grid.z0, z1: grid.z1 };
-  const lightMap = trackOwned(shell, canvasTexture(paintHillAlbedo(sample, bounds, "light"), THREE.SRGBColorSpace, 1, 1));
-  const darkMap = trackOwned(shell, canvasTexture(paintHillAlbedo(sample, bounds, "dark"), THREE.SRGBColorSpace, 1, 1));
+  const woodRings = ((shell.layers && shell.layers.woods) || []).map((wood) => wood.points);
+  const hill = paintHillAlbedo(sample, bounds, woodRings);
+  const lightMap = trackOwned(shell, canvasTexture(hill, THREE.SRGBColorSpace, 1, 1));
+  const darkMap = trackOwned(shell, canvasTexture(hill, THREE.SRGBColorSpace, 1, 1));
   const roughMap = trackOwned(shell, canvasTexture(paintHillAux(sample, bounds, "rough"), THREE.NoColorSpace, 1, 1));
   const bumpMap = trackOwned(shell, canvasTexture(paintHillAux(sample, bounds, "bump"), THREE.NoColorSpace, 1, 1));
   shell.terrainMaps = { light: lightMap, dark: darkMap };
@@ -795,14 +843,14 @@ export function buildCampusLayers(shell) {
   const roadMat = surfaceMat(shell, 0x5a6168, 0.9, 0.04, { map: asphaltTex });
   const curbMat = surfaceMat(shell, 0xc8c0b4, 0.86, 0.02, {});
   const pathMat = surfaceMat(shell, 0xcbbfae, 0.88, 0.03, {});
-  const turfMat = surfaceMat(shell, 0x3e5640, 0.9, 0.01, {});
-  const trackMat = surfaceMat(shell, 0x8a5348, 0.82, 0.03, {});
-  const parkMat = surfaceMat(shell, 0xc6b7a2, 0.9, 0.02, {});
-  const lotMat = surfaceMat(shell, 0x4d5158, 0.9, 0.05, { map: parkTex });
-  const waterMat = surfaceMat(shell, 0x1a3e46, 0.12, 0.25, {
-    envMapIntensity: 1,
+  const turfMat = surfaceMat(shell, 0x5e8a4c, 0.9, 0.01, {});
+  const trackMat = surfaceMat(shell, 0xc4a07a, 0.82, 0.03, {});
+  const parkMat = surfaceMat(shell, 0x6f945c, 0.9, 0.02, {});
+  const lotMat = surfaceMat(shell, 0x8a8e93, 0.9, 0.05, { map: parkTex });
+  const waterMat = surfaceMat(shell, 0x3e6e62, 0.34, 0.08, {
+    envMapIntensity: 0.85,
   });
-  const rimMat = surfaceMat(shell, 0x8f877c, 0.9, 0.04, {});
+  const rimMat = surfaceMat(shell, 0xc5c0b5, 0.9, 0.04, {});
   const roadGeo = [];
   const curbGeo = [];
   shell.roadMarks = [];
@@ -859,10 +907,10 @@ export function buildCampusLayers(shell) {
     else if (subtype === "park" || subtype === "garden" || subtype === "playground") buckets.park.push(geo);
     else buckets.turf.push(geo);
   }
-  mergeAndAdd(shell, buckets.turf, turfMat, false);
-  mergeAndAdd(shell, buckets.track, trackMat, false);
-  mergeAndAdd(shell, buckets.park, parkMat, false);
-  mergeAndAdd(shell, buckets.lot, lotMat, false);
+  mergeAndAdd(shell, buckets.turf, turfMat, false, "turf");
+  mergeAndAdd(shell, buckets.track, trackMat, false, "track");
+  mergeAndAdd(shell, buckets.park, parkMat, false, "park");
+  mergeAndAdd(shell, buckets.lot, lotMat, false, "lot");
   for (const water of layers.water || []) {
     const open = openRing(water.points);
     const tris = triangulateXZ(open);
@@ -871,10 +919,18 @@ export function buildCampusLayers(shell) {
     const level = heights.slice().sort((a, b) => a - b)[Math.floor(heights.length / 2)] + LIFT.water;
     const buf = { pos: [], nrm: [], uv: [] };
     addCap(buf, open, tris, level, 0.05);
-    addMesh(shell, geoFrom(buf), waterMat, false);
-    const rim = insetRing(open, -1.6);
-    const rimGeo = resampleLine(rim.concat([rim[0]]), sample, 1.5, LIFT.rim);
-    addMesh(shell, rimGeo, rimMat, false);
+    const waterMesh = addMesh(shell, geoFrom(buf), waterMat, false);
+    if (waterMesh) {
+      if (!shell.layerMeshes) shell.layerMeshes = {};
+      shell.layerMeshes.water = waterMesh;
+    }
+    const rim = insetRing(open, -0.75);
+    const rimGeo = resampleLine(rim.concat([rim[0]]), sample, 0.8, LIFT.rim);
+    const shoreMesh = addMesh(shell, rimGeo, rimMat, false);
+    if (shoreMesh) {
+      if (!shell.layerMeshes) shell.layerMeshes = {};
+      shell.layerMeshes.shore = shoreMesh;
+    }
   }
   buildTrees(shell, layers);
   shell.layerStats = {
@@ -927,13 +983,18 @@ function buildTrees(shell, layers) {
   shell.treeCount = trees.length;
   shell.treePoints = trees;
   if (!trees.length) return;
-  const trunkGeo = new THREE.CylinderGeometry(0.16, 0.28, 3.4, 5);
-  const crownA = new THREE.ConeGeometry(1.45, 2.5, 6).toNonIndexed();
-  crownA.translate(0, 2.15, 0);
-  const crownB = new THREE.ConeGeometry(1.05, 2.0, 6).toNonIndexed();
-  crownB.translate(0, 3.45, 0);
-  const foliageGeo = mergeGeos([crownA, crownB]);
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5a4032, roughness: 0.9, metalness: 0 });
+  const trunkGeo = new THREE.CylinderGeometry(0.22, 0.32, 2.4, 5);
+  const blob = (w, h, d, y) => {
+    const geo = new THREE.BoxGeometry(w, h, d).toNonIndexed();
+    geo.translate(0, y, 0);
+    return geo;
+  };
+  const foliageGeo = mergeGeos([
+    blob(2.1, 1.15, 2.1, 2.15),
+    blob(1.55, 0.95, 1.55, 3.05),
+    blob(1.05, 0.7, 1.05, 3.7),
+  ]);
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c4638, roughness: 0.9, metalness: 0 });
   const leafMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.86, metalness: 0 });
   shell.surfaceMaterials.push(trunkMat, leafMat);
   const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, trees.length);
@@ -947,19 +1008,18 @@ function buildTrees(shell, layers) {
   for (let i = 0; i < trees.length; i++) {
     const tree = trees[i];
     const h = tree.scale;
-    dummy.position.set(tree.x, tree.y + 1.7 * h, tree.z);
+    dummy.position.set(tree.x, tree.y + 1.2 * h, tree.z);
     dummy.rotation.set(0, tree.hue * Math.PI * 2, 0);
-    dummy.scale.set(h, tree.kind === "pine" ? h * 1.15 : h * 0.92, h);
+    dummy.scale.set(h * 0.9, h, h * 0.9);
     dummy.updateMatrix();
     trunks.setMatrixAt(i, dummy.matrix);
-    dummy.position.set(tree.x, tree.y + (tree.kind === "pine" ? 3.15 : 2.7) * h, tree.z);
-    dummy.scale.set(tree.kind === "pine" ? h * 0.82 : h * 1.18, h, tree.kind === "pine" ? h * 0.82 : h * 1.18);
+    dummy.position.set(tree.x, tree.y + 1.35 * h, tree.z);
+    dummy.scale.set(h * (tree.kind === "pine" ? 0.82 : 1.05), h, h * (tree.kind === "pine" ? 0.82 : 1.05));
     dummy.updateMatrix();
     leaves.setMatrixAt(i, dummy.matrix);
-    color.set(tree.kind === "pine" ? 0x3e4c34 : 0x667044);
-    color.offsetHSL((tree.hue - 0.5) * 0.04, (tree.hue - 0.5) * 0.08, (tree.hue - 0.5) * 0.08);
+    color.set(tree.kind === "pine" ? 0x2f5c38 : 0x4f8a3e);
     leaves.setColorAt(i, color);
-    trunks.setColorAt(i, new THREE.Color(0.85 + tree.hue * 0.2, 0.75, 0.62));
+    trunks.setColorAt(i, new THREE.Color(0x5c4638));
   }
   trunks.instanceMatrix.needsUpdate = true;
   leaves.instanceMatrix.needsUpdate = true;
@@ -1090,6 +1150,7 @@ export function buildRealisticBuildings(shell) {
       skirt: skirtMesh,
       mass,
       roof,
+      gravel: gravelMesh,
       edge: edges,
       beacon,
       group,
@@ -1109,9 +1170,23 @@ export function paintRealisticBuildings(shell) {
   const dark = shell.theme === "dark";
   for (const record of shell.buildings) {
     const mode = record.osmId === shell.selectedId ? "selected" : record.osmId === shell.hoverId ? "hover" : "idle";
-    const boost = mode === "selected" ? 0.28 : mode === "hover" ? 0.12 : 0;
+    const boost = mode === "selected" ? 0.12 : mode === "hover" ? 0.05 : 0;
+    const paint = wallPaint(record.osmId, record.archetype, shell.tint || 0, shell.theme);
+    const massHex = paint.mass;
+    const skirtHex = paint.skirt;
     for (const mat of record.facades || []) {
-      mat.emissiveIntensity = (dark ? 0.9 : 0.06) + boost;
+      mat.color.setHex(massHex);
+      mat.emissiveIntensity = (dark ? 0.16 : 0.04) + boost;
+    }
+    if (record.mass && record.mass.material && record.mass.material.color) record.mass.material.color.setHex(massHex);
+    if (record.skirt && record.skirt.material && record.skirt.material.color) record.skirt.material.color.setHex(skirtHex);
+    if (record.archetype !== "crimson" && record.roof && record.roof.material && record.roof.material.color) {
+      const roofHex = record.osmId === 1062064821 ? (dark ? 0x4a3028 : 0x7a5348) : (dark ? 0x4a5854 : 0x7d8c86);
+      record.roof.material.color.setHex(roofHex);
+    }
+    if (record.archetype !== "crimson" && record.gravel && record.gravel.material && record.gravel.material.color) {
+      const gravelHex = record.osmId === 1062064821 ? (dark ? 0x4a3028 : 0x7a5348) : (dark ? 0x4a5854 : 0x7d8c86);
+      record.gravel.material.color.setHex(gravelHex);
     }
     if (record.edge) {
       record.edge.material.opacity = record.archetype === "crimson"
@@ -1119,8 +1194,8 @@ export function paintRealisticBuildings(shell) {
         : (mode === "idle" ? 0.07 : 0.28);
     }
     if (record.skirt && record.skirt.material && record.skirt.material.emissive) {
-      record.skirt.material.emissive.setHex(0x6e675f);
-      record.skirt.material.emissiveIntensity = dark ? 0.72 : 0.48;
+      record.skirt.material.emissive.setHex(0x000000);
+      record.skirt.material.emissiveIntensity = 0;
     }
     if (record.beacon && record.beacon.material) {
       record.beacon.material.emissiveIntensity = dark ? 1.35 : 0.55;
@@ -1134,7 +1209,7 @@ export function repaintTerrainColors(shell) {
   const span = Math.max(1, maxY - minY);
   const colors = shell.terrainMesh.geometry.attributes.color.array;
   for (let i = 0; i < heights.length; i++) {
-    const tone = terrainColor((heights[i] - minY) / span, shell.theme);
+    const tone = terrainColor((heights[i] - minY) / span, shell.theme, shell.tint || 0);
     colors[i * 3] = tone[0];
     colors[i * 3 + 1] = tone[1];
     colors[i * 3 + 2] = tone[2];
