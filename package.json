@@ -4,7 +4,8 @@
     "build:map": "node scripts/build-map.mjs",
     "test": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs tests/poi-directory.test.mjs tests/map-presentation.test.mjs tests/campus-realism.test.mjs tests/shell-facing.test.mjs tests/walk-move.test.mjs tests/player.test.mjs tests/local-profile.test.mjs tests/favorite-lifecycle.test.mjs tests/ground-stability.test.mjs",
     "test:browser": "playwright test",
-    "test:all": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs tests/poi-directory.test.mjs tests/map-presentation.test.mjs tests/campus-realism.test.mjs tests/shell-facing.test.mjs tests/walk-move.test.mjs tests/player.test.mjs tests/local-profile.test.mjs tests/favorite-lifecycle.test.mjs tests/ground-stability.test.mjs && playwright test"
+    "test:all": "node --test tests/retrieve.test.mjs tests/terrain-placement.test.mjs tests/poi-directory.test.mjs tests/map-presentation.test.mjs tests/campus-realism.test.mjs tests/shell-facing.test.mjs tests/walk-move.test.mjs tests/player.test.mjs tests/local-profile.test.mjs tests/favorite-lifecycle.test.mjs tests/ground-stability.test.mjs && playwright test",
+    "perf:map": "node scripts/perf-measure.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
