@@ -1027,6 +1027,52 @@ html[data-theme="dark"] .map-faq-btn {
   .ai-dots i { animation: none !important; opacity: .7; }
 }
 </style>
+  <link rel="stylesheet" href="golden-ratio.css">
+  <style>
+/* Golden ratio for the Q&A shell only. Map canvas and map controls are left alone. */
+.wrap,
+.guess,
+.prompt-bar {
+  max-width: var(--gr-content);
+}
+h1.blur-title {
+  font-size: var(--gr-fs-lg);
+  line-height: var(--gr-lh-tight);
+}
+.card {
+  padding: var(--gr-space-md) var(--gr-space-lg);
+}
+.card.user {
+  padding: var(--gr-space-sm) var(--gr-space-md);
+}
+body {
+  padding-left: var(--gr-space-md);
+  padding-right: var(--gr-space-md);
+  padding-top: var(--gr-space-lg);
+}
+@media (max-width: 720px) {
+  h1.blur-title { font-size: var(--gr-fs-md); }
+  body {
+    padding-left: var(--gr-space-sm);
+    padding-right: var(--gr-space-sm);
+    padding-top: var(--gr-space-lg);
+  }
+}
+/* Keep dock clearance and map chrome unchanged. */
+.theme-switch,
+.theme-switch-slot,
+.lang,
+.lang button,
+.map-open-btn,
+.map-faq-btn,
+.composer button.send,
+.clear-btn,
+#aurora,
+canvas#aurora {
+  aspect-ratio: auto;
+}
+  </style>
+
 
 </head>
 <body data-chat-state="empty">
