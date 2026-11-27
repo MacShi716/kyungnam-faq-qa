@@ -60,7 +60,7 @@ test("building façades stay solid from the default, low, and close views", asyn
   expect(errors).toEqual([]);
 });
 
-test("walk controls move the camera and a building becomes the start", async ({ page }) => {
+test("walk controls move the camera and a building detail does not teleport", async ({ page }) => {
   test.setTimeout(120000);
   const errors = track(page);
   await silenceAi(page);
@@ -110,15 +110,16 @@ test("walk controls move the camera and a building becomes the start", async ({ 
 
   await page.locator("#btn-zh").evaluate((el) => el.click());
   await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
+  const beforeDetail = await page.evaluate(() => window.CampusMap.debugSnapshot());
   await page.locator(".map-list button[data-faq-id='F49']").click();
   await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("结束行走");
   await expect(page.locator(".map-info")).toContainText("本馆");
   const atHall = await page.evaluate(() => window.CampusMap.debugSnapshot());
   expect(atHall.viewMode).toBe("walk");
-  expect(atHall.focusId).toBe(1062064821);
-  expect(atHall.focusDistance).toBeGreaterThan(4);
-  expect(atHall.focusDistance).toBeLessThan(80);
-  expect(Math.abs(atHall.eyeGap - 1.7)).toBeLessThan(1.2);
+  expect(atHall.focusId).toBe(null);
+  expect(atHall.focusDistance).toBe(null);
+  const teleport = Math.hypot(atHall.camera.x - beforeDetail.camera.x, atHall.camera.z - beforeDetail.camera.z);
+  expect(teleport).toBeLessThan(0.01);
   await page.locator(".map-toolbar [data-map-action='reset']").click();
   await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveText("步行");
   await expect(page.locator(".map-toolbar [data-map-action='walk']")).toHaveAttribute("aria-pressed", "false");
@@ -240,6 +241,7 @@ test("walk entry keeps the eye above the mesh and the frame off a single ground 
   await page.goto("/");
   await openMap(page);
   await page.waitForFunction(() => window.CampusMap && window.CampusMap.debugWalkProbe);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
   await page.locator(".map-toolbar [data-map-action='directory']").click();
   await page.locator(".map-list button[data-faq-id='F49']").click();
   await expect(page.locator(".map-info")).toBeVisible();
@@ -272,6 +274,7 @@ test("phone walk separates the map from the controls", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await openMap(page);
+  await page.locator(".map-toolbar [data-map-action='walk']").click();
   await page.locator(".map-toolbar [data-map-action='directory']").click();
   await page.locator(".map-list button[data-faq-id='F49']").click();
   await expect(page.locator(".map-detail-summary")).toContainText("本馆");
@@ -357,9 +360,11 @@ test("360 walk reset and reentry keep the label and a campus view", async ({ pag
   await openMap(page);
   await expect(page.locator(".map-fallback")).toBeHidden();
   await expect(page.locator(".map-canvas")).toBeVisible();
+  const walk = page.locator(".map-toolbar [data-map-action='walk']");
+  await walk.click();
+  await expect(walk).toHaveText("结束行走");
   await page.locator(".map-toolbar [data-map-action='directory']").click();
   await page.locator(".map-list button[data-faq-id='F49']").click();
-  const walk = page.locator(".map-toolbar [data-map-action='walk']");
   const narrowFit = await page.evaluate(() => {
     const bar = document.querySelector(".map-toolbar");
     return bar.scrollWidth <= bar.clientWidth + 2;

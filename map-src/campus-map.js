@@ -197,13 +197,13 @@ const MAP_CSS = `
 .map-pad-btn[data-slot="s"]{grid-column:2;grid-row:3}
 .map-modal.is-narrow:not(.dir-collapsed) .map-walk{bottom:calc(48% + 50px)}
 .map-modal.is-narrow.info-open .map-walk{bottom:calc(min(62vh, 560px) + 52px)}
-.map-modal:not(.is-narrow):not(.dir-collapsed) .map-pad-look{margin-right:324px}
-.map-modal:not(.is-narrow).info-open:not(.dir-collapsed) .map-pad-look{margin-right:calc(336px + min(400px,100vw - 360px))}
-.map-modal:not(.is-narrow).info-open.dir-collapsed .map-pad-look{margin-right:calc(min(420px,100vw - 24px) + 20px)}
+.map-modal:not(.is-narrow):not(.dir-collapsed) .map-pad-look{margin-right:212px}
+.map-modal:not(.is-narrow).info-open:not(.dir-collapsed) .map-pad-look{margin-right:calc(224px + min(400px,100vw - 248px))}
+.map-modal:not(.is-narrow).info-open.dir-collapsed .map-pad-look{margin-right:calc(min(320px,100vw - 24px) + 20px)}
 .map-btn{min-height:44px;padding:0 11px;border-radius:8px;border:1px solid var(--map-line);background:var(--map-panel);color:var(--ink);font:inherit;font-weight:600;font-size:.82rem;letter-spacing:.01em;cursor:pointer;backdrop-filter:blur(18px) saturate(1.2);box-shadow:none}
 .map-btn[aria-pressed="true"]{background:var(--pressed-bg);box-shadow:inset 0 0 0 1px var(--map-line)}
 .map-btn:focus-visible,.map-search:focus-visible,.map-ext-link:focus-visible,.map-osm-link:focus-visible,.map-pill:focus-visible,.map-odbl-link:focus-visible{outline:2px solid var(--rim);outline-offset:2px}
-.map-directory{top:0;right:0;bottom:0;width:min(320px,100%);display:flex;flex-direction:column;gap:8px;padding:64px 10px 12px;background:color-mix(in srgb,var(--bg) 88%,transparent);border-left:1px solid var(--line);backdrop-filter:blur(18px);box-sizing:border-box}
+.map-directory{top:0;right:0;bottom:0;width:min(208px,100%);display:flex;flex-direction:column;gap:8px;padding:64px 10px 12px;background:color-mix(in srgb,var(--bg) 88%,transparent);border-left:1px solid var(--line);backdrop-filter:blur(18px);box-sizing:border-box}
 .map-modal.dir-collapsed:not(.is-narrow) .map-directory{transform:translateX(105%)}
 .map-search{width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;padding:8px 10px}
 .map-privacy,.map-storage,.map-meta{margin:0;color:var(--muted);font-size:.75rem;line-height:1.45}
@@ -214,8 +214,8 @@ const MAP_CSS = `
 .map-badge{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border-radius:999px;background:var(--badge-warn-bg);color:var(--warn);font-size:.75rem}
 .map-num-pill{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:.75rem}
 .map-role-badge{display:inline-block;margin:0 6px 6px 0;padding:2px 7px;border-radius:3px;background:transparent;color:#b91c1c;border:1px solid #c92a2a;font-size:.75rem;font-weight:650}
-.map-info{z-index:14;top:64px;right:332px;left:auto;bottom:auto;width:min(400px,calc(100% - 360px));max-height:calc(100% - 132px);overflow:auto;padding:14px 14px 18px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);backdrop-filter:blur(18px);box-sizing:border-box;box-shadow:0 16px 40px rgba(16,18,22,.12)}
-.map-modal.dir-collapsed:not(.is-narrow) .map-info{right:12px;width:min(420px,calc(100% - 24px))}
+.map-info{z-index:14;top:64px;right:220px;left:auto;bottom:auto;width:min(400px,calc(100% - 248px));max-height:calc(100% - 132px);overflow:auto;padding:14px 14px 18px;border-radius:12px;background:var(--map-panel);border:1px solid var(--map-line);backdrop-filter:blur(18px);box-sizing:border-box;box-shadow:0 16px 40px rgba(16,18,22,.12)}
+.map-modal.dir-collapsed:not(.is-narrow) .map-info{right:12px;width:min(320px,calc(100% - 24px))}
 .map-info-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .map-info h3{margin:0 0 4px;font-size:1.05rem;line-height:1.3}
 .map-info h4{margin:10px 0 6px;font-size:.86rem}
@@ -587,7 +587,7 @@ function createShell(opts) {
     onOpenFaq: opts.onOpenFaq, faqId: opts.faqId || "",
     favorites: readFavs(), favOwner: favoriteOwner(browserStore), category: "all", query: "", labelsOn: true,
     unbinds: [], buildings: [], pickables: [], webgl: false, glDisposed: false,
-    raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null,
+    raf: 0, interacting: false, tween: null, selectedId: null, hoverId: null, orbitPress: null,
     detailEntries: null, detailFocus: null, detailBuilding: null, detailExpanded: false,
     renderer: null, controls: null, scene: null, camera: null, avatar: null,
     touch: window.matchMedia ? window.matchMedia("(pointer: coarse)").matches : false,
@@ -1334,7 +1334,7 @@ function syncWalkChrome(shell) {
 function revealDetail(shell) {
   shell.info.hidden = false;
   shell.root.classList.add("info-open");
-  if (shell.root.classList.contains("is-narrow")) shell.root.classList.add("dir-collapsed");
+  shell.root.classList.add("dir-collapsed");
 }
 
 function detailHeader(title, sub) {
@@ -1702,7 +1702,6 @@ function selectBuilding(osmId, faqId) {
     const row = shell.list.querySelector(`[data-faq-id="${faqId}"]`);
     if (row && row.scrollIntoView) row.scrollIntoView({ block: "nearest" });
   }
-  if (shell.camera && shell.terrain) walkToBuilding(record);
 }
 
 function focusFaq(faqId) {
@@ -2495,7 +2494,16 @@ function bindPointer(shell) {
     });
   }
   bind(shell, shell.canvas, "pointerdown", (event) => {
-    if (!session || !session.walk || !session.walk.active) return;
+    if (!session) return;
+    if (!session.walk || !session.walk.active) {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (session.orbitPress) {
+        session.orbitPress.moved = true;
+        return;
+      }
+      session.orbitPress = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+      return;
+    }
     if (event.target !== shell.canvas) return;
     const active = document.activeElement;
     if (active && active !== shell.canvas && typeof active.blur === "function") active.blur();
@@ -2517,18 +2525,33 @@ function bindPointer(shell) {
     session.walk.drag = { x: event.clientX, y: event.clientY, moved: 0 };
   });
   bind(shell, shell.canvas, "pointerup", (event) => {
-    if (!session || !session.walk || session.walk.lookId !== event.pointerId) return;
+    if (!session) return;
+    if (!session.walk || !session.walk.active) {
+      const press = session.orbitPress;
+      session.orbitPress = null;
+      if (!press || press.id !== event.pointerId) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (!press.moved && Math.hypot(event.clientX - press.x, event.clientY - press.y) < 6) pickAt(event);
+      return;
+    }
+    if (session.walk.lookId !== event.pointerId) return;
     const moved = session.walk.drag ? session.walk.drag.moved : 0;
     session.walk.lookId = null;
     session.walk.drag = null;
     if (moved < 6) pickAt(event);
   });
   bind(shell, shell.canvas, "pointercancel", (event) => {
-    if (!session || !session.walk || session.walk.lookId !== event.pointerId) return;
+    if (!session) return;
+    if (session.orbitPress && session.orbitPress.id === event.pointerId) session.orbitPress = null;
+    if (!session.walk || session.walk.lookId !== event.pointerId) return;
     session.walk.lookId = null;
     session.walk.drag = null;
   });
   bind(shell, shell.canvas, "pointermove", (event) => {
+    const press = session && session.orbitPress;
+    if (press && press.id === event.pointerId && (!session.walk || !session.walk.active)) {
+      if (Math.hypot(event.clientX - press.x, event.clientY - press.y) >= 6) press.moved = true;
+    }
     if (session && session.walk && session.walk.active && session.walk.lookId === event.pointerId && session.walk.drag) {
       const dx = event.clientX - session.walk.drag.x;
       const dy = event.clientY - session.walk.drag.y;
