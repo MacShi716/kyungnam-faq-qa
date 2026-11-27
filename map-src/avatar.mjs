@@ -23,7 +23,7 @@ function block(w, h, d, color) {
     new THREE.BoxGeometry(w, h, d),
     new THREE.MeshStandardMaterial({ color, roughness: 0.88, metalness: 0.02 }),
   );
-  mesh.castShadow = true;
+  mesh.castShadow = false;
   mesh.receiveShadow = true;
   mesh.userData.avatar = true;
   return mesh;

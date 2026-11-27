@@ -495,13 +495,18 @@ function favId(entry) {
 function probeWebGL2() {
   try {
     const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
-    if (!gl) return false;
+    let gl = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: true });
+    let software = !gl;
+    gl = gl || canvas.getContext("webgl2");
+    if (!gl) return { ok: false, software: false };
+    const debug = gl.getExtension("WEBGL_debug_renderer_info");
+    const name = debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(name || ""))) software = true;
     const lose = gl.getExtension("WEBGL_lose_context");
     if (lose) lose.loseContext();
-    return true;
+    return { ok: true, software };
   } catch (e) {
-    return false;
+    return { ok: false, software: false };
   }
 }
 
@@ -1834,24 +1839,17 @@ function paintWalkUi(shell) {
 }
 
 function buildingRings(shell) {
-  return shell.buildings.map((record) => record.building.footprintXZ);
+  if (!shell.footprintRings) shell.footprintRings = shell.buildings.map((record) => record.building.footprintXZ);
+  return shell.footprintRings;
 }
 
 const BODY_RADIUS_M = 0.42;
-let groundRay = null;
 
 function surfaceY(shell, x, z) {
-  const smooth = shell && typeof shell.sampleHeight === "function"
+  if (!shell) return 0;
+  return typeof shell.sampleHeight === "function"
     ? shell.sampleHeight(x, z)
     : sampleTerrainY(shell.terrain, x, z);
-  if (!shell || !shell.terrainMesh) return smooth;
-  if (!groundRay) groundRay = new THREE.Raycaster();
-  groundRay.set(new THREE.Vector3(x, smooth + 80, z), new THREE.Vector3(0, -1, 0));
-  groundRay.near = 0;
-  groundRay.far = 200;
-  const hits = groundRay.intersectObject(shell.terrainMesh, false);
-  if (!hits.length) return smooth;
-  return Math.max(smooth, hits[0].point.y);
 }
 
 function roofY(record) {
@@ -2398,7 +2396,7 @@ function resize() {
   const box = shell.canvas.getBoundingClientRect();
   const w = Math.max(1, Math.round(box.width) || shell.stage.clientWidth);
   const h = Math.max(1, Math.round(box.height) || shell.stage.clientHeight);
-  shell.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  shell.renderer.setPixelRatio(maxPixelRatio(shell));
   shell.renderer.setSize(w, h, false);
   shell.camera.aspect = w / h;
   shell.camera.updateProjectionMatrix();
@@ -2604,11 +2602,16 @@ function applyThemeMaterials() {
   poke();
 }
 
+function maxPixelRatio(shell) {
+  const cap = Math.min(window.devicePixelRatio || 1, 1.5);
+  return shell && shell.softwareGL ? cap * 0.7 : cap;
+}
+
 function makeRenderer(shell) {
   const narrow = (shell.stage.clientWidth || window.innerWidth || 1280) < 420;
   const options = {
     canvas: shell.canvas,
-    antialias: !narrow,
+    antialias: !narrow && !shell.softwareGL,
     alpha: false,
     powerPreference: narrow ? "default" : "high-performance",
     preserveDrawingBuffer: true,
@@ -2629,9 +2632,11 @@ function makeRenderer(shell) {
 
 function buildScene(shell) {
   const renderer = makeRenderer(shell);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(maxPixelRatio(shell));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.08;
@@ -2805,6 +2810,9 @@ export function debugSnapshot() {
     clear: session.renderer ? session.renderer.getClearColor(new THREE.Color()).getHexString() : "",
     toneMapping: session.renderer && session.renderer.toneMapping === THREE.ACESFilmicToneMapping ? "ACESFilmic" : "",
     logDepth: !!(session.renderer && session.renderer.capabilities && session.renderer.capabilities.logarithmicDepthBuffer),
+    pixelRatio: session.renderer ? session.renderer.getPixelRatio() : 0,
+    softwareGL: !!session.softwareGL,
+    shadowAutoUpdate: !!(session.renderer && session.renderer.shadowMap.autoUpdate),
     fog: session.scene && session.scene.fog ? session.scene.fog.density : 0,
     trees: session.treeCount || 0,
     roads: session.layerStats ? session.layerStats.roads : 0,
@@ -3521,7 +3529,9 @@ export async function open(opts) {
     shell.layers = layers;
     shell.byOsm = indexEntries(poi);
     renderDirectory();
-    if (!probeWebGL2()) {
+    const gpu = probeWebGL2();
+    shell.softwareGL = gpu.software;
+    if (!gpu.ok) {
       showFallback(shell, "no-webgl2");
       if (opts.faqId) focusFaq(opts.faqId);
       return;

@@ -80,7 +80,7 @@ function mix(a, b, t) {
 }
 
 function paintHillAlbedo(sample, bounds, woods) {
-  const size = 1024;
+  const size = 512;
   const { x0, x1, z0, z1 } = bounds;
   const rings = woods || [];
   return fillImage(size, (data) => {
@@ -113,7 +113,7 @@ function paintHillAlbedo(sample, bounds, woods) {
   });
 }
 
-function paintHillAux(sample, bounds, mode) {
+function paintHillAux(sample, bounds) {
   const size = 512;
   const { x0, x1, z0, z1 } = bounds;
   return fillImage(size, (data) => {
@@ -125,13 +125,12 @@ function paintHillAux(sample, bounds, mode) {
         const x = x0 + u * (x1 - x0);
         const slope = slopeDegrees(sample, x, z);
         const grain = noise(x * 0.35, z * 0.35);
-        const value = mode === "rough"
-          ? 168 + Math.min(60, slope * 1.4) + grain * 18
-          : 118 + grain * 90 + Math.min(40, slope);
+        const rough = 168 + Math.min(60, slope * 1.4) + grain * 18;
+        const bump = 118 + grain * 90 + Math.min(40, slope);
         const o = (py * size + px) * 4;
-        data[o] = value;
-        data[o + 1] = value;
-        data[o + 2] = value;
+        data[o] = bump;
+        data[o + 1] = rough;
+        data[o + 2] = 0;
         data[o + 3] = 255;
       }
     }
@@ -326,12 +325,12 @@ export function installAtmosphere(shell) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   const wide = (shell.stage.clientWidth || window.innerWidth || 1280) >= 800;
   const sun = shell.sun;
   sun.castShadow = true;
   const small = (shell.stage.clientWidth || window.innerWidth || 1280) < 420;
-  sun.shadow.mapSize.set(small ? 512 : wide ? 2048 : 1024, small ? 512 : wide ? 2048 : 1024);
+  sun.shadow.mapSize.set(small ? 512 : wide ? 1024 : 768, small ? 512 : wide ? 1024 : 768);
   sun.shadow.bias = -0.00018;
   sun.shadow.normalBias = 0.035;
   sun.shadow.camera.near = 20;
@@ -666,16 +665,13 @@ export function buildRealisticTerrain(shell) {
   geo.computeVertexNormals();
   const bounds = { x0: grid.x0, x1: grid.x1, z0: grid.z0, z1: grid.z1 };
   const woodRings = ((shell.layers && shell.layers.woods) || []).map((wood) => wood.points);
-  const hill = paintHillAlbedo(sample, bounds, woodRings);
-  const lightMap = trackOwned(shell, canvasTexture(hill, THREE.SRGBColorSpace, 1, 1));
-  const darkMap = trackOwned(shell, canvasTexture(hill, THREE.SRGBColorSpace, 1, 1));
-  const roughMap = trackOwned(shell, canvasTexture(paintHillAux(sample, bounds, "rough"), THREE.NoColorSpace, 1, 1));
-  const bumpMap = trackOwned(shell, canvasTexture(paintHillAux(sample, bounds, "bump"), THREE.NoColorSpace, 1, 1));
-  shell.terrainMaps = { light: lightMap, dark: darkMap };
+  const hill = trackOwned(shell, canvasTexture(paintHillAlbedo(sample, bounds, woodRings), THREE.SRGBColorSpace, 1, 1));
+  const aux = trackOwned(shell, canvasTexture(paintHillAux(sample, bounds), THREE.NoColorSpace, 1, 1));
+  shell.terrainMaps = { light: hill, dark: hill };
   const mat = new THREE.MeshStandardMaterial({
-    map: shell.theme === "dark" ? darkMap : lightMap,
-    roughnessMap: roughMap,
-    bumpMap,
+    map: hill,
+    roughnessMap: aux,
+    bumpMap: aux,
     bumpScale: 1.4,
     roughness: 0.94,
     metalness: 0,
