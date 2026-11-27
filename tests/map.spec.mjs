@@ -437,6 +437,35 @@ test("iPad detail card keeps clearance from the attribution bar", async ({ page 
   expect(gap).toBeGreaterThanOrEqual(10);
 });
 
+test("tablet building click shows info without walk and narrows the directory", async ({ page }) => {
+  test.setTimeout(90000);
+  await silenceAi(page);
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  await openMap(page);
+  await page.waitForFunction(() => window.CampusMap && window.CampusMap.projectBuilding(1062064821));
+  const directoryWidth = await page.locator(".map-directory").evaluate((el) => el.getBoundingClientRect().width);
+  expect(directoryWidth).toBeGreaterThanOrEqual(200);
+  expect(directoryWidth).toBeLessThanOrEqual(220);
+  expect(await page.locator(".map-modal").evaluate((el) => el.classList.contains("dir-collapsed"))).toBe(false);
+  const point = await page.evaluate(() => window.CampusMap.projectBuilding(1062064821));
+  expect(point.behind).toBe(false);
+  await page.mouse.click(point.x, point.y);
+  await expect(page.locator(".map-info")).toContainText("本馆");
+  await expect(page.locator(".map-modal")).toHaveClass(/dir-collapsed/);
+  await expect(page.locator(".map-modal")).not.toHaveClass(/walk-active/);
+  await expect(page.locator(".map-stick")).toBeHidden();
+  const snap = await page.evaluate(() => window.CampusMap.debugSnapshot());
+  expect(snap.viewMode).toBe("orbit");
+  expect(snap.focusId).toBe(null);
+  const card = await page.locator(".map-info").boundingBox();
+  expect(card.width).toBeLessThanOrEqual(321);
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await expect(page.locator(".map-modal")).not.toHaveClass(/dir-collapsed/);
+  await page.locator(".map-toolbar [data-map-action='directory']").click();
+  await expect(page.locator(".map-modal")).toHaveClass(/dir-collapsed/);
+});
+
 test("escape closes the license, then the detail, then the map", async ({ page }) => {
   test.setTimeout(90000);
   await silenceAi(page);
